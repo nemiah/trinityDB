@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Data><Series>
+  <id>163531</id>
+  <Actors>|Jason Ritter|Blair Underwood|Laura Innes|Bill Smitrovich|Wes Ramsey|Lisa Vidal|Taylor Cole|Zeljko Ivanek|Scott Patterson|Ian Anthony Dale|Sarah Roemer|</Actors>
+  <Airs_DayOfWeek>Monday</Airs_DayOfWeek>
+  <Airs_Time>9:00 PM</Airs_Time>
+  <ContentRating>TV-PG</ContentRating>
+  <FirstAired>2010-09-20</FirstAired>
+  <Genre>|Action and Adventure|Drama|Science-Fiction|</Genre>
+  <IMDB_ID>tt1582459</IMDB_ID>
+  <Language>en</Language>
+  <Network>NBC</Network>
+  <NetworkID></NetworkID>
+  <Overview>The Event is an emotional, high-octane conspiracy thriller that follows Sean Walker, an everyman who investigates the mysterious disappearance of his would-be fiancée Leila, and unwittingly begins to expose the biggest cover-up in U.S. history.</Overview>
+  <Rating>8.3</Rating>
+  <RatingCount>37</RatingCount>
+  <Runtime>60</Runtime>
+  <SeriesID>78485</SeriesID>
+  <SeriesName>The Event</SeriesName>
+  <Status>Continuing</Status>
+  <added>2010-05-16 13:39:04</added>
+  <addedBy>6560</addedBy>
+  <banner>graphical/163531-g3.jpg</banner>
+  <fanart>fanart/original/163531-3.jpg</fanart>
+  <lastupdated>1299929059</lastupdated>
+  <poster>posters/163531-3.jpg</poster>
+  <zap2it_id>SH01266581</zap2it_id>
+</Series>
+<Episode>
+  <id>3039161</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>0</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Recap Show</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2011-02-28</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Two hour long broadcast: One hour recap and one hour new episode.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>6.0</Rating>
+  <RatingCount>1</RatingCount>
+  <SeasonNumber>0</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <airsafter_season></airsafter_season>
+  <airsbefore_episode></airsbefore_episode>
+  <airsbefore_season></airsbefore_season>
+  <filename></filename>
+  <lastupdated>1290890844</lastupdated>
+  <seasonid>247861</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2526111</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>I Haven't Told You Everything</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2010-09-20</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1609414</IMDB_ID>
+  <Language>en</Language>
+  <Overview>After his girlfriend mysteriously disappears from a cruise, Sean Walker discovers a conspiracy of global proportions.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.6</Rating>
+  <RatingCount>127</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Nick Wauters</Writer>
+  <absolute_number>1</absolute_number>
+  <filename>episodes/163531/2526111.jpg</filename>
+  <lastupdated>1299321818</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2737011</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>To Keep Us Safe</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2010-09-27</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1653550</IMDB_ID>
+  <Language>en</Language>
+  <Overview>The president's staff grapples with a new reality; the conspiracy engulfs an FBI agent and a mercenary with questionable ties; a shadowy figure emerges with knowledge of the detainees.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>121</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Evan Katz|Nick Wauters</Writer>
+  <absolute_number>2</absolute_number>
+  <filename>episodes/163531/2737011.jpg</filename>
+  <lastupdated>1295561586</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2757241</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Protect Them from the Truth</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2010-10-04</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1653551</IMDB_ID>
+  <Language>en</Language>
+  <Overview>The administration unveils a tough new strategy to force Sophia to reveal the detainees' plan; Vicky and Carter possess a crucial hostage.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.8</Rating>
+  <RatingCount>120</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>David H. Goodman|James Wong</Writer>
+  <absolute_number>3</absolute_number>
+  <filename>episodes/163531/2757241.jpg</filename>
+  <lastupdated>1295561598</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2764251</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>John Badham</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>A Matter of Life and Death</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired>2010-10-11</FirstAired>
+  <GuestStars>D.B. Sweeney|Heather McComb|Hal Holbrook</GuestStars>
+  <IMDB_ID>tt1653552</IMDB_ID>
+  <Language>en</Language>
+  <Overview>The White House grapples with a mysterious biological threat. Their only hope is to crack Sophia during interrogation. Meanwhile, Vicky and Carter keep their hostage captive while they await further instructions. FBI Agent Collier, on her search for Leila, stumbles upon Vicky's secret life. Elsewhere, a powerful businessman, Dempsey with classified intelligence and ties to the White House, emerges from the shadows.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.6</Rating>
+  <RatingCount>105</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>David Schulner|Lisa Zwerling</Writer>
+  <absolute_number>4</absolute_number>
+  <filename>episodes/163531/2764251.jpg</filename>
+  <lastupdated>1295561611</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2764261</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Milan Cheylov</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Casualties of War</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired>2010-10-18</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1653553</IMDB_ID>
+  <Language>en</Language>
+  <Overview>The CDC tries to identify the contagion and treat those infected as the biological threat intensifies; Simon asks Sophia to betray Thomas.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>109</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|Dan Dworkin|Jay Beattie|</Writer>
+  <absolute_number>5</absolute_number>
+  <filename>episodes/163531/2764261.jpg</filename>
+  <lastupdated>1295561623</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2945021</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jonas Pate</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Loyalty</EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired>2010-10-25</FirstAired>
+  <GuestStars>Paula Malcomson</GuestStars>
+  <IMDB_ID>tt1653554</IMDB_ID>
+  <Language>en</Language>
+  <Overview>Sean encounters a mysterious conspiracy theorist while looking for answers in Leila's home; Simon's allegiances are tested.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.7</Rating>
+  <RatingCount>105</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|Leyani Diaz|Vanessa Rojas|</Writer>
+  <absolute_number>6</absolute_number>
+  <filename>episodes/163531/2945021.jpg</filename>
+  <lastupdated>1295561635</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2997671</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Milan Cheylov</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>I Know Who You Are</EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired>2010-11-08</FirstAired>
+  <GuestStars>Paula Malcomson</GuestStars>
+  <IMDB_ID>tt1653555</IMDB_ID>
+  <Language>en</Language>
+  <Overview>President Martinez orders Director of National Intelligence, Blake Sterling, to root out the mole from their staff, which causes Sterling to question his judgment of people close to him. Sophia reasserts her power over Thomas and the other detainees, and she prepares them for the next leg of their mission. Elsewhere, with the aid of Madeline, Sean continues his hunt for answers, all the while trying to stay one step ahead of the covert agents who trail him.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>97</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|Evan Katz|Lisa Zwerling|</Writer>
+  <absolute_number>7</absolute_number>
+  <filename>episodes/163531/2997671.jpg</filename>
+  <lastupdated>1295561648</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2997681</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>For the Good of Our Country</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired>2010-11-15</FirstAired>
+  <GuestStars>Hal Holbrook</GuestStars>
+  <IMDB_ID>tt1653556</IMDB_ID>
+  <Language>en</Language>
+  <Overview>President Martinez, furious about recent security failures, demands answers from Director of National Intelligence, Blake Sterling. When he doesn't receive the progress that he desires, Martinez decides to personally interrogate Michael Buchanan about his involvement in the assassination attempt. While Michael holds to his claim that he doesn't know who is involved, he inadvertently reveals incriminating evidence about someone deep inside the President's staff. Meanwhile, Dempsey dispatches Vicky on a new clandestine mission. And, elsewhere, Sean and Leila  scramble to stay ahead of the covert ops that are trying to silence them and what they know.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>96</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|David H. Goodman|James Wong|</Writer>
+  <absolute_number>8</absolute_number>
+  <filename>episodes/163531/2997681.jpg</filename>
+  <lastupdated>1295561661</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>2997691</id>
+  <Combined_episodenumber>9</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Michelle MacLaren</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Your World to Take</EpisodeName>
+  <EpisodeNumber>9</EpisodeNumber>
+  <FirstAired>2010-11-22</FirstAired>
+  <GuestStars>Hal Holbrook</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>President Martinez reacts to the knowledge of who betrayed him within his administration. Meanwhile, after revealing her plan for the Sleepers' future, Sophia learns of dissension among her people. She sets a trap for the perpetrators and acts decisively to quell any future mutiny. Elsewhere, Sean and Leila try to unravel the mystery of Samantha's kidnapping, while evading Dempsey's nefarious clutches. </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>93</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|Dan Dworkin|Jay Beattie|</Writer>
+  <absolute_number>9</absolute_number>
+  <filename>episodes/163531/2997691.jpg</filename>
+  <lastupdated>1295561674</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>3039151</id>
+  <Combined_episodenumber>10</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Norberto Barba</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Everything Will Change</EpisodeName>
+  <EpisodeNumber>10</EpisodeNumber>
+  <FirstAired>2010-11-29</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Sophia's suspicions are confirmed when Thomas reveals a shocking new plan. Leila and Sean battle mercenaries while searching for Samantha.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.7</Rating>
+  <RatingCount>83</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|David Schulner|Nick Wauters|</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/163531/3039151.jpg</filename>
+  <lastupdated>1295561685</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>3150021</id>
+  <Combined_episodenumber>11</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>And Then There Were More</EpisodeName>
+  <EpisodeNumber>11</EpisodeNumber>
+  <FirstAired>2011-03-07</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Martinez and his Chief of Staff order their intelligence departments to determine the nature of Thomas' message and who it was sent to. Meanwhile, Thomas launches a surprise attack, Alaskan Senator Catherine Lewis threatens to go on national television to alert the public to the enemy among them, and Sean and Leila get a fresh lead on Samantha's location.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>23</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/163531/3150021.jpg</filename>
+  <lastupdated>1299554095</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>3302511</id>
+  <Combined_episodenumber>12</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jeffrey Reiner</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Inostranka</EpisodeName>
+  <EpisodeNumber>12</EpisodeNumber>
+  <FirstAired>2011-03-07</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Meanwhile, newly appointed Alaskan Senator Catherine Lewis threatens to divulge information about the Mt. Inostranka detention facility on an episode of &quot;HARDBALL with Chris Matthews.&quot; Elsewhere, Sean and Leila get a fresh lead on the whereabouts of Samantha, but it leads them to a dramatic turn in their lives. James Dempsey foresees that he and Sean will once again cross paths.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>20</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number>12</absolute_number>
+  <filename>episodes/163531/3302511.jpg</filename>
+  <lastupdated>1299554110</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>3784711</id>
+  <Combined_episodenumber>13</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Turnabout</EpisodeName>
+  <EpisodeNumber>13</EpisodeNumber>
+  <FirstAired>2011-03-14</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number>13</absolute_number>
+  <filename></filename>
+  <lastupdated>1298743730</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+<Episode>
+  <id>3832411</id>
+  <Combined_episodenumber>14</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>A Message Back </EpisodeName>
+  <EpisodeNumber>14</EpisodeNumber>
+  <FirstAired>2011-03-21</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1299400105</lastupdated>
+  <seasonid>285101</seasonid>
+  <seriesid>163531</seriesid>
+</Episode>
+</Data>

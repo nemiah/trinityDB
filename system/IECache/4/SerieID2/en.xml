@@ -1,0 +1,1229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Data><Series>
+  <id>79511</id>
+  <Actors>|John Barrowman|Eve Myles|Gareth David-Lloyd|Naoko Mori|Burn Gorman|</Actors>
+  <Airs_DayOfWeek>Sunday</Airs_DayOfWeek>
+  <Airs_Time>9:00 PM</Airs_Time>
+  <ContentRating>TV-MA</ContentRating>
+  <FirstAired>2006-10-22</FirstAired>
+  <Genre>|Action and Adventure|Drama|Science-Fiction|</Genre>
+  <IMDB_ID>tt0485301</IMDB_ID>
+  <Language>en</Language>
+  <Network>BBC Two</Network>
+  <NetworkID></NetworkID>
+  <Overview>Captain Jack Harkness is a man from the 51st century trapped in the past, finding himself drawn into alien conspiracies as he works for Torchwood. Torchwood is a top secret British government agency whose job it is to investigate alien goings on in the world, and to act as mankind's best interest and last hope for defence, if needed.</Overview>
+  <Rating>8.3</Rating>
+  <RatingCount>81</RatingCount>
+  <Runtime>60</Runtime>
+  <SeriesID>50470</SeriesID>
+  <SeriesName>Torchwood</SeriesName>
+  <Status>Continuing</Status>
+  <added></added>
+  <addedBy></addedBy>
+  <banner>graphical/79511-g13.jpg</banner>
+  <fanart>fanart/original/79511-28.jpg</fanart>
+  <lastupdated>1299479064</lastupdated>
+  <poster>posters/79511-6.jpg</poster>
+  <zap2it_id>SH947230</zap2it_id>
+</Series>
+<Episode>
+  <id>629691</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>0</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Kate McAll</Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Lost Souls</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2008-09-10</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Torchwood BBC Radio Audio Play:
+Torchwood Three are chasing a Weevil through Cardiff Bay. Dr. Martha Jones phones Captain Jack Harkness, requesting help. Jack immediately agrees to meet Martha when she says people are disappearing from the CERN facility in Switzerland; where she's working. Martha suggests they go undercover; and Torchwood set off for Geneva.
+
+Gwen Cooper says there aren't any records of the disappearances; but instead on the Large Hadron Collider, or LHC. Jack explains to her and Ianto Jones that CERN seeks the 'Higgs Particle', the fundamental particle of existence. CERN had found a way of examining the building blocks of matter itself; and built the world's largest particle collider which runs from Switzerland to France, in a 27km round tunnel. Jack excitedly states that the plan is to collide protons moving at the speed of light together, to produce what would effectively be like the &quot;Big Bang&quot;. Jack guesses the people may have discovered something unusual and were forcibly removed. He explains that the particle collision is thought to expose parallel dimensions, create black holes or turn the world inside out. After noticing Gwen and Ianto's expressions, Jack assures them that it would all be fine since it's theoretical.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>0</SeasonNumber>
+  <Writer>Joseph Lidster</Writer>
+  <absolute_number></absolute_number>
+  <airsafter_season>2</airsafter_season>
+  <airsbefore_episode>1</airsbefore_episode>
+  <airsbefore_season>3</airsbefore_season>
+  <filename></filename>
+  <lastupdated>1247183011</lastupdated>
+  <seasonid>26938</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311188</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Brian Kelly</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Everything Changes</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2006-10-22</FirstAired>
+  <GuestStars>|Paul Kasey| Mark Heal| Gary Shepheard| Gwilym Havard Davies| Cathryn Davies| Jams Thomas| Dion Davis| Gwyn Vaughan-Jones| Jason May| Tom Price| Guy Lewis| Rhys Swinburn| Olwen Medi|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>WPC Gwen Cooper is at the scene of a brutal murder, when the &quot;special ops,&quot; known only as Torchwood, arrive. After witnessing the group bring the dead man back to life, Gwen goes in pursuit of this mysterious organisation, only to see weirder things than she could ever imagine existed. Soon after, she begins to regret giving in to her curiosity, when she meets Captain Jack Harkness.
+</Overview>
+  <ProductionCode>1-1</ProductionCode>
+  <Rating>6.9</Rating>
+  <RatingCount>32</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Russell T. Davies</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311188.jpg</filename>
+  <lastupdated>1298007813</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311189</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Brian Kelly</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Day One</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2006-10-22</FirstAired>
+  <GuestStars>|Sara Gregory| Felicity Rhys| Alex Parry| Adrian  Christopher| Ross O'Hennessy| Ceri Mears| Justin McDonald| Brendan Charleson| Rob Storr| Donald Longdon| Naomi Martell| Tom Price| Mark Heal| Paul Kasey|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>It's Gwen's first day on the job, and it's not going very well. After accidentally releasing a mysterious gas from a comet that landed, a new type of alien is let loose on the streets - an alien that's addicted to sex. Torchwood must find the inhabited body, and prevent anymore deaths from the violent form of sex.
+</Overview>
+  <ProductionCode>1-2</ProductionCode>
+  <Rating>6.7</Rating>
+  <RatingCount>19</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311189.jpg</filename>
+  <lastupdated>1289927091</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311190</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Colin Teague</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Ghost Machine</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2006-10-29</FirstAired>
+  <GuestStars>|Daniel Llinos| John Normington| Emily Evans| Christopher Elson| Christopher Greene| Julie Gibbs| Ian Kay| Ryan Conway| Kathryn Howard| Ben McKay| Gareth Thomas|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Whilst chasing a man, Gwen retrieves an unusual machine that allows the user to see back into the past. It is considered dangerous, and no members of Torchwood are permitted to use it. But Owen has other plans, and witnesses a violent murder that took place over forty years ago. Using the information he gathered, Owen starts to track down the still-living murderer.
+</Overview>
+  <ProductionCode>1-3</ProductionCode>
+  <Rating>6.9</Rating>
+  <RatingCount>16</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Helen Raynor</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311190.jpg</filename>
+  <lastupdated>1298007864</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311191</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>James Strong</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Cyberwoman</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired>2006-11-05</FirstAired>
+  <GuestStars>|Bethan Walker| Togo Igawa| Caroline Chikezie|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A Ianto themed episode
+Ianto Jones hides a very big secret at Torchwood - his half-converted girlfriend from the Canary Wharf Battle - down in the basement. He is quick to hire a Japanese doctor who believes he can &quot;cure&quot; her. But things soon go wrong, and the Cyberwoman's destructive powers are released to the whole of Torchwood. Upgrading is compulsary.
+</Overview>
+  <ProductionCode>1-4</ProductionCode>
+  <Rating>6.5</Rating>
+  <RatingCount>15</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311191.jpg</filename>
+  <lastupdated>1298007894</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311192</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Alice Troughton</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Small Worlds</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired>2006-11-12</FirstAired>
+  <GuestStars>|Ffion Wilkins| Nathan Sussex| Heledd Baskerville| Victoria Gourley| Roger Barcley| Sophie Davies| William Travis| Adrienne O'Sullivan| Eve Pearce| Lara Phillipart|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Jack catches up with a very old friend of his, who is investigating fairy sightings in the local wood. After having visited her, Torchwood are informed of a man's mysterious death in a prison cell. Then, Tosh uncovers a series of localised, extreme weather patterns. Nobody at the organisation is sure of these events, or how they may be connected. Except Jack, who has witnessed the creatures causing this, almost a century ago.
+</Overview>
+  <ProductionCode>1-5</ProductionCode>
+  <Rating>7.2</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>P. J. Hammond</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311192.jpg</filename>
+  <lastupdated>1290276363</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311193</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Countrycide</EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired>2006-11-19</FirstAired>
+  <GuestStars>|Kai Owen|Owen Teale|Maxine Evans|Calum Callaghan|Rhys op Trefor|Emily Bower|Robert Barton|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Whilst investigating a group of unexplainable deaths in a village, the Torchwood team are separated. Discovering further, Jack, Gwen and Owen find a scared man, hiding from the thing responsible for the murders. But Tosh and Ianto go that one step extra, and locate the killer, who wants them as their next victims.
+</Overview>
+  <ProductionCode>1-6</ProductionCode>
+  <Rating>6.6</Rating>
+  <RatingCount>11</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311193.jpg</filename>
+  <lastupdated>1298009495</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>311194</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Colin Teague</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Greeks Bearing Gifts</EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired>2006-11-26</FirstAired>
+  <GuestStars>|Shaheen Jafargholi| Paul Kasey| Eiry Thomas| Ravin J. Ganatra| Tom Robertson| Daniela Denby-Ashe|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A Toshiko themed episode
+Tosh meets an unusual woman, Mary, at a bar, who gives her a strange pendant. She is upset, yet amazed by what she now has - the ability to read people's minds. However, Tosh finds this terrible curse, that contains her friends darkest secrets, must be broken. So she asks for help from Mary, the only person who knows, but first, Tosh has to get her into Torchwood.
+</Overview>
+  <ProductionCode>1-7</ProductionCode>
+  <Rating>7.0</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Toby Whithouse</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/311194.jpg</filename>
+  <lastupdated>1298007930</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313295</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>James Strong</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>They Keep Killing Suzie</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired>2006-12-03</FirstAired>
+  <GuestStars>|The Shend|Gary Pillai|Indira Varma|Badi Uzzaman|Daniel Llewelyn-Williams|Yasmin Bannerman|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A Suzie themed episode
+Using the Resurrection Gauntlet that former Torchwood member Suzie Costello originally had, the team are able to bring a number of murder victims back to life. However, these all have a link with the now-deceased Suzie, and the group have no choice but to bring her back. After the process goes wrong, and permanently keeps her alive, Suzie manipulates the naïve Gwen into taking her to see her father.
+</Overview>
+  <ProductionCode>1-8</ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>15</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|Paul Tomalin|Dan McCulloch|</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313295.jpg</filename>
+  <lastupdated>1298008049</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313296</id>
+  <Combined_episodenumber>9</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>James Eskrine</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Random Shoes</EpisodeName>
+  <EpisodeNumber>9</EpisodeNumber>
+  <FirstAired>2006-12-10</FirstAired>
+  <GuestStars>|Steve Meo|Luke Bromley|Roger Ashton-Griffiths|Nicola Duffett| Ryan Chappell| Leroy Libyrd| Paul Chequer| Amy Starling| Joshua Hughes|Gareth Potter|Robyn Isaac|Celyn Jones|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Eugene Jones wakes up, finding himself lying on the middle of a road. He then discovers that he has been the victim of a hit-and-run incident, and is, now, not only dead, but invisible. Eugene recalls events leading up to his death, involving a mysterious alien eye. Simultaneously, Gwen investigates the suspicious circumstances around his fatality.
+</Overview>
+  <ProductionCode>1-9</ProductionCode>
+  <Rating>6.8</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jaquetta May</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313296.jpg</filename>
+  <lastupdated>1298008089</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313297</id>
+  <Combined_episodenumber>10</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Alice Troughton</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Out Of Time</EpisodeName>
+  <EpisodeNumber>10</EpisodeNumber>
+  <FirstAired>2006-12-17</FirstAired>
+  <GuestStars>|Kai Owen|Rhea Bailey|Louise Delamere|Mark Lewis Jones|Olivia Hallinan|Sam Beazley|Janine Carrington|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Three passengers from 1953 arrive in modern day Cardiff, when their plane flies through the Rift. With no means of travelling back, each person must adapt to their new life, starting personal relationships with the separate members of Torchwood.
+</Overview>
+  <ProductionCode>1-10</ProductionCode>
+  <Rating>7.6</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Cath Tregenna</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313297.jpg</filename>
+  <lastupdated>1298008143</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313298</id>
+  <Combined_episodenumber>11</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Combat</EpisodeName>
+  <EpisodeNumber>11</EpisodeNumber>
+  <FirstAired>2006-12-24</FirstAired>
+  <GuestStars>|Kai Owen|Alex Hassell|Paul Kasey|Alexandra Dunn|Matthew Raymond|David Gyasi|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>An Owen themed episode
+Weevils are appearing all over the streets of Cardiff, and then disappearing again - but not by alien forces. People are abducting them, and using the Weevils for their own purposes, so Owen investigates.
+</Overview>
+  <ProductionCode>1-11</ProductionCode>
+  <Rating>6.5</Rating>
+  <RatingCount>13</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Noel Clarke</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313298.jpg</filename>
+  <lastupdated>1298009799</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313299</id>
+  <Combined_episodenumber>12</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley Way</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Captain Jack Harkness</EpisodeName>
+  <EpisodeNumber>12</EpisodeNumber>
+  <FirstAired>2007-01-01</FirstAired>
+  <GuestStars>|Murray Melvin|Matt Rippy|Gavin Brocker|Eleyn Rhys|Nadine Beaton|Peter Sandys-Clarke|Ciaran Joyce|Melissa Moore|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A Jack themed episode
+Whilst investigating an old, derelict dance hall, Jack and Tosh are transported back to the 1940s, during the Blitz. Owen, Ianto, and Gwen realise, in modern day, that this has happened, and go in search of clues Tosh may have left. Meanwhile, back in the forties, Jack meets a very interesting man. One with the name Captain Jack Harkness...
+</Overview>
+  <ProductionCode>1-12</ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>17</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Cath Tregenna</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313299.jpg</filename>
+  <lastupdated>1298009980</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>313300</id>
+  <Combined_episodenumber>13</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley Way</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>End of Days</EpisodeName>
+  <EpisodeNumber>13</EpisodeNumber>
+  <FirstAired>2007-01-01</FirstAired>
+  <GuestStars>|Tom Price|Matthew Gravelle|Jamie Belton|Murray Melvin|Noriko Aida|Kai Owen|Caroline Chikezie|Louise Delamere|Rhian Wyn Jones|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>With the Rift having been opened, people and objects throughout time are falling through it, and being spread across the world. &quot;The thing in the darkness&quot; has finally come, and Jack realises that he is the only one who can save planet Earth from the destruction that &quot;the son of the Beast&quot; will cause.
+</Overview>
+  <ProductionCode>1-13</ProductionCode>
+  <Rating>8.2</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/313300.jpg</filename>
+  <lastupdated>1298008286</lastupdated>
+  <seasonid>16552</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348535</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley Way</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Kiss Kiss, Bang Bang</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2008-01-16</FirstAired>
+  <GuestStars>|James Marsters|Kai Owen|Tom Price|Menna Trussler|Paul Kasey|Jonathan Hart</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Captain Jack returns, as the Torchwood team reunite to fight a rogue Time Agent. The mysterious Captain John Hart is determined to wreak havoc, and needs to find something hidden on Earth. But with Gwen's life in danger, and cluster bombs scattered across the city, whose side is Jack on? </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>6.6</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348535.jpg</filename>
+  <lastupdated>1298008679</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348536</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Colin Teague</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Sleeper</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2008-01-23</FirstAired>
+  <GuestStars>|Paul Kasey|Nikki Amuka-Bird|Dyfed Potter|Doug Rollins|Claire Cage|Sean Carlson|Victoria Pugh|Luke Rutherford|Alex Harries|Dominic Coleman|William Hughes|Millie Philippart|Matthew Arwel|Derek Lea|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>When a burglary turns into a slaughter, Torchwood suspect alien involvement. Who is Beth, and can she be as innocent as she seems? But when the investigation escalates into a city-wide assault, Jack realises that the whole planet is in danger. </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>15</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>James Moran</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348536.jpg</filename>
+  <lastupdated>1298013428</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348537</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>To The Last Man</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2008-01-30</FirstAired>
+  <GuestStars>|Anthony Lewis|Roderic Culver|Siobhan Hewlett|Lizzie Rogan|Ricky Fearon|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Toshiko falls for a handsome soldier, trapped out of his time, who unwittingly holds the key to saving the world. With an old hospital haunted by ghosts from 1918, a crisis foreseen by Torchwood 90 years ago is about to reach its climax. Time zones are colliding and with life and death decisions to be made, will Torchwood be able to stop an explosive end for Cardiff? </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Helen Raynor</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348537.jpg</filename>
+  <lastupdated>1298010379</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348538</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Colin Teague</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Meat</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired>2008-02-06</FirstAired>
+  <GuestStars>|Kai Owen|Colin Baxter|Patti Clare|Garry Lake|Gerard Carey|Matt Ryan|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>When Rhys discovers the truth about Torchwood, he helps the gang to find the source of an unusual alien meat supply.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>11</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Catherine Tregenna</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348538.jpg</filename>
+  <lastupdated>1298010510</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348539</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Adam</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired>2008-02-13</FirstAired>
+  <GuestStars>|Bryan Dick|Kai Owen|Paul Kasey|Demetri Goritsas|Lauren Ward|Jack Montgomery|Ethan Brooke|Rhys Myers|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A memory thief gets in to the minds of the Torchwood team, and uncovers long forgotten secrets.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Catherine Tregenna</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348539.jpg</filename>
+  <lastupdated>1298012480</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>348540</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley May</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Reset</EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired>2008-02-13</FirstAired>
+  <GuestStars>|Freema Agyeman|Alan Dale|Jacqueline Boatswain|Jan Anderson|Rhodri Miles|Michael Sewel|John Samuel Worsey|Paul Kasey|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Jack calls in an old friend for a favour, none other than Martha Jones, as they attempt to stop a pharmaceutical facility that uses aliens in the hope of discovering a cure for all diseases.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>J.C. Wilsher</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/348540.jpg</filename>
+  <lastupdated>1298012984</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>351905</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Dead Man Walking</EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired>2008-02-20</FirstAired>
+  <GuestStars>|Freema Agyeman|Kai Owen|Skye Bennett|Paul Kasey|Joanna Griffiths|Ben Walker|Lauren Phillips|Golda Rosheuvel|Janie Booth|Rhys Ap William|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Captain Jack resurrects Owen with a resurrection glove, only to find out that the new glove isn't quite what they'd bargained for. Owen, in an undead state, helps the team figure out why he's still around.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.2</Rating>
+  <RatingCount>13</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Matt Jones</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/351905.jpg</filename>
+  <lastupdated>1298013285</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>351906</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Andy Goddard</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>A Day In The Death</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired>2008-02-27</FirstAired>
+  <GuestStars>|Freema Agyeman|Richard Briers|Christine Bottomley|Louis Decosta Johnson|Brett Allen|Gil Kolirin|Paul Kasey|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A victim of his newfound circumstances, Owen Harper believes he needs absolution. Will the lonely girl on the rooftop help him, or will it be a mission to the retrieve an alien device that is proving more lethal by the second? And how far will Toshiko go to help him?</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>6.9</Rating>
+  <RatingCount>14</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Joseph Lidster</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/351906.jpg</filename>
+  <lastupdated>1298013689</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>353732</id>
+  <Combined_episodenumber>9</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley Way</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Something Borrowed</EpisodeName>
+  <EpisodeNumber>9</EpisodeNumber>
+  <FirstAired>2008-03-05</FirstAired>
+  <GuestStars>|Nerys Hughes|Kai Owen|Sharon Morgan|William Thomas|Robin Griffith|Collette Brown|Danielle Henry|Ceri Ann Gregory|Jonathan Lewis Owen|Morgan Hopkins|Valerie Murray|Pethrow Gooden|Mike Henley|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Gwen awakes on her wedding day to find she has been impregnated by a shape-shifting alien male. With it's life-partner eager to retrieve it's mate at the cost of Gwen's life, the team race to intercept her as Gwen decides to go through with her marriage at a secluded location with all of her family present </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Phil Ford</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/353732.jpg</filename>
+  <lastupdated>1298013855</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>353733</id>
+  <Combined_episodenumber>10</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jonathan Fox Bassett</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>From Out Of The Rain</EpisodeName>
+  <EpisodeNumber>10</EpisodeNumber>
+  <FirstAired>2008-03-12</FirstAired>
+  <GuestStars>|Julian Bleach|Caroline Sheen|Camilla Power|Stephen Marzella|Hazel Wyn Williams|Lowri Sian Jones|Anwen Carlisle|Yasmin Wilde|Craig Gallivan|Eileen Essell|Alastair Sill|Catherine Olding|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>An old cinema reopens and mysterious horrors of the past return to Cardiff.  Why are people trapped between life and death, questions are asked about the Night Travellers, and what Torchwood can do to stop them.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>P. J. Hammond</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/353733.jpg</filename>
+  <lastupdated>1298014094</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>353734</id>
+  <Combined_episodenumber>11</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Mark Everest</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Adrift</EpisodeName>
+  <EpisodeNumber>11</EpisodeNumber>
+  <FirstAired>2008-03-19</FirstAired>
+  <GuestStars>|Ruth Jones|Kai Owen|Tom Price|Robert Pugh|Lorna Gayle|Oliver Ferriman|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Gwen finds the darker side of Torchwood when a teenager disappears, investigating why hundreds of people have vanished without a trace. Jack is obstructing attempts to find them, and the answer appears to lie in the Rift.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>11</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/353734.jpg</filename>
+  <lastupdated>1298014342</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>353735</id>
+  <Combined_episodenumber>12</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Jonathan Fox Bassett</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Fragments</EpisodeName>
+  <EpisodeNumber>12</EpisodeNumber>
+  <FirstAired>2008-03-21</FirstAired>
+  <GuestStars>|Amy Manson|Kai Owen|Heather Craney|Skye Bennett|Julian Lewis Jones|Simon Shackleton|Gareth Jones|Clare Clifford|Noriko Aida|Andrea Lowe|Richard Lloyd-King|Catherine Morris|Selva Rasalingam|Paul Kasey|Selva Rasalingham|James Marsters|Lachlan Nieboer|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>As the team are knocked unconscious we find out how Jack, Toshiko, Ianto and Owen were initiated into Torchwood.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>8.0</Rating>
+  <RatingCount>10</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/353735.jpg</filename>
+  <lastupdated>1298015703</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>353736</id>
+  <Combined_episodenumber>13</Combined_episodenumber>
+  <Combined_season>2</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ashley Way</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Exit Wounds</EpisodeName>
+  <EpisodeNumber>13</EpisodeNumber>
+  <FirstAired>2008-04-04</FirstAired>
+  <GuestStars>|Kai Owen|James Marsters|Lachlan Nieboer|Golda Rosheuvel|Paul Marc Davis|Cornelius Macarthy|Paul Marc Davies|Syreeta Kumar|Amy Manson|Tom Price|Paul Kasey|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Captain John Hart returns to wreak havoc upon Jack's world, who ends up getting captured. It is up to the Torchwood team to rescue him and save the city.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>8.1</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>2</SeasonNumber>
+  <Writer>Chris Chibnall</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/353736.jpg</filename>
+  <lastupdated>1298016177</lastupdated>
+  <seasonid>30174</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>426507</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>3</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Euros Lyn</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Children of Earth, Day One</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2009-07-06</FirstAired>
+  <GuestStars>|Kai Owen|Peter Capaldi|Paul Copley|Nicholas Farrell|Susan Brown|Lucy Cohu|Cush Jumbo|Liz May Brice|Ian Gelder|Colin McFarlane|Deborah Findlay|Nicholas Briggs|Patric Naiambana|Tom Price|Charles Abomeli|Rik Makarem|Katy Wix|Rhodri Lewis|Hilary MacLean|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>At 8.45am, every child in the world suddenly stops, chanting the words &quot;we are coming&quot; again and again. Whilst investigating, the remaining Torchwood team face greater personal and professional challenges than ever before, having to work with their numbers depleted.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>8.3</Rating>
+  <RatingCount>19</RatingCount>
+  <SeasonNumber>3</SeasonNumber>
+  <Writer>Russell T Davies</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/426507.jpg</filename>
+  <lastupdated>1298017477</lastupdated>
+  <seasonid>39610</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>426508</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>3</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Euros Lyn</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Children of Earth, Day Two</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2009-07-07</FirstAired>
+  <GuestStars>|Kai Owen|Peter Capaldi|Paul Copley|Nicholas Farrell|Susan Brown|Lucy Cohu|Cush Jumbo|Liz May Brice|Ian Gelder|Colin McFarlane|Deborah Findlay|Nicholas Briggs|Patric Naiambana|Tom Price|Charles Abomeli|Rik Makarem|Katy Wix|Rhodri Lewis|Hilary MacLean|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Torchwood are forced underground, as the government takes swift and brutal action.  With members of the team being hunted down, only Lois holds the key to Torchwood's salvation - but she is helpless as her superiors make plans for the mysterious Floor 13.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.7</Rating>
+  <RatingCount>13</RatingCount>
+  <SeasonNumber>3</SeasonNumber>
+  <Writer>John Fay</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/426508.jpg</filename>
+  <lastupdated>1298533211</lastupdated>
+  <seasonid>39610</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>426509</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>3</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Euros Lyn</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Children of Earth, Day Three</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2009-07-08</FirstAired>
+  <GuestStars>|Kai Owen|Peter Capaldi|Paul Copley|Nicholas Farrell|Susan Brown|Lucy Cohu|Cush Jumbo|Liz May Brice|Ian Gelder|Colin McFarlane|Deborah Findlay|Nicholas Briggs|Patric Naiambana|Tom Price|Charles Abomeli|Rik Makarem|Katy Wix|Rhodri Lewis|Hilary MacLean|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>The eyes of the world turn to Britain, as the 456 announce, 'We are here'. As a pillar of fire descends upon London, the members of Torchwood must battle to protect their own families, as the fight gets personal. But will Clem's memories destroy everything?</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.8</Rating>
+  <RatingCount>12</RatingCount>
+  <SeasonNumber>3</SeasonNumber>
+  <Writer>|James Moran|Russell T Davies|</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/426509.jpg</filename>
+  <lastupdated>1298533654</lastupdated>
+  <seasonid>39610</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>426510</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>3</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Euros Lyn</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Children of Earth, Day Four</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired>2009-07-09</FirstAired>
+  <GuestStars>|Kai Owen|Peter Capaldi|Paul Copley|Nicholas Farrell|Susan Brown|Lucy Cohu|Cush Jumbo|Liz May Brice|Ian Gelder|Colin McFarlane|Deborah Findlay|Nicholas Briggs|Patric Naiambana|Tom Price|Charles Abomeli|Rik Makarem|Katy Wix|Rhodri Lewis|Hilary MacLean|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Torchwood finally learns the truth about the events of 1965. But Britain is in danger of becoming a rogue state, and everything now pivots around John Frobisher, as the Ambassador of the 456 destroys its old allegiances and reveals its true intent.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>11</RatingCount>
+  <SeasonNumber>3</SeasonNumber>
+  <Writer>Russell T Davies</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/426510.jpg</filename>
+  <lastupdated>1298534306</lastupdated>
+  <seasonid>39610</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>426511</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>3</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Euros Lyn</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Children of Earth, Day Five</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired>2009-07-10</FirstAired>
+  <GuestStars>|Kai Owen|Peter Capaldi|Paul Copley|Nicholas Farrell|Susan Brown|Lucy Cohu|Cush Jumbo|Liz May Brice|Ian Gelder|Colin McFarlane|Deborah Findlay|Nicholas Briggs|Patric Naiambana|Tom Price|Charles Abomeli|Rik Makarem|Katy Wix|Rhodri Lewis|Hilary MacLean|</GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Torchwood is defenceless, and Gwen Cooper stands alone, as the final sanction begins. As violence erupts and the world descends into anarchy, an ordinary council estate becomes a battleground where the future of the human race will be decided.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>8.1</Rating>
+  <RatingCount>13</RatingCount>
+  <SeasonNumber>3</SeasonNumber>
+  <Writer>Russell T Davies</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/79511/426511.jpg</filename>
+  <lastupdated>1298534870</lastupdated>
+  <seasonid>39610</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3437751</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 1</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2011-07-01</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319838</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491901</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 2</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319853</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491911</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 3</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319862</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491921</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 4</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319868</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491931</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 5</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319875</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491941</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 6</EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319883</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491951</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 7</EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319888</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491961</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 8</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319894</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491971</id>
+  <Combined_episodenumber>9</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 9</EpisodeName>
+  <EpisodeNumber>9</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295319904</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+<Episode>
+  <id>3491981</id>
+  <Combined_episodenumber>10</Combined_episodenumber>
+  <Combined_season>4</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Miracle Day, Episode 10</EpisodeName>
+  <EpisodeNumber>10</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>4</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1295320159</lastupdated>
+  <seasonid>391031</seasonid>
+  <seriesid>79511</seriesid>
+</Episode>
+</Data>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>73374</id>
+  <Image>actors/73374.jpg</Image>
+  <Name>Bret Harrison</Name>
+  <Role>Sam Oliver</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>73370</id>
+  <Image>actors/73370.jpg</Image>
+  <Name>Missy Peregrym</Name>
+  <Role>Andi Prendergast</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>73372</id>
+  <Image>actors/73372.jpg</Image>
+  <Name>Ray Wise</Name>
+  <Role>The Devil</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>91771</id>
+  <Image>actors/91771.jpg</Image>
+  <Name>Jenny Wade</Name>
+  <Role>Nina</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73378</id>
+  <Image>actors/73378.jpg</Image>
+  <Name>Valarie Rae Miller</Name>
+  <Role>Josie</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73373</id>
+  <Image>actors/73373.jpg</Image>
+  <Name>Tyler Labine</Name>
+  <Role>Bert 'Sock' Wysocki</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73371</id>
+  <Image>actors/73371.jpg</Image>
+  <Name>Rick Gonzalez</Name>
+  <Role>Ben Gonzalez</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73376</id>
+  <Image></Image>
+  <Name>Allison Hossack</Name>
+  <Role>Mrs. Oliver</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73377</id>
+  <Image></Image>
+  <Name>Andrew Airlie</Name>
+  <Role>Mr. Oliver</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73375</id>
+  <Image></Image>
+  <Name>Donavon Stinson</Name>
+  <Role>Ted</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77840</id>
+  <Image></Image>
+  <Name>Christine Willes</Name>
+  <Role>Gladys - DMV Demon</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

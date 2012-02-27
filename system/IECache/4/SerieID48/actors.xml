@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>177041</id>
+  <Image>actors/177041.jpg</Image>
+  <Name>Maggie Q</Name>
+  <Role>Nikita</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>200921</id>
+  <Image>actors/200921.jpg</Image>
+  <Name>Shane West</Name>
+  <Role>Michael</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>201411</id>
+  <Image>actors/201411.jpg</Image>
+  <Name>Lyndsy Fonseca</Name>
+  <Role>Alex</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>201431</id>
+  <Image>actors/201431.jpg</Image>
+  <Name>Tiffany Hines</Name>
+  <Role>Jaden</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>201421</id>
+  <Image>actors/201421.jpg</Image>
+  <Name>Ashton Holmes</Name>
+  <Role>Thom</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>201401</id>
+  <Image>actors/201401.jpg</Image>
+  <Name>Aaron Stanford</Name>
+  <Role>Birkhoff</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>201391</id>
+  <Image>actors/201391.jpg</Image>
+  <Name>Melinda Clarke</Name>
+  <Role>Amanda</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>201381</id>
+  <Image>actors/201381.jpg</Image>
+  <Name>Xander Berkeley</Name>
+  <Role>Percy</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

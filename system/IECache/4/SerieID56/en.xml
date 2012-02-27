@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Data><Series>
+  <id>121361</id>
+  <Actors>|Sean Bean|Peter Dinklage|Emilia Clarke|Lena Headey|Nikolaj Coster-Waldau |Michelle Fairley|</Actors>
+  <Airs_DayOfWeek>Sunday</Airs_DayOfWeek>
+  <Airs_Time>9:00 PM</Airs_Time>
+  <ContentRating></ContentRating>
+  <FirstAired>2011-04-17</FirstAired>
+  <Genre>|Action and Adventure|Drama|Fantasy|</Genre>
+  <IMDB_ID>tt0944947</IMDB_ID>
+  <Language>en</Language>
+  <Network>HBO</Network>
+  <NetworkID></NetworkID>
+  <Overview>Adapted from George R.R. Martin's epic fantasy novel series &quot;A Song of Ice and Fire,&quot; this HBO project plans to explore the world of kings and queens, knights, lordlings, and renegades all struggling in the only game that matters - The Game of Thrones.</Overview>
+  <Rating>8.8</Rating>
+  <RatingCount>4</RatingCount>
+  <Runtime>60</Runtime>
+  <SeriesID>77121</SeriesID>
+  <SeriesName>Game of Thrones</SeriesName>
+  <Status>Continuing</Status>
+  <added>2009-10-26 16:51:46</added>
+  <addedBy>10072</addedBy>
+  <banner>graphical/121361-g2.jpg</banner>
+  <fanart>fanart/original/121361-7.jpg</fanart>
+  <lastupdated>1299589156</lastupdated>
+  <poster>posters/121361-2.jpg</poster>
+  <zap2it_id></zap2it_id>
+</Series>
+<Episode>
+  <id>3226241</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>0</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Inside Game of Thrones</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2010-12-05</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A Short look into the film-making process for the production Game of Thrones</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>8.0</Rating>
+  <RatingCount>4</RatingCount>
+  <SeasonNumber>0</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <airsafter_season></airsafter_season>
+  <airsbefore_episode></airsbefore_episode>
+  <airsbefore_season></airsbefore_season>
+  <filename>episodes/121361/3226241.jpg</filename>
+  <lastupdated>1295654490</lastupdated>
+  <seasonid>137481</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3254641</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Tim Van Patten</Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>Winter is Coming</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2011-04-17</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>The death of his most trusted adviser has led the King to the cold North, to seek out an old ally and invite him to join his court as Hand of the King. But mystery shrouds the death of the King’s previous Hand, and a decision must be made quickly … for winter is coming.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>|David Benioff|D.B. Weiss|</Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1299544613</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436411</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2011-04-24</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294477839</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436421</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2011-05-01</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294477870</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436431</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294440076</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436441</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294440079</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436451</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294440110</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3436461</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director></Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName></EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer></Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1294440113</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+<Episode>
+  <id>3360391</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Daniel Minahan</Director>
+  <EpImgFlag></EpImgFlag>
+  <EpisodeName>The Pointy End</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired></FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview></Overview>
+  <ProductionCode></ProductionCode>
+  <Rating></Rating>
+  <RatingCount>0</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>George R. R. Martin</Writer>
+  <absolute_number></absolute_number>
+  <filename></filename>
+  <lastupdated>1299589156</lastupdated>
+  <seasonid>364731</seasonid>
+  <seriesid>121361</seriesid>
+</Episode>
+</Data>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>78763</id>
+  <Image>actors/78763.jpg</Image>
+  <Name>Colin Morgan</Name>
+  <Role>Merlin</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>78764</id>
+  <Image>actors/78764.jpg</Image>
+  <Name>Bradley James</Name>
+  <Role>Arthur Pendragon</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>78768</id>
+  <Image>actors/78768.jpg</Image>
+  <Name>Katie McGrath</Name>
+  <Role>Lady Morgana</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78767</id>
+  <Image>actors/78767.jpg</Image>
+  <Name>Angel Coulby</Name>
+  <Role>Gwen</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78766</id>
+  <Image>actors/78766.jpg</Image>
+  <Name>Anthony Stewart Head</Name>
+  <Role>Uther Pendragon</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78765</id>
+  <Image>actors/78765.jpg</Image>
+  <Name>Richard Wilson</Name>
+  <Role>Gaius</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

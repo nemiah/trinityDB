@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>77049</id>
+  <Image>actors/77049.jpg</Image>
+  <Name>Anna Torv</Name>
+  <Role>Olivia Dunham</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>77045</id>
+  <Image>actors/77045.jpg</Image>
+  <Name>Joshua Jackson</Name>
+  <Role>Peter Bishop</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>77047</id>
+  <Image>actors/77047.jpg</Image>
+  <Name>John Noble</Name>
+  <Role>Dr. Walter Bishop</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>77050</id>
+  <Image>actors/77050.jpg</Image>
+  <Name>Mark Valley</Name>
+  <Role>John Scott</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77048</id>
+  <Image>actors/77048.jpg</Image>
+  <Name>Lance Reddick</Name>
+  <Role>Phillip Broyles</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77046</id>
+  <Image>actors/77046.jpg</Image>
+  <Name>Jasika Nicole</Name>
+  <Role>Astrid</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77044</id>
+  <Image>actors/77044.jpg</Image>
+  <Name>Blair Brown</Name>
+  <Role>Nina Sharp</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77042</id>
+  <Image>actors/77042.jpg</Image>
+  <Name>Kirk Acevedo</Name>
+  <Role>Charlie Francis</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>233151</id>
+  <Image>actors/233151.jpg</Image>
+  <Name>John Noble</Name>
+  <Role>Walternate</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

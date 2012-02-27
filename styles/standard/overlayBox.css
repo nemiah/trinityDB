@@ -1,0 +1,22 @@
+#overlay {
+	position:fixed;
+	top:0px;
+	left:0px;
+	z-index:1000;
+}
+
+.loginWindow {
+	width:100%;
+}
+
+#boxInOverlay {
+	position:fixed;
+	margin:auto;
+	top:4px;
+	z-index:1001;
+	width:430px;
+	padding:4px;
+	border-style:solid;
+	border-width:1px;
+}
+

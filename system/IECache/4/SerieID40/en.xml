@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Data><Series>
+  <id>158661</id>
+  <Actors>|Emily Rose|Eric Balfour|Lucas Bryant|</Actors>
+  <Airs_DayOfWeek>Friday</Airs_DayOfWeek>
+  <Airs_Time>10:00 PM</Airs_Time>
+  <ContentRating>TV-PG</ContentRating>
+  <FirstAired>2010-07-09</FirstAired>
+  <Genre>|Drama|Science-Fiction|</Genre>
+  <IMDB_ID>tt1519931</IMDB_ID>
+  <Language>en</Language>
+  <Network>Syfy</Network>
+  <NetworkID></NetworkID>
+  <Overview>Deep in the heart of Maine, Haven is a town where people with supernatural abilities have migrated for generations because it mutes their powers, allowing them to lead normal lives. At least, until recently. When hot-shot FBI agent Audrey Parker is called to Haven to solve the murder of a local ex-con, she catches the killer but uncovers a much deeper mystery about this town. Each week, as the town-peoples’ dormant powers begin to express themselves, Audrey will try to keep these supernatural forces at bay while unraveling the many mysteries of Haven – including one surrounding her own surprising past in this extraordinary place. </Overview>
+  <Rating>7.8</Rating>
+  <RatingCount>33</RatingCount>
+  <Runtime>60</Runtime>
+  <SeriesID>78043</SeriesID>
+  <SeriesName>Haven</SeriesName>
+  <Status>Continuing</Status>
+  <added>2010-04-23 01:19:23</added>
+  <addedBy>76261</addedBy>
+  <banner>graphical/158661-g.jpg</banner>
+  <fanart>fanart/original/158661-3.jpg</fanart>
+  <lastupdated>1297718594</lastupdated>
+  <poster>posters/158661-1.jpg</poster>
+  <zap2it_id>SH01281487</zap2it_id>
+</Series>
+<Episode>
+  <id>2111911</id>
+  <Combined_episodenumber>1</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Adam Kane</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Welcome to Haven</EpisodeName>
+  <EpisodeNumber>1</EpisodeNumber>
+  <FirstAired>2010-07-09</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1595706</IMDB_ID>
+  <Language>en</Language>
+  <Overview>FBI agent Audrey Parker travels to the town of Haven to investigate the death of a local ex-con. She soon discovers the man's death is merely the tip of a very large iceberg of supernatural phenomena.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.3</Rating>
+  <RatingCount>89</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Sam Ernst|Jim Dunn</Writer>
+  <absolute_number>1</absolute_number>
+  <filename>episodes/158661/2111911.jpg</filename>
+  <lastupdated>1288549667</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2416111</id>
+  <Combined_episodenumber>2</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Tim Southam</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Butterfly</EpisodeName>
+  <EpisodeNumber>2</EpisodeNumber>
+  <FirstAired>2010-07-16</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Audrey remains in Haven to investigate her mother's connection to the Colorado Kid, but ends up working with Nathan to determine the cause of a mysterious series of incidents that involve butterflies and otherworldly phenomena centered on a angry reverend, his passive daughter, and her foster son.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.2</Rating>
+  <RatingCount>75</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Ann Lewis Hamilton</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2416111.jpg</filename>
+  <lastupdated>1288549821</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2416101</id>
+  <Combined_episodenumber>3</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Rachel Talalay</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Harmony</EpisodeName>
+  <EpisodeNumber>3</EpisodeNumber>
+  <FirstAired>2010-07-23</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID>tt1672658</IMDB_ID>
+  <Language>en</Language>
+  <Overview>A plague of insanity strikes at a local hospital, causing the doctors to go insane... and the patients to become normal. Audrey and Nathan seek to discover the cause before it spreads further.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>68</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Matt McGuinness</Writer>
+  <absolute_number>2</absolute_number>
+  <filename>episodes/158661/2416101.jpg</filename>
+  <lastupdated>1289644668</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2416121</id>
+  <Combined_episodenumber>4</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Rachel Talalay</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Consumed</EpisodeName>
+  <EpisodeNumber>4</EpisodeNumber>
+  <FirstAired>2010-07-30</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Audrey remains in Haven to investigate her mother's connection to the Colorado Kid, but ends up working with Nathan to determine the cause of a mysterious plague that targets fields and livestock alike.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>58</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Ann Lewis Hamilton</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2416121.jpg</filename>
+  <lastupdated>1289924859</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2483881</id>
+  <Combined_episodenumber>5</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Tim Southam</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Ball and Chain</EpisodeName>
+  <EpisodeNumber>5</EpisodeNumber>
+  <FirstAired>2010-08-06</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Time speeds ahead as an unknown element begins rapidly aging the men in Haven.
+</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>54</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Nikki Toscano</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2483881.jpg</filename>
+  <lastupdated>1289924844</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2483891</id>
+  <Combined_episodenumber>6</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Keith Samples</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Fur</EpisodeName>
+  <EpisodeNumber>6</EpisodeNumber>
+  <FirstAired>2010-08-13</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Audrey and Nathan find that even the animals in Haven are full of dangerous surprises. </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.4</Rating>
+  <RatingCount>48</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jim Dunn</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2483891.jpg</filename>
+  <lastupdated>1292148960</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2483901</id>
+  <Combined_episodenumber>7</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>T. W. Peacocke</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Sketchy</EpisodeName>
+  <EpisodeNumber>7</EpisodeNumber>
+  <FirstAired>2010-08-20</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A woman manifests the ability to effect whatever she sketches. </Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>48</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Matt McGuinness</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2483901.jpg</filename>
+  <lastupdated>1292148994</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2483911</id>
+  <Combined_episodenumber>8</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Ken Girotti</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Ain't No Sunshine</EpisodeName>
+  <EpisodeNumber>8</EpisodeNumber>
+  <FirstAired>2010-08-29</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>A ghost story comes true when a dark spirit is unleashed in Haven.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>49</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Sam Ernst</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2483911.jpg</filename>
+  <lastupdated>1292149016</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2685591</id>
+  <Combined_episodenumber>9</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Robert Lieberman</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>As You Were</EpisodeName>
+  <EpisodeNumber>9</EpisodeNumber>
+  <FirstAired>2010-09-10</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Audrey's new Haven friends throw a surprise birthday party for her at a local hotel, but the celebration sours when the group learns that a predatory shape-shifter has replaced one of the party-goers.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>49</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jose Molina</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2685591.jpg</filename>
+  <lastupdated>1293098587</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2685601</id>
+  <Combined_episodenumber>10</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Rick Rosenthal</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>The Hand You're Dealt</EpisodeName>
+  <EpisodeNumber>10</EpisodeNumber>
+  <FirstAired>2010-09-17</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Duke helps Audrey look into the mystery behind the Colorado kid.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.5</Rating>
+  <RatingCount>46</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jim Dunn</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2685601.jpg</filename>
+  <lastupdated>1293699656</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2685611</id>
+  <Combined_episodenumber>11</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Lee Rose</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>The Trial Of Audrey Parker</EpisodeName>
+  <EpisodeNumber>11</EpisodeNumber>
+  <FirstAired>2010-09-24</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>Audrey's FBI boss, comes to Haven to question Audrey about her strange actions.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.7</Rating>
+  <RatingCount>44</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jose Molina|Sam Ernst|Charles Ardai</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2685611.jpg</filename>
+  <lastupdated>1293699667</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2818231</id>
+  <Combined_episodenumber>12</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Michael Rohl</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Resurfacing</EpisodeName>
+  <EpisodeNumber>12</EpisodeNumber>
+  <FirstAired>2010-10-01</FirstAired>
+  <GuestStars></GuestStars>
+  <IMDB_ID></IMDB_ID>
+  <Language>en</Language>
+  <Overview>An unseen force begins attacking visitors at a local family's house.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.7</Rating>
+  <RatingCount>37</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Charles Ardai</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2818231.jpg</filename>
+  <lastupdated>1294130446</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+<Episode>
+  <id>2818241</id>
+  <Combined_episodenumber>13</Combined_episodenumber>
+  <Combined_season>1</Combined_season>
+  <DVD_chapter></DVD_chapter>
+  <DVD_discid></DVD_discid>
+  <DVD_episodenumber></DVD_episodenumber>
+  <DVD_season></DVD_season>
+  <Director>Fred Gerber</Director>
+  <EpImgFlag>2</EpImgFlag>
+  <EpisodeName>Spiral</EpisodeName>
+  <EpisodeNumber>13</EpisodeNumber>
+  <FirstAired>2010-10-08</FirstAired>
+  <GuestStars>Stephen McHattie|Michelle Monteith|John Bourgeois</GuestStars>
+  <IMDB_ID>tt1707723</IMDB_ID>
+  <Language>en</Language>
+  <Overview>As the mysterious cracks spread throughout Haven at an increasing rate, while a mysterious criminal returns to Haven and Audrey discovers the secrets of her past and her mother's.</Overview>
+  <ProductionCode></ProductionCode>
+  <Rating>7.9</Rating>
+  <RatingCount>34</RatingCount>
+  <SeasonNumber>1</SeasonNumber>
+  <Writer>Jim Dunn|Sam Ernst</Writer>
+  <absolute_number></absolute_number>
+  <filename>episodes/158661/2818241.jpg</filename>
+  <lastupdated>1294715251</lastupdated>
+  <seasonid>235111</seasonid>
+  <seriesid>158661</seriesid>
+</Episode>
+</Data>

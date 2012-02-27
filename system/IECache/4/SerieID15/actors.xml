@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>73489</id>
+  <Image>actors/73489.jpg</Image>
+  <Name>Lena Headey</Name>
+  <Role>Sarah Connor</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>73487</id>
+  <Image>actors/73487.jpg</Image>
+  <Name>Thomas Dekker</Name>
+  <Role>John Connor</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>73488</id>
+  <Image>actors/73488.jpg</Image>
+  <Name>Summer Glau</Name>
+  <Role>Cameron Phillips</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>94651</id>
+  <Image>actors/94651.jpg</Image>
+  <Name>Stephanie Chaves-Jacobsen</Name>
+  <Role>Jesse</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80068</id>
+  <Image>actors/80068.jpg</Image>
+  <Name>Garret Dillahunt</Name>
+  <Role>Cromartie</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80067</id>
+  <Image>actors/80067.jpg</Image>
+  <Name>Brian Austin Green</Name>
+  <Role>Derek Reese</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80066</id>
+  <Image>actors/80066.jpg</Image>
+  <Name>Shirley Manson</Name>
+  <Role>Catherine Weaver</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80065</id>
+  <Image>actors/80065.jpg</Image>
+  <Name>Leven Rambin</Name>
+  <Role>Riley</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>73490</id>
+  <Image>actors/73490.jpg</Image>
+  <Name>Richard T. Jones</Name>
+  <Role>James Ellison</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

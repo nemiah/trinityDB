@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>79101</id>
+  <Image>actors/79101.jpg</Image>
+  <Name>Cat Taber</Name>
+  <Role>Padme Amidala</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79100</id>
+  <Image>actors/79100.jpg</Image>
+  <Name>Tom Kane</Name>
+  <Role>Yoda|Narrator|Wullf Yularen</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79099</id>
+  <Image>actors/79099.jpg</Image>
+  <Name>Tom Kenny</Name>
+  <Role>Nute Gunray</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79098</id>
+  <Image>actors/79098.jpg</Image>
+  <Name>Nika Frost</Name>
+  <Role>TC-70|Asajj Ventress</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79097</id>
+  <Image>actors/79097.jpg</Image>
+  <Name>Dee Bradley Baker</Name>
+  <Role>Captain Rex|Commander Cody|Clone Troopers</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79096</id>
+  <Image>actors/79096.jpg</Image>
+  <Name>Matthew Wood</Name>
+  <Role>General Grievous|Battle Droids</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

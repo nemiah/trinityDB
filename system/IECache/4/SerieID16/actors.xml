@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>22017</id>
+  <Image>actors/22017.jpg</Image>
+  <Name>Zachary Levi</Name>
+  <Role>Charles &quot;Chuck&quot; Bartowski</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>22019</id>
+  <Image>actors/22019.jpg</Image>
+  <Name>Yvonne Strahovski</Name>
+  <Role>Sarah Walker</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>22018</id>
+  <Image>actors/22018.jpg</Image>
+  <Name>Adam Baldwin</Name>
+  <Role>Major John Casey</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>80686</id>
+  <Image>actors/80686.jpg</Image>
+  <Name>Bonita Friedericy</Name>
+  <Role>General Diane Beckman</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80674</id>
+  <Image>actors/80674.jpg</Image>
+  <Name>Julia Ling</Name>
+  <Role>Anna Wu</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80673</id>
+  <Image>actors/80673.jpg</Image>
+  <Name>Vik Sahay</Name>
+  <Role>Lester Partel</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80672</id>
+  <Image>actors/80672.jpg</Image>
+  <Name>Ryan McPartlin</Name>
+  <Role>Devon &quot;Captain Awesome&quot; Woodcomb</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80671</id>
+  <Image>actors/80671.jpg</Image>
+  <Name>Scott Krinsky</Name>
+  <Role>Jeff Barnes</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>80670</id>
+  <Image>actors/80670.jpg</Image>
+  <Name>Mark Christopher Lawrence</Name>
+  <Role>Big Mike</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77810</id>
+  <Image>actors/77810.jpg</Image>
+  <Name>Sarah Lancaster</Name>
+  <Role>Ellie Bartowski</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>77809</id>
+  <Image>actors/77809.jpg</Image>
+  <Name>Joshua Gomez</Name>
+  <Role>Morgan Grimes</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>258451</id>
+  <Image>actors/258451.jpg</Image>
+  <Name>Mekenna Melvin</Name>
+  <Role>Alex McHugh</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>233481</id>
+  <Image>actors/233481.jpg</Image>
+  <Name>Linda Hamilton</Name>
+  <Role>Mary Bartowski</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>144291</id>
+  <Image>actors/144291.jpg</Image>
+  <Name>Brandon Routh</Name>
+  <Role>Daniel Shaw</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>123921</id>
+  <Image>actors/123921.jpg</Image>
+  <Name>Matthew Bomer</Name>
+  <Role>Bryce Larkin</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>235191</id>
+  <Image></Image>
+  <Name>C.S. Lee</Name>
+  <Role>Harry Tang</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>71961</id>
+  <Image>actors/71961.jpg</Image>
+  <Name>Douglas Henshall</Name>
+  <Role>Prof. Nick Cutter</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>71962</id>
+  <Image>actors/71962.jpg</Image>
+  <Name>James Murray</Name>
+  <Role>Stephen Hart</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>143451</id>
+  <Image>actors/143451.jpg</Image>
+  <Name>Karl Theobald</Name>
+  <Role>Oliver Leek</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>71963</id>
+  <Image>actors/71963.jpg</Image>
+  <Name>Hannah Spearritt</Name>
+  <Role>Abby Maitland</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>71967</id>
+  <Image>actors/71967.jpg</Image>
+  <Name>Juilet Aubrey</Name>
+  <Role>Helen Cutter</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>71966</id>
+  <Image>actors/71966.jpg</Image>
+  <Name>Ben Miller</Name>
+  <Role>Sir James Lester</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>71965</id>
+  <Image>actors/71965.jpg</Image>
+  <Name>Lucy Brown</Name>
+  <Role>Claudia Brown|Jenny Lewis </Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>71964</id>
+  <Image>actors/71964.jpg</Image>
+  <Name>Andrew-Lee Potts</Name>
+  <Role>Connor Temple</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>240071</id>
+  <Image></Image>
+  <Name>Alexander Siddig</Name>
+  <Role>Philipp Burton</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>240081</id>
+  <Image></Image>
+  <Name>Ben Mansfield</Name>
+  <Role>Capitaine Becker</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>240061</id>
+  <Image></Image>
+  <Name>Ciarán McMenamin</Name>
+  <Role>Matt Anderson</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>240041</id>
+  <Image></Image>
+  <Name>Ruth Kearney</Name>
+  <Role>Jess Parker</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

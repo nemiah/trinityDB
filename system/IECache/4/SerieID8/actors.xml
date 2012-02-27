@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>175481</id>
+  <Image>actors/175481.jpg</Image>
+  <Name>Indiana Evans</Name>
+  <Role>Isabel (Bella) Hartley</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>75161</id>
+  <Image>actors/75161.jpg</Image>
+  <Name>Cariba Heine</Name>
+  <Role>Rikki Chadwick</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>75162</id>
+  <Image>actors/75162.jpg</Image>
+  <Name>Phoebe Tonkin</Name>
+  <Role>Cleo Sertori</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>75164</id>
+  <Image>actors/75164.jpg</Image>
+  <Name>Angus McLaren</Name>
+  <Role>Lewis McCartney</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>75163</id>
+  <Image>actors/75163.jpg</Image>
+  <Name>Claire Holt</Name>
+  <Role>Emma Gilbert</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

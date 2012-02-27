@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>79750</id>
+  <Image>actors/79750.jpg</Image>
+  <Name>Tim Roth</Name>
+  <Role>Cal Lightman</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>79749</id>
+  <Image>actors/79749.jpg</Image>
+  <Name>Kelli Williams</Name>
+  <Role>Dr. Gillian Foster</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>79751</id>
+  <Image>actors/79751.jpg</Image>
+  <Name>Monica Raymund</Name>
+  <Role>Ria Torres</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>79748</id>
+  <Image>actors/79748.jpg</Image>
+  <Name>Brendan Hines</Name>
+  <Role>Will Loker</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>144141</id>
+  <Image>actors/144141.jpg</Image>
+  <Name>Jennifer Beals</Name>
+  <Role>Zoe Landau</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>144131</id>
+  <Image>actors/144131.jpg</Image>
+  <Name>Mekhi Phifer</Name>
+  <Role>Ben Reynolds</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>144121</id>
+  <Image>actors/144121.jpg</Image>
+  <Name>Hayley McFarland</Name>
+  <Role>Emily Lightman</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

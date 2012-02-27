@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>88691</id>
+  <Image>actors/88691.jpg</Image>
+  <Name>Eric Stoltz</Name>
+  <Role>Daniel Graystone</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>88681</id>
+  <Image>actors/88681.jpg</Image>
+  <Name>Alessandra Torresani</Name>
+  <Role>Zoe Graystone</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>88671</id>
+  <Image>actors/88671.jpg</Image>
+  <Name>Esai Morales</Name>
+  <Role>Joseph Adama</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>88721</id>
+  <Image>actors/88721.jpg</Image>
+  <Name>Paula Malcomson</Name>
+  <Role>Amanda Graystone</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>162541</id>
+  <Image>actors/162541.jpg</Image>
+  <Name>Genevieve Buechner</Name>
+  <Role>Tamara Adama</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>151151</id>
+  <Image>actors/151151.jpg</Image>
+  <Name>Sasha Roiz</Name>
+  <Role>Sam Adama</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>88731</id>
+  <Image>actors/88731.jpg</Image>
+  <Name>Magda Apanowicz</Name>
+  <Role>Lacy Rand</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>88711</id>
+  <Image>actors/88711.jpg</Image>
+  <Name>Sina Najafi</Name>
+  <Role>William Adama</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>88701</id>
+  <Image>actors/88701.jpg</Image>
+  <Name>Avan Jogia</Name>
+  <Role>Ben Stark</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>88661</id>
+  <Image>actors/88661.jpg</Image>
+  <Name>Polly Walker</Name>
+  <Role>Sister Clarice Willow</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>151161</id>
+  <Image>actors/151161.jpg</Image>
+  <Name>James Marsters</Name>
+  <Role>Barnabus Grealy</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

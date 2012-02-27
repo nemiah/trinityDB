@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>78233</id>
+  <Image>actors/78233.jpg</Image>
+  <Name>Craig Horner</Name>
+  <Role>Richard Cypher</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>78234</id>
+  <Image>actors/78234.jpg</Image>
+  <Name>Bridget Regan</Name>
+  <Role>Kahlan Amnell</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>78235</id>
+  <Image>actors/78235.jpg</Image>
+  <Name>Bruce Spence</Name>
+  <Role>Zeddicus &quot;Zedd&quot; Zu'l Zorander</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>78237</id>
+  <Image>actors/78237.jpg</Image>
+  <Name>Jay Laga'aia</Name>
+  <Role>Dell Brandstone &quot;Chase&quot;</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78236</id>
+  <Image>actors/78236.jpg</Image>
+  <Name>Craig Parker</Name>
+  <Role>Darken Rahl</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>118581</id>
+  <Image>actors/118581.jpg</Image>
+  <Name>Tabrett Bethell</Name>
+  <Role>Cara</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

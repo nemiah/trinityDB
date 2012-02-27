@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>15653</id>
+  <Image>actors/15653.jpg</Image>
+  <Name>Dylan Walsh</Name>
+  <Role>Dr. Sean McNamara</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>15652</id>
+  <Image>actors/15652.jpg</Image>
+  <Name>Julian McMahon</Name>
+  <Role>Dr. Christian Troy</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>15651</id>
+  <Image>actors/15651.jpg</Image>
+  <Name>Joely Richardson</Name>
+  <Role>Julia McNamara</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>82142</id>
+  <Image>actors/82142.jpg</Image>
+  <Name>Bruno Campos</Name>
+  <Role>Dr. Quentin Costa</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78463</id>
+  <Image>actors/78463.jpg</Image>
+  <Name>Kelly Carlson</Name>
+  <Role>Kimber Henry</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>78462</id>
+  <Image>actors/78462.jpg</Image>
+  <Name>Kelsey Batelaan</Name>
+  <Role>Annie McNamara</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>15656</id>
+  <Image>actors/15656.jpg</Image>
+  <Name>Valerie Cruz</Name>
+  <Role>Grace Santiago</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>15655</id>
+  <Image>actors/15655.jpg</Image>
+  <Name>Roma Maffia</Name>
+  <Role>Dr. Liz Cruz</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>15654</id>
+  <Image>actors/15654.jpg</Image>
+  <Name>John Hensley</Name>
+  <Role>Matt McNamara</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

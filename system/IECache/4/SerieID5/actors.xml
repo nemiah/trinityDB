@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>80637</id>
+  <Image>actors/80637.jpg</Image>
+  <Name>Erin Karpluk</Name>
+  <Role>Erica Strange</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>80638</id>
+  <Image>actors/80638.jpg</Image>
+  <Name>Michael Riley</Name>
+  <Role>Dr. Tom</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>108981</id>
+  <Image>actors/108981.jpg</Image>
+  <Name>Tyron Leitso</Name>
+  <Role>Ethan Wakefield</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>116791</id>
+  <Image>actors/116791.jpg</Image>
+  <Name>Reagan Pasternak</Name>
+  <Role>Julianne Giacomelli</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>116781</id>
+  <Image>actors/116781.jpg</Image>
+  <Name>Morgan Kelly</Name>
+  <Role>Brent Kennedy</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108991</id>
+  <Image>actors/108991.jpg</Image>
+  <Name>Laurence Leboeuf</Name>
+  <Role>Claire Wakefield</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108961</id>
+  <Image>actors/108961.jpg</Image>
+  <Name>Devon Bostick</Name>
+  <Role>Leo Strange</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108931</id>
+  <Image>actors/108931.jpg</Image>
+  <Name>Joanna Douglas</Name>
+  <Role>Samantha Strange/MacIntosh</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108921</id>
+  <Image>actors/108921.jpg</Image>
+  <Name>Kathleen Laskey</Name>
+  <Role>Barb Strange</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108911</id>
+  <Image>actors/108911.jpg</Image>
+  <Name>John Boylan</Name>
+  <Role>Gary Strange</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108901</id>
+  <Image>actors/108901.jpg</Image>
+  <Name>Vinessa Antoine</Name>
+  <Role>Judith Winters</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108941</id>
+  <Image></Image>
+  <Name>Adam MacDonald</Name>
+  <Role>Josh MacIntosh</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108951</id>
+  <Image></Image>
+  <Name>Paula Brancati</Name>
+  <Role>Jenny Zalen</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>108971</id>
+  <Image></Image>
+  <Name>Sarah Gadon</Name>
+  <Role>Katie Atkins</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>116771</id>
+  <Image></Image>
+  <Name>Sebastian Pigott</Name>
+  <Role>Kai Booker</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>

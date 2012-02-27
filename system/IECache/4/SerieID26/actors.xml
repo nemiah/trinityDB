@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actors>
+<Actor>
+  <id>82571</id>
+  <Image>actors/82571.jpg</Image>
+  <Name>Saul Rubinek</Name>
+  <Role>Artie Nelson</Role>
+  <SortOrder>0</SortOrder>
+</Actor>
+<Actor>
+  <id>82591</id>
+  <Image>actors/82591.jpg</Image>
+  <Name>Eddie McClintock</Name>
+  <Role>Pete Lattimer</Role>
+  <SortOrder>1</SortOrder>
+</Actor>
+<Actor>
+  <id>82581</id>
+  <Image>actors/82581.jpg</Image>
+  <Name>Joanne Kelly</Name>
+  <Role>Myka Bering</Role>
+  <SortOrder>2</SortOrder>
+</Actor>
+<Actor>
+  <id>82601</id>
+  <Image>actors/82601.jpg</Image>
+  <Name>CCH Pounder</Name>
+  <Role>Mrs. Frederic</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>104651</id>
+  <Image>actors/104651.jpg</Image>
+  <Name>Allison Scagliotti</Name>
+  <Role>Claudia Donovan</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+<Actor>
+  <id>103871</id>
+  <Image>actors/103871.jpg</Image>
+  <Name>Genelle Williams</Name>
+  <Role>Leena</Role>
+  <SortOrder>3</SortOrder>
+</Actor>
+</Actors>
