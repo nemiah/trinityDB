@@ -131,139 +131,13 @@ if(file_exists(Util::getRootPath()."system/build.xml")){
 $validUntil = Environment::getS("validUntil", null);
 
 if($_SESSION["S"]->checkIfUserLoggedIn() == false) $_SESSION["CurrentAppPlugins"]->scanPlugins();
-#header('Content-type: text/html; charset="utf-8"',true);
-/*echo '<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="./styles/layout.xsl" ?>
-<phynx>
-	<HTMLGUI>
-		<overlay>
-			<options>
-				<label for="username">'.$texts[$browserLang]["username"].'</label>
-				<label for="password">'.$texts[$browserLang]["password"].'</label>
-				<label for="application">'.$texts[$browserLang]["application"].'</label>
-				<!--<label for="login"></label>-->
-				<label for="save">'.$texts[$browserLang]["save"].'</label>
-				<label for="optionsImage">'.$texts[$browserLang]["optionsImage"].'</label>
-				<label for="lostPassword">'.$texts[$browserLang]["lostPassword"].'</label>
-				
-				<label for="isDemo">'.($validUntil != null ? "Bitte beachten Sie: Diese Version läuft noch bis ".date("d.m.Y", $validUntil) : "Für den Demo-Zugang verwenden Sie bitte Max//Max oder Admin//Admin").'</label>
-				<label for="extDemo">Dies ist die erweiterte Demoversion. Sie können sich auch als Mitarbeiter//Mitarbeiter einloggen, um eine für Mitarbeiter angepasste Version von <b>open3A</b> zu sehen.</label>
 
-				<isDemo value="'.((strstr($_SERVER["SCRIPT_FILENAME"],"demo") OR $validUntil != null) ? "true" : "false").'" />
-				<isExtendedDemo value="'.(strstr($_SERVER["SCRIPT_FILENAME"],"demo_all") ? "true" : "false").'" />
-				
-				<hasImpressum value="'.Environment::getS("impressum", "").'" />
-				<hasDatenschutz value="'.Environment::getS("datenschutz", "").'" />
-				<hasRegistrierung value="'.Environment::getS("registrierung", "").'" />
-				
-				<showApplicationsList value="'.Environment::getS("showApplicationsList", "1").'" defaultApplicationIfFalse="'.Environment::getS("defaultApplication", "").'" />
-				<showCertificateLogin value="'.(extension_loaded("openssl") ? "true" : "false").'" />
-			</options>
-			
-			<languages>
-				<lang value="default">'.$texts[$browserLang]["sprache"].'</lang>
-				<lang value="de_DE">deutsch</lang>
-				<lang value="en_US">english</lang>
-				<lang value="it_IT">italiano</lang>
-			</languages>
-		</overlay>
-		
-		<applications>'.$_SESSION["applications"]->getGDL().'
-		</applications>
-		
-		<options>
-			<label for="title">'.Environment::getS("renameFramework", "phynx by Furtmeier Hard- und Software").'</label>
-			<isDesktop value="'.((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "desktop") ? "true" : "false").'" />
-			<physion>'.$physion.'</physion>
-		</options>
-		
-		<stylesheets>
-			<css>./libraries/jquery/jquery-ui-1.8.17.custom.css</css>
-			<css>./libraries/jquery/jquery.qtip.min.css</css>
-			<css>./styles/standard/overlayBox.css</css>
-			<css>./styles/standard/frames.css</css>
-			<css>./styles/standard/general.css</css>
-			<css>./styles/standard/navigation.css</css>
-			<css>./styles/standard/autoCompletion.css</css>
-			<css>./styles/standard/phynxContextMenu.css</css>
-			<css>./styles/standard/TextEditor.css</css>
-			<css>./styles/standard/calendar.css</css>
-			<css>./styles/'.Environment::getS("cssColorsDir", $cssColorsDir).'/colors.css</css>
-			'.((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "vertical") ? '<css>./styles/standard/vertical.css</css>' : "").'
-			'.((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "desktop") ? '<css>./styles/standard/desktop.css</css>' : "").'
-			'.((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "fixed") ? '<css>./styles/standard/fixed.css</css>' : "").'
-		</stylesheets>
-		
-		<javascripts>
-			<staticJsAbove>./libraries/jquery/jquery-1.7.1.min.js</staticJsAbove>
-			<staticJsAbove>./libraries/jquery/jquery-ui-1.8.17.custom.min.js</staticJsAbove>
-			<staticJsAbove>./libraries/jquery/jquery.json-2.3.min.js</staticJsAbove>
-			<staticJsAbove>./libraries/jquery/jquery.timers.js</staticJsAbove>
-			<staticJsAbove>./libraries/jquery/jquery.qtip.min.js</staticJsAbove>
-			<staticJsAbove>./libraries/jquery/jquery.scrollTo-1.4.2-min.js</staticJsAbove>
-			<staticJsAbove>./libraries/jstorage.js</staticJsAbove>
-
-			<staticJsAbove>./libraries/webtoolkit.base64.js</staticJsAbove>
-			<staticJsAbove>./libraries/webtoolkit.sha1.js</staticJsAbove>
-			
-			'.(file_exists(Util::getRootPath()."ubiquitous/Wysiwyg/tiny_mce/tiny_mce.js") ? '
-			<staticJsBelow>./ubiquitous/Wysiwyg/tiny_mce/tiny_mce.js</staticJsBelow>
-			<staticJsBelow>./ubiquitous/Wysiwyg/tiny_mce/jquery.tinymce.js</staticJsBelow>' : '').'
-			<staticJsBelow>./javascript/DynamicJS.php?r='.rand().'</staticJsBelow>
-				
-			
-			<js>./javascript/P2J.js</js>
-			
-			<js>./javascript/Aspect.js</js>
-			<js>./javascript/Observer.js</js>
-			<js>./javascript/Overlay.js</js>
-			<js>./javascript/Menu.js</js>
-			<js>./javascript/autoComplete.js</js>
-			<js>./javascript/phynxContextMenu.js</js>
-			<js>./javascript/userControl.js</js>
-			<js>./javascript/Interface.js</js>
-			<js>./javascript/Popup.js</js>
-			<js>./javascript/contentManager.js</js>
-			<js>./javascript/DesktopLink.js</js>
-			<js>./javascript/notificationArea.js</js>
-			<js>./javascript/handler.js</js>
-			<js>./javascript/Util.js</js>
-			
-			<js>./libraries/TextEditor.js</js>
-			<js>./libraries/fileuploader.js</js>
-			
-			
-		</javascripts>
-		
-		<contentLeft>
-			<p>Sie haben JavaScript nicht aktiviert.<br />
-			Bitte aktivieren Sie JavaScript, damit diese Anwendung funktioniert.</p>
-		</contentLeft>
-		
-		<footer>
-			<options>
-				<showHelpButton value="'.Environment::getS("showHelpButton", "1").'" />
-				<showLayoutButton value="'.Environment::getS("showLayoutButton", "1").'" />
-				<showCopyright value="'.Environment::getS("showCopyright", "1").'" />
-				<onLogout>'.Environment::getS("onLogout", "userControl.doLogout();").'</onLogout>
-			</options>
-
-			<iconLayout>./images/navi/office.png</iconLayout>
-			<iconLogout>./images/i2/logout.png</iconLogout>
-			<iconHelp>./images/navi/hilfe.png</iconHelp>
-			
-			<copyright>
-				Copyright (C) 2007 - 2012 by <a href="http://www.Furtmeier.IT">Furtmeier Hard- und Software</a>. This program comes with ABSOLUTELY NO WARRANTY; this is free software, and you are welcome to redistribute it under certain conditions; see <a href="gpl.txt">gpl.txt</a> for details.<br />Thanks to the authors of the libraries and icons used by this program. <a href="javascript:contentManager.loadFrame(\'contentRight\',\'Credits\');">View credits.</a>
-			</copyright>
-		</footer>
-	</HTMLGUI>
-</phynx>';*/
 ?><!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<meta name="revisit-after" content="14 days" />
-		<title><?php echo Environment::getS("renameFramework", "phynx by Furtmeier Hard- und Software"); ?></title>
+		<title>trinityDB</title>
 
 		<link rel="shortcut icon" href="./images/FHSFavicon.ico" /> 
 
@@ -343,9 +217,6 @@ if($_SESSION["S"]->checkIfUserLoggedIn() == false) $_SESSION["CurrentAppPlugins"
 		<div id="DynamicJS" style="display: none;"></div>
 		<!--<div style="position:fixed;top:0px;left:0px;width:20px;" id="growlContainer"></div>-->
 		<div id="boxInOverlay" style="display: none;" class="backgroundColor0 borderColor1">
-			<?php if(Environment::getS("showCopyright", "1") == "1") { ?>
-			<p style="color:grey;left:10px;position:fixed;bottom:10px;"><a style="color:grey;" target="_blank" href="http://www.furtmeier.it">Unternehmenssoftware</a> von Furtmeier Hard- und Software</p>
-			<?php } ?>
 			<form id="loginForm" onsubmit="return false;">
 				<table class="loginWindow">
 					<colgroup>
