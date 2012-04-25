@@ -15,20 +15,39 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class GUITabFactory {
 
-	private $className = null;
-	private $tabBar = null;
+	private $className;
+	private $tabBar = array();
+	private $tabContainer = array();
+	private $size = "CRM";
 
 	function  __construct($className) {
 		$this->className = $className;
 	}
 
+	/**
+	 * available size names are:
+	 * 
+	 * CRM
+	 * defaultLeft
+	 * 
+	 * @param string $sizeName 
+	 */
+	public function size($sizeName){
+		$this->size = $sizeName;
+	}
+
 	public function buildTabBar(){
 		$widths = Aspect::joinPoint("changeWidths", $this, __METHOD__);
-		if($widths == null) $widths = array(700);
+
+		if($widths == null AND $this->size == "CRM")
+			$widths = array(700);
+		
+		if($this->size == "defaultLeft")
+			$widths = array(410);
 
 		$cTab = mUserdata::getUDValueS("TabBarLastTab$this->className", "none");
 
@@ -56,7 +75,7 @@ class GUITabFactory {
 			$bar .= "
 				<div
 					id=\"tab_$id\"
-					style=\"float:left;width:110px;padding:3px;cursor:pointer;-moz-user-select:none;\"
+					style=\"float:left;width:110px;padding:3px;cursor:pointer;-moz-user-select:none;margin-bottom:5px;\"
 					onmouseover=\"if(this.className != 'navBackgroundColor') this.className = 'backgroundColor2';\"
 					onmouseout=\"if(this.className != 'navBackgroundColor') this.className = '';\"
 					onclick=\"$onClick\">
@@ -71,26 +90,27 @@ class GUITabFactory {
 
 		$bar .= "
 			</div>
-			<div style=\"clear:both;\"></div>";
+			<div style=\"clear:both;margin-bottom:-5px;\"></div>";
 
-		foreach($this->tabBar AS $value){
+		foreach($this->tabBar AS $key => $value){
 			if(!is_object($value[0])) continue;
-			$bar .= "<div id=\"".get_class($value[0])."\" style=\"display:none;\">".$value[0]->getHTML(-1, 0)."</div>";
+			$bar .= "<div id=\"".get_class($value[0])."\" style=\"display:none;".($this->tabContainer[$key] === true ? "padding:10px;" : "")."\">".$value[0]->getHTML(-1, 0)."</div>";
 		}
 
 		return $bar;
 	}
 
-	public function addTab($element, $label, $icon){
-		if($this->tabBar == null) $this->tabBar = array();
-
+	public function addTab($element, $label, $icon, $container = false){
 		$this->tabBar[] = array($element, $label, $icon);
+		$this->tabContainer[] = $container;
 	}
 
 	public function addCustomTab($onclick, $label, $icon){
-		if($this->tabBar == null) $this->tabBar = array();
-
 		$this->tabBar[] = array($onclick, $label, $icon);
+	}
+
+	public function __toString() {
+		return $this->buildTabBar();
 	}
 }
 ?>

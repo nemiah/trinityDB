@@ -30,7 +30,7 @@ function loadWithHighlighter(folder){
 	onSuccess: function(transport) {
     	$('contentLeft').update(transport.responseText);
     	
-    	new Ajax.Updater('contentRight','./interface/loadFrame.php?p=mInstallation');
+		contentManager.reloadFrame('contentRight');
 	}});
 }
 
@@ -48,15 +48,13 @@ function checkFields(plugin){
 			return;
 		}
 		if(transport.responseText != "-1") showMessage(transport.responseText+" Feld"+(transport.responseText != "1" ? "er" : "")+" aktualisiert.");
-    	//$('contentLeft').update(transport.responseText);
-    	//new Ajax.Updater('contentRight','./interface/loadFrame.php?p=mInstallation');
 	}});
 }
 
-function reloadApp() {
-	new Ajax.Request("./interface/rme.php?class=Installation&constructor=-1&method=reloadApplication&parameters=''", {
-	method: 'get',
-	onSuccess: function(transport) {
-		location.reload();
-	}});
+var Installation = {
+	reloadApp: function() {
+		contentManager.rmePCR("Util", "-1", "reloadApplication", "", function() {
+			location.reload();
+		});
+	}
 }

@@ -24,27 +24,25 @@ class FileGUI extends File implements iGUIHTML2 {
 	function getHTML($id){
 		$this->loadMeOrEmpty();
 		
-		$gui = new HTMLGUI();
-		$gui->setObject($this);
-		$gui->setLabelCaption("Dateieigenschaften");
+		$gui = new HTMLGUIX($this);
+		$gui->name("Dateieigenschaften");
+		#$gui->setObject($this);
+		#$gui->setLabelCaption("Dateieigenschaften");
 
-		$gui->setLabel("FileName","Dateiname");
-		$gui->setLabel("FileDir","Verzeichnis");
-		$gui->setLabel("FileSize","Größe");
-		$gui->setLabel("FileMimetype","Typ");
-		$gui->setLabel("FileIsWritable","beschreibbar?");
-		$gui->setLabel("FileIsReadable","lesbar?");
-		$gui->insertSpaceAbove("FileIsWritable");
-		$gui->setType("FileIsDir","hidden");
-		
-		$gui->setParser("FileSize","Util::formatByte");
-		
-		$gui->setIsDisplayMode(true);
-		
-		$gui->setStandardSaveButton($this);
-	
-		$gui->setParser("FileIsWritable","Util::catchParser");
-		$gui->setParser("FileIsReadable","Util::catchParser");
+		$gui->label("FileName","Dateiname");
+		$gui->label("FileDir","Verzeichnis");
+		$gui->label("FileSize","Größe");
+		$gui->label("FileMimetype","Typ");
+		$gui->label("FileIsWritable","beschreibbar?");
+		$gui->label("FileIsReadable","lesbar?");
+		$gui->label("FileCreationDate","Erstellt am");
+		$gui->space("FileIsWritable");
+		$gui->type("FileIsDir","hidden");
+
+		$gui->parser("FileSize","FileGUI::sizeParser");
+		$gui->parser("FileIsWritable","Util::catchParser");
+		$gui->parser("FileIsReadable","Util::catchParser");
+		$gui->parser("FileCreationDate","FileGUI::dateParser");
 		
 		$display = "";
 		
@@ -58,9 +56,12 @@ class FileGUI extends File implements iGUIHTML2 {
 				
 				$display .= "<img src=\"".$relPath."\" />";
 			break;
-			case "text/plain": 
+		
+			case "text/plain":
+			case "text/x-php":
 				$display = highlight_file($this->A->FileDir."/".$this->A->FileName,true);
 			break;
+
 			case "application/pdf":
 				$display = "<input onclick=\"windowWithRme('File', '$Path', 'previewPDF', '');\" type=\"button\" class=\"bigButton backgroundColor2\" value=\"PDF\nanzeigen\" style=\"margin:5px;background-image:url(./images/navi/pdf.png);\" />";
 			break;
@@ -71,8 +72,59 @@ class FileGUI extends File implements iGUIHTML2 {
 			<div class=\"backgroundColor1 Tab\"><p>Vorschau</p></div>
 			<div class=\"backgroundColor3\" style=\"margin-left:10px;margin-right:10px;overflow:auto;max-height:400px;\">$display</div>
 		</div>";
+
+		if($this->A("FileIsDir") == "0"){
+			if(stripos(PHP_OS, "WIN") === false){
+				$B = $gui->addSideButton("Verschieben", "./plugins/Files/move.png");
+				#$B->select(false, "mFile", "File", $this->getID(), "moveToDir");
+				$B->customSelect("contentRight", $this->getID(), "mFile", "pFile.move");
+			}
+			
+			$B = $gui->addSideButton("Umbenennen", "./plugins/Files/rename.png");
+			$B->popup("", "Datei umbenennen", "File", $this->getID(), "popupRename");
+		}
+		
+		$gui->optionsEdit(false, false);
 		
 		return (!$this->showPreviewOnly ? $gui->getEditHTML() : "").$display;
+	}
+
+	public function moveToDir($newDir){
+		$FD = new File($newDir);
+		if($FD->A("FileIsDir") != "1")
+			Red::alertD("Bitte wählen Sie ein Verzeichnis!");
+
+		try {
+			$pr = parent::moveToDir($newDir);
+		} catch(Exception $e){
+			Red::errorD($e->getMessage());
+		}
+		
+		if($pr === false)
+			echo $this->getID();
+		else
+			echo $pr;
+	}
+
+	public function popupRename(){
+		$F = new HTMLForm("newFileName", array("dateiName"));
+		$F->setLabel("dateiName", "Neuer Name");
+		$F->setSaveRMEPCR("Datei umbenennen", "./images/i2/save.gif", "File", $this->getID(), "rename", "function(transport) { contentManager.loadFrame('contentLeft', 'File', transport.responseText, 0); Popup.close('File', 'edit'); contentManager.reloadFrame('contentRight'); }");
+
+		echo $F;
+	}
+
+	public function rename($newName){
+		try {
+			$result = parent::rename($newName);
+		} catch(Exception $e){
+			Red::errorD($e->getMessage());
+		}
+
+		if($result === false)
+			echo $this->getID();
+		else
+			echo $result;
 	}
 	
 	public function previewWindow(){
@@ -87,7 +139,8 @@ class FileGUI extends File implements iGUIHTML2 {
 					
 					$display .= "<img src=\".".$relPath."\" />";
 				break;
-				case "text/plain": 
+				case "text/plain":
+				case "text/x-php":
 					$display = "<body><p>".highlight_file($this->ID,true)."</p></body>";
 				break;
 				case "application/pdf":
@@ -98,7 +151,15 @@ class FileGUI extends File implements iGUIHTML2 {
 			$display = "Verzeichnis";
 		echo "<html>".$display."</html>";
 	}
+
+	public static function sizeParser($w){
+		return Util::formatByte($w);
+	}
 	
+	public static function dateParser($w){
+		return Util::CLDateParser($w);
+	}
+
 	public function previewPDF(){
 		$this->loadMe();
 		echo "<html><script>document.location='.".$this->getRelPath()."';</script></html>";

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class HTMLInput {
 	private $type;
@@ -25,19 +25,22 @@ class HTMLInput {
 	private $onclick = null;
 	private $onchange = null;
 	#private $onblur = null;
-	private $style = null;
+	protected $style = null;
 	private $id = null;
 	private $onkeyup = null;
+	private $onkeydown = null;
 	private $hasFocusEvent = false;
 	private $isSelected = false;
-	private $isDisabled = false;
+	protected $isDisabled = false;
 	private $isDisplayMode = false;
 	private $tabindex;
 	private $multiEditOptions;
-	private $autocomplete = true;
-	private $onblur;
+	private $autocompleteBrowser = true;
+	protected $onblur;
 	private $onfocus;
 	private $className;
+	private $requestFocus = "";
+	private $autocomplete;
 
 	public function __construct($name, $type = "text", $value = null, $options = null){
 		$this->name = $name;
@@ -46,6 +49,10 @@ class HTMLInput {
 		$this->options = $options;
 	}
 
+	public function autocomplete($targetClass, $onSelectionFunction = null, $hideOnSelection = false, $getACData3rdParameter = null, Button $ButtonEmptyValues = null){
+		$this->autocomplete = array($targetClass, $onSelectionFunction, $hideOnSelection, $getACData3rdParameter == null ? "null" : $getACData3rdParameter, $ButtonEmptyValues);
+	}
+	
 	public function setType($type){
 		$this->type = $type;
 	}
@@ -55,21 +62,28 @@ class HTMLInput {
 	}
 
 	public function activateMultiEdit($targetClass, $targetClassID, $onSuccessFunction = null){
+		if(strpos($onSuccessFunction, "function(") !== 0)
+				$onSuccessFunction = "function(transport){ $onSuccessFunction }";
+		
 		$this->multiEditOptions = array($targetClass, $targetClassID, $onSuccessFunction);
 	}
 
-	public function setOptions($options, $labelField = null){
+	public function setOptions($options, $labelField = null, $zeroEntry = "bitte auswählen", $additionalOptions = null){
 		if(is_object($options) AND $options instanceof Collection AND $labelField != null){
-			$this->options = array("0" => "bitte auswählen");
+			$this->options = array("0" => $zeroEntry);
 
 			while($t = $options->getNextEntry())
 				$this->options[$t->getID()] = $t->A($labelField);
 		} else
 			$this->options = $options;
+		
+		if($additionalOptions != null)
+			foreach($additionalOptions AS $k => $v)
+				$this->options[$k] = $v;
 	}
 
-	public function autocomplete($bool){
-		$this->autocomplete = $bool;
+	public function autocompleteBrowser($bool){
+		$this->autocompleteBrowser = $bool;
 	}
 
 	public function tabindex($index){
@@ -108,8 +122,21 @@ class HTMLInput {
 		$this->onkeyup = $function;
 	}
 
+	public function onkeydown($function){
+		$this->onkeydown = $function;
+	}
 
+	public function getValue(){
+		return $this->value;
+	}
 
+	public function requestFocus(){
+		if($this->id === null)
+			$this->id = "Field".rand(100, 1000000);
+		
+		$this->requestFocus = "<script type=\"text/javascript\">setTimeout(function() { $('$this->id').focus(); }, 200);</script>";
+	}
+	
 	public function onEnter($function){
 		$this->onkeyup = "if(event.keyCode == 13) ".$function;
 	}
@@ -131,16 +158,58 @@ class HTMLInput {
 	}
 
 	public function  __toString() {
-		$style = "";
-		if($this->type == "date") $this->style .= "width:80%;";
-		if($this->style != null) $style = " style=\"$this->style\"";
+		#$style = "";
+		if($this->type == "date" AND strpos($this->style, "width:") === false) $this->style .= "width:87%;";
+		#if($this->style != null) $style = " style=\"$this->style\"";
 
 		switch($this->type){
+			case "audio":
+				return "<audio controls preload=\"auto\" autobuffer style=\"$this->style\"><source src=\"$this->value\"></audio>";
+			break;
+		
+			case "HTMLEditor":
+
+				$B = new Button("in HTML-Editor\nbearbeiten","editor");
+				$B->windowRme("Wysiwyg","","getEditor","","WysiwygGUI;FieldClass:{$this->options[0]};FieldClassID:{$this->options[1]};FieldName:{$this->options[2]}");
+				$B->className("backgroundColor2");
+
+				return $B->__toString();
+			break;
+		
+			case "TextEditor":
+				#return "<input ".(isset($this->events[$as]) ? $eve : "")." style=\"background-image:url(./images/navi/editor.png);".(isset($this->inputStyle[$as]) ? "".$this->inputStyle[$as]."" : "")."\" type=\"button\" class=\"bigButton backgroundColor2\" onclick=\"TextEditor.show('$as','$this->FormID');\" value=\"".$this->texts["in Editor bearbeiten"]."\" /><textarea style=\"display:none;\" name=\"".$as."\" id=\"".$as."\">".$this->attributes->$as."</textarea>";
+				$B = new Button("in Editor\nbearbeiten","editor");
+				$B->className("backgroundColor2");
+				$B->onclick("TextEditor.show('$this->name','{$this->options[0]}');");
+
+				$ITA = new HTMLInput($this->name, "textarea", $this->value);
+				$ITA->id($this->name);
+				$ITA->style("display:none;");
+				
+				return $B->__toString().$ITA;
+			break;
+		
+			case "tinyMCE":
+
+				$BO = array("'{$this->options[0]}'", "'{$this->options[1]}'");
+				if(isset($this->options[2]))
+					$BO[] = "'{$this->options[2]}'";
+					
+				$B = new Button("in Editor\nbearbeiten","editor");
+				#$B->windowRme("Wysiwyg","","getEditor","","WysiwygGUI;FieldClass:{$this->options[0]};FieldClassID:{$this->options[1]};FieldName:{$this->options[2]}");
+				$B->popup("", "Editor", "Wysiwyg", "-1", "editInPopup", $BO, "", "Popup.presets.large");
+				$B->className("backgroundColor2");
+
+				$ITA = new HTMLInput($this->name, "textarea", $this->value);
+				
+				return $B->__toString().$ITA;
+			break;
+		
 			case "multiInput":
 				return "<input
 					class=\"multiEditInput2\"
 					type=\"text\"
-					$style
+					".($this->style != null ? " style=\"$this->style\"" : "")."
 					value=\"".htmlspecialchars($this->value)."\"
 					onfocus=\"oldValue = this.value;\"
 					id=\"".$this->options[2]."ID".$this->options[1]."\"
@@ -175,7 +244,7 @@ class HTMLInput {
 				}
 
 				return "<textarea
-					$style
+					".($this->style != null ? " style=\"$this->style\"" : "")."
 					name=\"$this->name\"
 					".($this->className != null ? "class=\"$this->className\"" : "")."
 					".($this->onkeyup != null ? "onkeyup=\"$this->onkeyup\"" : "")."
@@ -193,7 +262,7 @@ class HTMLInput {
 						<div id=\"progressBar_$currentId\" style=\"height:10px;width:0%;\" class=\"backgroundColor1\"></div>
 					</div>
 					<div id=\"$currentId\" style=\"width:100%;\"></div>
-					<script type=\"text/jacascript>
+					<script type=\"text/javascript\">
 						var QQUploader = new qq.FileUploader({
 							maxSizePossible: '".ini_get("upload_max_filesize")."B',
 							element: $('$currentId'),
@@ -209,6 +278,7 @@ class HTMLInput {
 					</script>";
 			break;
 
+			case "radio1":
 			case "date":
 			case "text":
 			case "hidden":
@@ -216,10 +286,14 @@ class HTMLInput {
 			case "button":
 			case "password":
 			case "checkbox":
-			case "radio":
+			case "readonly":
+				$JS = "";
+				if($this->type == "radio1")
+					$this->type = "radio";
 				if($this->isDisplayMode) {
 					if($this->type == "checkbox") return Util::catchParser($this->value);
-					return $this->value;
+					if($this->type == "hidden") return "";
+					return $this->value."";
 				}
 
 				if($this->hasFocusEvent){
@@ -228,13 +302,18 @@ class HTMLInput {
 				}
 
 				$cal = "";
+				$B2 = "";
 				if($this->type == "date") {
-					if($this->id == null) $this->id = rand(10000,20000);
+					if($this->id == null) $this->id = rand(10000,90000);
 
 					$cal = new Button("","./images/i2/calendar.gif");
-					$cal->onclick("Kalender.show(null,null,'$this->id',-365,0,'%d.%m.%y','');");
+					$cal->onclick("\$j('#$this->id').focus();");
 					$cal->type("icon");
 					$cal->className("calendarIcon");
+
+					$JS = "<script type=\"text/javascript\">\$j('#$this->id').datepicker();</script>";
+					
+					$this->type = "text";
 				}
 
 				$value = "value=\"".htmlspecialchars($this->value)."\"";
@@ -242,47 +321,121 @@ class HTMLInput {
 
 				if($this->multiEditOptions != null){
 					$this->id($this->name."ID".$this->multiEditOptions[1]);
-					$this->onfocus .= " oldValue = this.value;";
-					$this->onkeyup .= "if(event.keyCode == 13) saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."');";
-					$this->onblur .= "if(oldValue != this.value) saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."');";
+					
+					if($this->type == "checkbox")
+						$this->onchange = "saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."'".($this->multiEditOptions[2] != null ? ", ".$this->multiEditOptions[2] : "").");";
+					else {
+						$this->onfocus .= " oldValue = this.value;";
+						$this->onkeyup .= "if(event.keyCode == 13) saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."'".($this->multiEditOptions[2] != null ? ", ".$this->multiEditOptions[2] : "").");";
+						$this->onblur .= "if(oldValue != this.value) saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."'".($this->multiEditOptions[2] != null ? ", ".$this->multiEditOptions[2] : "").");";
+					}
 				}
 
-				return "$cal<input
-					$style
-					".(!$this->autocomplete ? "autocomplete=\"off\"" : "")."
+				if($this->autocomplete != null){
+					if($this->id == null)
+						$this->id = $this->name;
+					
+					/*$this->onfocus .= " ACInputHasFocus=true; AC.start(this);";
+					$this->onblur .= " ACInputHasFocus = false; AC.end(this);";
+					$this->onkeyup .= " AC.update(event.keyCode, this, '".$this->autocomplete[0]."');";*/
+					$this->autocompleteBrowser = false;
+					
+					
+					$cal = new Button("Suche", "./images/i2/details.png");
+					$cal->onclick("$('$this->id').style.display = ''; $('$this->id').value = ''; $('$this->id').focus();");
+					$cal->type("icon");
+					$cal->className("calendarIcon");
+					
+					if($this->autocomplete[4] != null){
+						$B2 = $this->autocomplete[4];
+						$B2->style("float:right;margin-left:5px;");
+						$this->style .= "width:80%";
+					} else {
+						$this->style .= "width:87%";
+					}
+						
+					
+					if($this->autocomplete[1] == null){
+						$cal->onclick("$('{$this->id}Display').style.display = ''; $('{$this->id}Display').value = ''; $('{$this->id}Display').focus();");
+						
+						$IN = new HTMLInput($this->name, "hidden", htmlspecialchars($this->value));
+						$IN->id($this->name);
+						$JS .= $IN;
+						
+						$this->autocomplete[1] = "function(selection){ $('$this->id').value = selection.value; $('{$this->id}Display').value = selection.label; return false; }";
+
+						if($this->value != ""){
+							$C = substr($this->autocomplete[0], 1)."GUI";
+							$C = new $C($this->value);
+							
+							$value = "value=\"".htmlspecialchars($C->ACLabel())."\"";
+						}
+						
+						$this->id.= "Display";
+						
+					}
+					
+					 $JS .= OnEvent::script("var OnSelectCallback$this->id = ".$this->autocomplete[1]."; \$j(\"input#$this->id\").autocomplete({
+						source: function(request, response){ 
+							 ".OnEvent::rme($this->autocomplete[0], "getACData", array("'$this->name'", "request.term", $this->autocomplete[3]), "function(transport){ response(jQuery.parseJSON(transport.responseText)); }")."
+							 
+						},
+						select: function(event, ui) { var r = OnSelectCallback$this->id(ui.item); ".($this->autocomplete[2] ? "$('$this->id').style.display = 'none';" : "")." return r; }
+					}).data(\"autocomplete\")._renderItem = function( ul, item ) {
+						return \$j( \"<li></li>\" )
+							.data( \"item.autocomplete\", item )
+							.append( \"<a>\" + item.label + (item.description ? \"<br /><small>\"+item.description+\"</small>\" : \"\")+\"</a>\" )
+							.appendTo( ul );
+					};");
+				}
+				
+				return "$B2$cal<input
+					".($this->style != null ? " style=\"$this->style\"" : "")."
+					".(!$this->autocompleteBrowser ? "autocomplete=\"off\"" : "")."
 					".($this->className != null ? "class=\"$this->className\"" : "")."
 					".($this->onclick != null ? "onclick=\"$this->onclick\"" : "")."
 					".($this->onblur != null ? "onblur=\"$this->onblur\"" : "")."
 					".($this->onfocus != null ? "onfocus=\"$this->onfocus\"" : "")."
 					".($this->onkeyup != null ? "onkeyup=\"$this->onkeyup\"" : "")."
+					".($this->onkeydown != null ? "onkeydown=\"$this->onkeydown\"" : "")."
 					".($this->tabindex != null ? "tabindex=\"$this->tabindex\"" : "")."
 					".($this->isSelected ? "checked=\"checked\"" : "")."
 					".($this->type == "file" ? "size=\"1\"" : "")."
+					".($this->type == "readonly" ? "readonly=\"readonly\"" : "")."
 					name=\"$this->name\"
 					".($this->isDisabled ? "disabled=\"disabled\"" : "")."
-					type=\"$this->type\"
+					type=\"".($this->type != "readonly" ? $this->type : "text" )."\"
 					".($this->onchange != null ? "onchange=\"$this->onchange\"" : "")."
 					".($this->id != null ? "id=\"$this->id\"" : "")."
-					$value />";
+					$value />$this->requestFocus$JS";
 			break;
 
 			case "option":
-				return "<option$style ".($this->isDisabled ? "disabled=\"disabled\"" : "")." ".($this->isSelected ? "selected=\"selected\"" : "")." value=\"$this->value\">$this->name</option>";
+				return "<option".($this->style != null ? " style=\"$this->style\"" : "")." ".($this->isDisabled ? "disabled=\"disabled\"" : "")." ".($this->isSelected ? "selected=\"selected\"" : "")." value=\"$this->value\">$this->name</option>";
 			break;
 
+		
+			case "radio":
+				$html = "";
+				foreach($this->options AS $k => $v)
+					$html .= "<div style=\"margin-bottom:5px;\"><input name=\"$this->name\" value=\"$k\" ".($k == $this->value ? "checked=\"checked\"" : "")." style=\"float:left;margin-right:5px;\" type=\"radio\">$v</div>";
+				
+				return $html;
+			break;
+		
 			case "select":
 			case "select-multiple":
 				if($this->type == "select-multiple")
-					$values = explode(";:;", $this->value);
+					$values = trim($this->value) != "" ? explode(";:;", $this->value) : array();
 
 				if($this->isDisplayMode) return is_object($this->options[$this->value]) ? $this->options[$this->value]->__toString() : $this->options[$this->value];
 
 				if($this->multiEditOptions != null){
-					$this->onchange("saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."');");
+					$this->onchange("saveMultiEditInput('".$this->multiEditOptions[0]."','".$this->multiEditOptions[1]."','".$this->name."'".($this->multiEditOptions[2] != null ? ", ".$this->multiEditOptions[2] : "").");");
 					$this->id($this->name."ID".$this->multiEditOptions[1]);
 				}
 
-				$html = "<select".($this->type == "select-multiple" ? " multiple=\"multiple\"" : "")."$style ".($this->onchange != null ? "onchange=\"$this->onchange\"" : "")." name=\"$this->name\" ".($this->id != null ? "id=\"$this->id\"" : "").">";
+				$html = "<select ".($this->isDisabled ? "disabled=\"disabled\"" : "")." ".($this->type == "select-multiple" ? " multiple=\"multiple\"" : "")."".($this->style != null ? " style=\"$this->style\"" : "")." ".($this->onchange != null ? "onchange=\"$this->onchange\"" : "")." name=\"$this->name\" ".($this->id != null ? "id=\"$this->id\"" : "").">";
 
 				if($this->options != null AND is_array($this->options))
 					foreach($this->options AS $k => $v)
@@ -293,7 +446,7 @@ class HTMLInput {
 							$html .= "<option ".($isThisIt ? "selected=\"selected\"" : "")." value=\"$k\">$v</option>";
 						}
 						else {
-							if($this->value == $k)
+							if($this->value == $k OR $v->getValue() == $this->value)
 								$v->isSelected(true);
 							$html .= $v;
 						}
@@ -304,6 +457,7 @@ class HTMLInput {
 				return $html;
 			break;
 		}
+		
 	}
 }
 ?>

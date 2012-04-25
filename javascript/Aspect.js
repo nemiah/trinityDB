@@ -23,16 +23,24 @@ var Aspect = {
 
 	joinPoint: function(mode, method, arg, responseText){
 
-		arg = Array.prototype.slice.call(arg);
+		arg2 = Array.prototype.slice.call(arg);
 
 		if(!Aspect.pointCuts[mode]) return null;
 		if(!Aspect.pointCuts[mode][method]) return null;
 
-		for(var i = 0; i < Aspect.pointCuts[mode][method].length; i++)
-			Aspect.pointCuts[mode][method][i](arg, responseText);
+		for(var i = 0; i < Aspect.pointCuts[mode][method].length; i++){
+			if(Aspect.pointCuts[mode][method][i] == null)
+				continue;
+			
+			var r = Aspect.pointCuts[mode][method][i][0](arg2, responseText);
+			if(Aspect.pointCuts[mode][method][i][1] == true && r)
+				Aspect.pointCuts[mode][method][i] = null;
+		}
 	},
 
-	registerPointCut: function(mode, pointCut, advice){
+	registerPointCut: function(mode, pointCut, advice, once){
+		if(typeof once == "undefined") once = false;
+		
 		if(!Aspect.pointCuts[mode])
 			Aspect.pointCuts[mode] = new Array();
 
@@ -42,25 +50,26 @@ var Aspect = {
 		for(var i = 0; i < Aspect.pointCuts[mode][pointCut].length; i++)
 			if(Aspect.pointCuts[mode][pointCut][i] == advice) return;
 
-		Aspect.pointCuts[mode][pointCut][Aspect.pointCuts[mode][pointCut].length] = advice;
+		Aspect.pointCuts[mode][pointCut].push([advice, once]);
 	},
 
 	unregisterPointCut: function(mode, pointCut){
 		Aspect.pointCuts[mode][pointCut] = new Array();
 	},
 
-	registerOnLoadFrame: function(targetFrame, plugin, isNewEntry, advice){
+	registerOnLoadFrame: function(targetFrame, plugin, isNewEntry, advice, once){
 		if(typeof isNewEntry == "undefined") isNewEntry = true;
+		if(typeof once == "undefined") once = false;
 
 		Aspect.registerPointCut("loaded", "contentManager.loadFrame", function(a, responseText){
-			if(a[0] != targetFrame) return;
-			if(a[1] != plugin) return;
+			if(a[0] != targetFrame) return false;
+			if(a[1] != plugin) return false;
 
-			if(isNewEntry && a[2] != "-1") return;
-			if(!isNewEntry && a[2] == "-1") return;
+			if(isNewEntry && a[2] != "-1") return false;
+			if(!isNewEntry && a[2] == "-1") return false;
 
-			advice(a, responseText);
-		});
+			return advice(a, responseText);
+		}, once);
 	},
 
 	registerOnRmePCR: function(targetClass, targetMethod, advice){

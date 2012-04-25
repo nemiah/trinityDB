@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class TempFile {
@@ -56,13 +56,18 @@ class TempFile {
 	function A($attributeName){
 		return $this->Attributes->$attributeName;
 	}
+
+	function AA(){
+	}
 	
 	function saveMe(){
 		#echo $this->Attributes->data;
 	}
 	
 	function deleteMe(){
-		unlink($this->Attributes->filename);
+		if(file_exists($this->Attributes->filename))
+			unlink($this->Attributes->filename);
+		
 		$_SESSION["TempFiles"]->remove($this->ID);
 	}
 	
@@ -99,6 +104,7 @@ class TempFile {
 		    
 		fclose ($handle);
 		#echo "Speicher start 3: ".Util::formatByte(memory_get_usage(true),2)."<br />";
+		$bugger = trim($bugger);
 		
 		if(strpos($bugger, $newLine) === false AND $win){
 			echo "Keine Windows-Zeilenumbrüche gefunden, verwende Unix!";

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class User extends PersistentObject {
 	
@@ -31,9 +31,8 @@ class User extends PersistentObject {
 	
 	function loadMe($empty = true){
 		if($this->getID() > 20000){
-			$S = Users::getAppServerClient();
-			$this->setA($S->getUserById(Session::currentUser()->getA(), $this->ID));
-
+			$S = Util::getAppServerClient();
+			$this->setA($S->getUserById($this->ID));
 			return;
 		}
 	    parent::loadMe();
@@ -41,23 +40,43 @@ class User extends PersistentObject {
 	}
 	
 	function saveMe($checkUserData = true, $output = false){
+		$allowedUsers = Environment::getS("allowedUsers", null);
+		if($allowedUsers !== null AND $this->A("isAdmin") == "0"){
+			$AC = anyC::get("User", "isAdmin", "0");
+			$AC->addAssocV3("UserID", "!=", $this->getID());
+			$AC->lCV3();
+			
+			if($AC->numLoaded() >= $allowedUsers)
+				Red::errorD("Sie können keine weiteren Benutzer ohne Admin-Rechte anlegen. Bitte wenden Sie sich an den Support.");
+		}
+		
 		$U = new User($this->ID);
 		$U->loadMe(false);
-		if(mUserdata::getGlobalSettingValue("encryptionKey") == null) mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
+		if(mUserdata::getGlobalSettingValue("encryptionKey") == null AND Session::isUserAdminS()) mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
 		if($this->A->SHApassword != "") $this->A->SHApassword = sha1($this->A->SHApassword);
-		else $this->A->SHApassword = $U->getA()->SHApassword;
+		else $this->A->SHApassword = $U->A("SHApassword");
 
 		if($checkUserData) mUserdata::checkRestrictionOrDie("cantEdit".str_replace("GUI","",get_class($this)));
 
 		$this->loadAdapter();
 		$this->Adapter->saveSingle2($this->getClearClass(get_class($this)),$this->A);
-		echo "message:GlobalMessages.M002";
+		if($output)
+			Red::messageSaved();
 	}
 	
 	function newMe($checkUserData = true, $output = false){
-		if(mUserdata::getGlobalSettingValue("encryptionKey") == null) mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
+		$allowedUsers = Environment::getS("allowedUsers", null);
+		if($allowedUsers !== null AND $this->A("isAdmin") == "0"){
+			$AC = anyC::get("User", "isAdmin", "0");
+			$AC->lCV3();
+			
+			if($AC->numLoaded() >= $allowedUsers)
+				Red::errorD("Sie können keine weiteren Benutzer ohne Admin-Rechte anlegen. Bitte wenden Sie sich an den Support.");
+		}
+		
+		if(mUserdata::getGlobalSettingValue("encryptionKey") == null AND Session::isUserAdminS()) mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
 		$this->A->SHApassword = sha1($this->A->SHApassword);
-		parent::newMe($checkUserData, $output);
+		return parent::newMe($checkUserData, $output);
 	}
 	
 	public function convertPassword(){

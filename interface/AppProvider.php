@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 require "../system/connect.php";
 
@@ -25,7 +25,7 @@ class AppProvider {
 		return "Test erfolgreich";
 	}
 
-	private function login($credentials){
+	/*private function login($credentials){
 		$U = new Users();
 		$L = $U->getUser($credentials->username, $credentials->SHAPassword, true);
 
@@ -33,20 +33,14 @@ class AppProvider {
 			throw new SoapFault("Server", "Credentials invalid");
 
 		return $L;
-	}
+	}*/
 
-	function getApplications($credentials){
-		$U = $this->login($credentials);
-
-		$Apps = Applications::getList();
-		if($U->A("allowedApplications") != null AND is_array($U->A("allowedApplications")))
-			$Apps = array_intersect($U->A("allowedApplications"), $Apps);
-
-		return $Apps;
+	function getApplications(){
+		return Applications::getList();
 	}
 
 	function getServices(){
-		return array();
+		return Services::getList();
 	}
 }
 

@@ -62,5 +62,12 @@ class Attributes {
 	function fillWithAssociativeArray($values){
 	    $this->newWithAssociativeArray($values);
 	}
+	
+	function A($fieldName){
+		if(!isset($this->$fieldName))
+			return null;
+		
+		return $this->$fieldName;
+	}
 }
 ?>

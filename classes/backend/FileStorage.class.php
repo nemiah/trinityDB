@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class FileStorage {
 	protected $instance;
@@ -66,7 +66,7 @@ class FileStorage {
 	}
 	
 	private function getFileClass($file, $isDir){
-		
+		$file = str_replace(DIRECTORY_SEPARATOR, "/", $file);
 		$F = new File($file);
 		if(!file_exists($file)) $A = null;
 		else {
@@ -79,10 +79,30 @@ class FileStorage {
 			if(is_readable($file) AND $isDir == "0" AND function_exists("mime_content_type")) $A->FileMimetype = mime_content_type($file);
 			$A->FileIsWritable = is_writable($file);
 			$A->FileIsReadable = is_readable($file);
+			$A->FileCreationDate = filectime($file);
 		}
 		
 		$F->setA($A);
 		return $F;
+	}
+	
+	public static function getFilesDir(){
+		
+		$CH = Util::getCloudHost();
+		if($CH != null){
+			Environment::load();
+			
+			$dir = $CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/specifics/";
+			
+			if(!file_exists($dir)){
+				#mkdir($CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/");
+				mkdir($CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/specifics/", 0777, true);
+			}
+			
+			return $dir;
+		}
+		
+		return realpath(Util::getRootPath()."specifics")."/";
 	}
 	
 	function loadMultipleV4(SelectStatement $statement){
@@ -91,15 +111,29 @@ class FileStorage {
 		$dir = realpath($this->dir);
 		$dir .= "/";
 		
-		if(strpos($dir,"specifics") === false AND !$this->forceDir) $dir = realpath("../specifics")."/";
+		if(strpos($dir,"specifics") === false AND !$this->forceDir) $dir = self::getFilesDir();#realpath("../specifics")."/";
 		
 		$dirs = array();
 		$files = array();
 		
 		$fp = opendir($dir);
 		while(($file = readdir($fp)) !== false) {
-			if($file == ".") continue;
-			
+			#if($file == ".") continue;
+			if(strpos(basename($file), "NewsletterID") === 0)
+				continue;
+
+			if(strpos(basename($file), "ProjektID") === 0)
+				continue;
+
+			if(strpos(basename($file), "WAdresseID") === 0)
+				continue;
+
+			if(strpos(basename($file), "VertragID") === 0)
+				continue;
+
+			if(strpos(basename($file), "FITCRMID") === 0)
+				continue;
+
 			if(is_dir($dir.$file)) $dirs[] = $dir.$file;
 			else $files[] = $dir.$file;
 		}
@@ -138,6 +172,9 @@ class FileStorage {
 	
 
 	function deleteSingle($table, $keyName, $id){
+		if(strpos($id, FileStorage::getFilesDir()) === false)
+			Red::errorD("Die Datei kann wegen fehlender Berechtigung nicht gelöscht werden!");
+		
 		if(is_dir($id)) {
 			$fp = opendir($id);
 			$i = 0;
@@ -148,20 +185,19 @@ class FileStorage {
 				$i++;
 			}
 			closedir($fp);
-			if($i > 0) die("error:GlobalMessages.E020");
+			if($i > 0) Red::errorD("Das Verzeichnis kann nicht gelöscht werden, es ist nicht leer!");
 			
 			rmdir($id);
 		}
 		else {
 			if(!is_writable($id))
-				die("error:GlobalMessages.E021");
+				Red::errorD("Die Datei kann wegen fehlender Berechtigung nicht gelöscht werden!");
 			
 			unlink($id);
 		}
 	}
 	
 	function makeNewLine2($table, $A) {
-		#print_r($A);
 		
 		if($A->FileName == "") return;
 		$file = $A->FileDir."/".basename($A->FileName);

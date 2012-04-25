@@ -477,7 +477,7 @@ qq.FileUploaderBasic.prototype = {
 qq.FileUploader = function(o){
     // call parent constructor
     qq.FileUploaderBasic.apply(this, arguments);
-    
+
     // additional options    
     qq.extend(this._options, {
         element: null,

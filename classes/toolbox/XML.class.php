@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class XML {
 	
@@ -115,10 +115,11 @@ class XML {
 		$class = $class[0];
 		if($class == "") return;
 		$c = new $class(-1);
-		$A = $c->newAttributes();
+		$A = new Attributes();
 		
 		foreach($this->vals as $k => $v){
 			if($this->vals[$k]["tag"] == "entry" && $this->vals[$k]["type"] == "open") {
+				$c = new $class(-1);
 				$Att = clone $A;
 				continue;
 			}

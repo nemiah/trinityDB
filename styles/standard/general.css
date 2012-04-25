@@ -12,7 +12,7 @@ a:hover {
 	text-decoration:none;
 }
 
-.mouseoverFade:hover {
+.mouseoverFade[onclick]:hover {
 	opacity:0.5;
 	filter:alpha(opacity=50);
 }
@@ -61,11 +61,7 @@ input[type=radio] {
 	width:10px;
 }
 
-input[readonly] {
-	color:grey;
-}
-
-input[disabled] {
+input[disabled], select[disabled], input[readonly] {
 	color:grey;
 }
 
@@ -75,8 +71,11 @@ input[disabled] {
 	height:40px;
 	background-position:115px;
 	cursor:pointer;
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
+	border-radius:3px;
+}
+
+.bigButton:active  {
+	box-shadow: 1px 1px 2px #777777;
 }
 
 .LPBigButton {
@@ -85,6 +84,11 @@ input[disabled] {
 	height:40px;
 	background-position:3px;
 	cursor:pointer;
+	border-radius:3px;
+}
+
+.LPBigButton:active {
+	box-shadow: 0 0 2px #777777;
 }
 /*
 caption {
@@ -240,17 +244,111 @@ div + .Tab {
 }
 
 #contentRight .desktopButton {
-	-moz-border-radius-topleft:5px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	/*-moz-border-radius-topleft:5px;
     -moz-border-radius-bottomleft:5px;
 	-webkit-border-top-left-radius:5px;
-	-webkit-border-bottom-left-radius:5px;
+	-webkit-border-bottom-left-radius:5px;*/
 }
 
 #contentLeft .desktopButton {
-	-moz-border-radius-topright:5px;
-    -moz-border-radius-bottomright:5px;
-	-webkit-border-top-right-radius:5px;
-	-webkit-border-bottom-right-radius:5px;
+	/*-moz-border-radius-topright:5px;
+    -moz-border-radius-bottomright:5px;*/
+	border-top-right-radius:5px;
+	border-bottom-right-radius:5px;
+}
+
+
+#contentRight .sideTableLeft {
+	width:160px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:-170px;
+}
+
+#contentLeft .sideTableRight {
+	width:160px;
+	margin-left:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-right:-170px;
+}
+			
+@media only screen and (max-width: 1200px) {
+	.sideTableRight .bigButton, .sideTableLeft .bigButton {
+		width:38px;
+		background-position:3px;
+		text-indent: 100px;
+		font-size: 0px;
+		overflow: hidden;
+	}
+	
+	.sideTableLeft .bigButton {
+		float:right;
+	}
+	
+	#contentRight .sideTableLeft {
+		width:60px;
+		margin-left:-70px;
+	}
+	
+	#contentLeft .sideTableRight {
+		width:60px;
+		margin-right:-70px;
+	}
+}
+
+.FormSeparatorWithLabel td {
+	padding-top:8px;
+}
+
+.spell {
+	box-shadow: 0px 0px 3px #777;
+}
+
+.spell:hover {
+	box-shadow: inset 0px 0px 3px #777;
+}
+
+.selectionBox {
+	vertical-align:top;
+	cursor:pointer;
+	padding:3px;
+	margin-bottom:8px;
+	margin-left:5px;
+	width:160px;
+	display:inline-block;
+	
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
+}
+
+.popup {
+	position:fixed;
+	box-shadow: 0px 0px 3px #777;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	border-style:solid;
+	border-width:1px;
+}
+
+.popup > div:first-child {
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+}
+
+.popupSidePanel {
+	border-top-right-radius:5px;
+	box-shadow: 0px 0px 2px #777;
+	width:200px;
+	border-width:1px;
+	border-style:solid;
+	position:fixed;
+	min-height:200px;
 }
 
 .qq-uploader { position:relative; width: 100%;}
@@ -265,12 +363,12 @@ div + .Tab {
 
 .qq-upload-drop-area {
     position:absolute; top:0; left:0; width:100%; height:100%; min-height: 70px; z-index:2;
-    background:#FF9797; text-align:center;
+    background:#8EAC1B; text-align:center;
 }
 .qq-upload-drop-area span {
     display:block; position:absolute; top: 50%; width:100%; margin-top:-8px; font-size:16px;
 }
-.qq-upload-drop-area-active {background:#FF7171;}
+.qq-upload-drop-area-active {background:#5c7400;}
 
 .qq-upload-list {padding:0; list-style:disc;}
 .qq-upload-list li { margin-top:5px; padding:0; font-size:10px;}
@@ -284,3 +382,35 @@ div + .Tab {
 
 .qq-upload-failed-text {display:none;}
 .qq-upload-fail .qq-upload-failed-text {display:inline;}
+
+
+.ui-datepicker {
+	width:200px;
+}
+
+.ui-datepicker-header {
+	height:25px;
+}
+
+.ui-autocomplete.ui-autocomplete,
+.ui-autocomplete .ui-corner-all,
+.ui-datepicker.ui-corner-all,
+.ui-datepicker-inline.ui-corner-all,
+.ui-datepicker-header.ui-corner-all
+{
+	border-radius:0px;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+	background:none;
+}
+
+.ui-widget-header {
+	background:none;
+	background-color:#EEE;
+}
+
+.ui-tooltip-text {
+	font-size:12px;
+	line-height: 1.5;
+}

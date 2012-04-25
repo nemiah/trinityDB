@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Users extends anyC {
 	function __construct(){
@@ -38,8 +38,8 @@ class Users extends anyC {
 
 	public function getUser($username, $password, $isSHA = false){
 		if($password == ";;;-1;;;") return null;
-
-		$user = $this->getAppServerUser($username, $password);
+		
+		$user = $this->getAppServerUser($username, !$isSHA ? sha1($password) : $password);
 		if($user != null) return $user;
 
 		$this->addAssocV3("username","=",$username);
@@ -68,22 +68,8 @@ class Users extends anyC {
 		return null;
 	}
 
-	public static function getAppServerClient(){
-		try {
-			$AppServer = mUserdata::getGlobalSettingValue("AppServer", "");
-			if($AppServer != ""){
-				$uri = $AppServer."/plugins/AppServer/AppServer.php";
-				return new SoapClient(null, array("location" => $uri,"uri" => $uri));
-
-				$user = $S->getUser($username, $password);
-			}
-		} catch (Exception $e){}
-
-		return null;
-	}
-
 	private function getAppServerUsers(){
-		$S = $this->getAppServerClient();
+		$S = Util::getAppServerClient();
 		try {
 			$collection = array();
 			$Users = $S->getUsers(Session::currentUser()->getA());
@@ -103,7 +89,7 @@ class Users extends anyC {
 
 	private function getAppServerUser($username, $password){
 		try {
-			$S = $this->getAppServerClient();
+			$S = Util::getAppServerClient(false);
 			if($S != null){
 
 				$user = $S->getUser($username, $password);
@@ -119,7 +105,38 @@ class Users extends anyC {
 		return null;
 	}
 	
+	protected function doCertificateLogin($application, $sprache, $cert){
+		if(!CertTest::isCertSigner($cert, CertTest::$FITCertificate))
+			return 0;
+		
+		$x509cert = openssl_x509_read($cert);
+		$data = openssl_x509_parse($x509cert);
+		
+		if($data["validFrom_time_t"] > time())
+			Red::errorD("Zertifikat noch nicht gültig");
+		
+		if($data["validTo_time_t"] < time())
+			Red::errorD("Zertifikat nicht mehr gültig");
+		
+		$Users = self::getUsers();
+		$foundU = null;
+		while($U = $Users->getNextEntry())
+			if(trim($U->A("name")) === trim($data["subject"]["CN"]) AND strtolower(trim($U->A("UserEmail"))) === strtolower(trim($data["subject"]["emailAddress"]))) {
+				$foundU = $U;
+				break;
+			}
+		
+		if($foundU == null)
+			return 0;
+		
+		return $this->doLogin(array("loginUsername" => $foundU->A("username"), "loginSHAPassword" => $foundU->A("SHApassword"), "anwendung" => $application, "loginSprache" => $sprache));
+	}
+	
 	protected function doLogin($ps){
+		$validUntil = Environment::getS("validUntil", null);
+		if($validUntil != null and $validUntil < time())
+			Red::errorD("Diese Version ist abgelaufen. Bitte wenden Sie sich an den Support.");
+		
 		if(!is_array($ps)) parse_str($ps, $p);
 		else $p = $ps;
 		#if($p["loginPassword"] == ";;;-1;;;") return 0;
@@ -158,10 +175,9 @@ class Users extends anyC {
 		if(strtolower($U->getA()->username) != strtolower($p["loginUsername"])) return 0;
 		
 		$_SESSION["S"]->setLoggedInUser($U);
-		$_SESSION["S"]->init($p["anwendung"]);
+		$_SESSION["S"]->initApp($p["anwendung"]);
 
 		#if($_SESSION["S"]->checkIfUserLoggedIn()) die("Beim Einloggen ist ein Fehler aufgetreten.\nBitte drücken Sie F5 (aktualisieren) und melden Sie sich erneut an.");
-		
 		return 1;
 	}
 	
@@ -170,6 +186,7 @@ class Users extends anyC {
 		$_SESSION["CurrentAppPlugins"] = null;
 		$_SESSION["BPS"] = null;
 		$_SESSION["S"]->logoutUser();
+		SpeedCache::clearCache();
 	}
 	
 	public function getListOfUsers(){

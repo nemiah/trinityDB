@@ -54,16 +54,26 @@ class mUserdata extends anyC {
 	}
 	
 	public static function getHiddenPlugins(){
+		$Cache = SpeedCache::getCache("getHiddenPlugins");
+		if($Cache !== null)
+			return $Cache;
+
 		$UD = new mUserdata();
 		$UD->addAssocV3("typ","=","pHide");
 		$UD->addAssocV3("UserID","=",$_SESSION["S"]->getCurrentUser()->getID());
 	
 		$labels = array();
-		
-		while(($sUD = $UD->getNextEntry())){
-			$A = $sUD->getA();
-			$labels[$A->wert] = 1;
+		try {
+			while(($sUD = $UD->getNextEntry())){
+				$A = $sUD->getA();
+				$labels[$A->wert] = 1;
+			}
+
+		} catch (StorageException $e){
+			return true;
 		}
+		SpeedCache::setCache("getHiddenPlugins", $labels);
+
 		return $labels;
 	}
 	
@@ -188,7 +198,7 @@ class mUserdata extends anyC {
 		return $U->setUserdata($name, $wert, $typ, $UserID);
 	}
 
-	public function setUserdata($name, $wert, $typ = "", $UserID = 0){
+	public function setUserdata($name, $wert, $typ = "", $UserID = 0, $echoSaved = false){
 		if($UserID  != 0 AND $_SESSION["S"]->isUserAdmin() == "0"){
 			echo "Only an admin-user can change Userdata of other users!";
 			exit();
@@ -219,6 +229,8 @@ class mUserdata extends anyC {
 		} else 
 			$UD->saveNewValue($wert);
 		
+		if($echoSaved)
+			Red::messageSaved ();
 	}
 	
 	public static function checkRestrictionOrDie($restriction){

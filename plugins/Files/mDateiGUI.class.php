@@ -40,7 +40,7 @@ class mDateiGUI extends anyC implements iGUIHTMLMP2 {
 		
 		$gui->setShowAttributes(array("DateiName"));
 		
-		$gui->setParser("DateiName","mDateiGUI::nameParser",array("\$DateiPath","\$DateiIsDir"));
+		$gui->setParser("DateiName","mDateiGUI::nameParser",array("\$DateiPath","\$DateiIsDir", "\$DateiSize"));
 		
 		$gui->setIsDisplayMode(true);
 		if(!$this->viewOnly) $gui->setDeleteInDisplayMode(true);
@@ -54,7 +54,7 @@ class mDateiGUI extends anyC implements iGUIHTMLMP2 {
 			#$t->addRow(array("<input onclick=\"loadFrameV2('contentRight','mFile','mFileGUI;selectionMode:multiSelection,".($this->onAddClass != null ? $this->onAddClass : "'+lastLoadedLeftPlugin+'").",$this->classID,addFile,'+lastLoadedRightPlugin+',".($this->onReloadFrame != null ? $this->onReloadFrame : "contentLeft").",".($this->onReloadClass != null ? $this->onReloadClass : "'+lastLoadedLeftPlugin+'").",".($this->onReloadID != null ? $this->onReloadID : $this->classID)."');\" type=\"button\" class=\"backgroundColor3 bigButton\" style=\"background-image:url(./images/navi/computer.png);\" value=\"Datei\nhinzufügen\" />"));
 		}
 
-		$gui->setJSEvent("onDelete",$this->onDeleteFunction == null ? "function() { reloadLeftFrame(); }" : $this->onDeleteFunction);
+		$gui->setJSEvent("onDelete",$this->onDeleteFunction == null ? "function() { contentManager.reloadFrame('contentLeft'); }" : $this->onDeleteFunction);
 			
 		try {
 			if($this->viewOnly AND $this->numLoaded() == 0) return "";
@@ -70,7 +70,7 @@ class mDateiGUI extends anyC implements iGUIHTMLMP2 {
 	public static function nameParser($w, $l, $p){
 		$p = HTMLGUI::getArrayFromParametersString($p);
 		$dl = "<img src=\"./plugins/Files/download.png\" class=\"mouseoverFade\" title=\"Datei herunterladen\" onclick=\"windowWithRme('File','$p[0]','download','');\" style=\"float:right;\" />";
-		if($p[1] == "0") return "$dl<img src=\"./images/i2/details.png\" class=\"mouseoverFade\" onclick=\"windowWithRme('File', '$p[0]', 'previewWindow', '');\" style=\"float:left;margin-right:5px;\" />".$w;
+		if($p[1] == "0") return "$dl<small style=\"color:grey;float:right;margin-right:5px;\">".Util::formatByte($p[2])."</small><img src=\"./images/i2/details.png\" class=\"mouseoverFade\" onclick=\"windowWithRme('File', '$p[0]', 'previewWindow', '');\" style=\"float:left;margin-right:5px;\" />".$w;
 		else return "<img src=\"./images/i2/folder.png\" style=\"float:left;margin-right:5px;\" />$w";
 	}
 }

@@ -39,12 +39,12 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 		$html = "
 		<table>
 			<tr>
-				<td class=\"backgroundColor3\"><input type=\"button\" style=\"background-image:url(./images/navi/seiten.png);\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["copy"]) ? $text["copy"] : "von Benutzer\nkopieren")."\" onclick=\"contextMenu.start(this, 'mUserdata','copyFromUser','".(isset($text["kopieren"]) ? $text["kopieren"] : "kopieren").":');\" /></td>
+				<td class=\"backgroundColor3\"><input type=\"button\" style=\"background-image:url(./images/navi/seiten.png);\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["copy"]) ? $text["copy"] : "von Benutzer\nkopieren")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','copyFromUser','".(isset($text["kopieren"]) ? $text["kopieren"] : "kopieren").":');\" /></td>
 			</tr>
 		</table>";
 		$gui->addRowAfter("1","addRestriction");
 		$gui->setParser("addRestriction","mUserdataGUI::addRestrictionParser");
-		$gui->setJSEvent("onDelete","function(){reloadLeftFrame();}");
+		$gui->setJSEvent("onDelete","function(){contentManager.reloadFrameLeft();}");
 		try {
 			return $gui->getBrowserHTML($id).($this->numLoaded() == 0 ? $html : "");
 		} catch (Exception $e){ echo $e; }
@@ -131,13 +131,13 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 		$text = $singularLanguageClass != null ? $singularLanguageClass->getText() : $deText;
 		
 		return "
-		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Feld\numbenennen"]) ? $text["Feld\numbenennen"] : "Feld\numbenennen")."\" onclick=\"contextMenu.start(this, 'mUserdata','2','".$text["Umbenennung"].":');\" style=\"float:right;background-image:url(./images/navi/relabel.png);\" />
-		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Einschränkung\nhinzufügen"]) ? $text["Einschränkung\nhinzufügen"] : "Einschränkung\nhinzufügen")."\" onclick=\"contextMenu.start(this, 'mUserdata','1','".$text["Einschränkung"].":');\" style=\"margin-bottom:10px;background-image:url(./images/navi/restrictions.png);\" /><br />
+		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Feld\numbenennen"]) ? $text["Feld\numbenennen"] : "Feld\numbenennen")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','2','".$text["Umbenennung"].":');\" style=\"float:right;background-image:url(./images/navi/relabel.png);\" />
+		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Einschränkung\nhinzufügen"]) ? $text["Einschränkung\nhinzufügen"] : "Einschränkung\nhinzufügen")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','1','".$text["Einschränkung"].":');\" style=\"margin-bottom:10px;background-image:url(./images/navi/restrictions.png);\" /><br />
 		
-		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Feld\nausblenden"]) ? $text["Feld\nausblenden"] : "Feld\nausblenden")."\" onclick=\"contextMenu.start(this, 'mUserdata','3','".$text["Ausblenden"].":');\" style=\"float:right;background-image:url(./images/navi/clear.png);\" />
-		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Plugin-\nspezifisch"]) ? $text["Plugin-\nspezifisch"] : "Plugin-\nspezifisch")."\" onclick=\"contextMenu.start(this, 'mUserdata','4','".$text["Plugin"].":');\" style=\"margin-bottom:10px;background-image:url(./images/navi/lieferschein.png);\" />
+		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Feld\nausblenden"]) ? $text["Feld\nausblenden"] : "Feld\nausblenden")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','3','".$text["Ausblenden"].":');\" style=\"float:right;background-image:url(./images/navi/clear.png);\" />
+		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Plugin-\nspezifisch"]) ? $text["Plugin-\nspezifisch"] : "Plugin-\nspezifisch")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','4','".$text["Plugin"].":');\" style=\"margin-bottom:10px;background-image:url(./images/navi/lieferschein.png);\" />
 		
-		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Plugin\nausblenden"]) ? $text["Plugin\nausblenden"] : "Plugin\nausblenden")."\" onclick=\"contextMenu.start(this, 'mUserdata','5','".$text["Plugin"].":');\" style=\"background-image:url(./images/navi/tab.png);\" />";
+		<input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".(isset($text["Plugin\nausblenden"]) ? $text["Plugin\nausblenden"] : "Plugin\nausblenden")."\" onclick=\"phynxContextMenu.start(this, 'mUserdata','5','".$text["Plugin"].":');\" style=\"background-image:url(./images/navi/tab.png);\" />";
 	}
 	
 	public function getContextMenuHTML($identifier){
@@ -171,7 +171,7 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 			if(!$_SESSION["CurrentAppPlugins"]->getIsAdminOnly($key) AND $_SESSION["CurrentAppPlugins"]->isCollectionOfFlip($key) != "")
 				$opts .= "<option value=\"$key:".$_SESSION["CurrentAppPlugins"]->isCollectionOfFlip($key)."\">$value</option>";
 		}
-		$s = split(":",$identifier);
+		$s = explode(":",$identifier);
 		if(isset($s[1])) $identifier = $s[0];
 		switch($identifier){
 			case "1":
@@ -182,13 +182,13 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 				echo "
 				<table>
 					<tr>
-						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$c."\" style=\"background-image:url(./images/navi/new.png);\" onclick=\"contextMenu.update('mUserdata','Create','".str_replace(array("\n","'"),array(" ","\'"),$c).":');\" /></td>
+						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$c."\" style=\"background-image:url(./images/navi/new.png);\" onclick=\"phynxContextMenu.update('mUserdata','Create','".str_replace(array("\n","'"),array(" ","\'"),$c).":');\" /></td>
 					</tr>
 					<tr>
-						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$b."\" style=\"background-image:url(./images/navi/editb.png);\" onclick=\"contextMenu.update('mUserdata','Edit','".str_replace(array("\n","'"),array(" ","\'"),$b).":');\" /></td>
+						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$b."\" style=\"background-image:url(./images/navi/editb.png);\" onclick=\"phynxContextMenu.update('mUserdata','Edit','".str_replace(array("\n","'"),array(" ","\'"),$b).":');\" /></td>
 					</tr>
 					<tr>
-						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$l."\" style=\"background-image:url(./images/navi/trash.png);\" onclick=\"contextMenu.update('mUserdata','Delete','".str_replace(array("\n","'"),array(" ","\'"),$l).":');\" /></td>
+						<td><input type=\"button\" class=\"bigButton backgroundColor2\" value=\"".$l."\" style=\"background-image:url(./images/navi/trash.png);\" onclick=\"phynxContextMenu.update('mUserdata','Delete','".str_replace(array("\n","'"),array(" ","\'"),$l).":');\" /></td>
 					</tr>
 					<tr>
 						<td><img src=\"./images/navi/warning.png\" style=\"float:left;margin-right:4px;\" />".$text["pluginSupport"]."</td>
@@ -223,7 +223,7 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 						<td><select id=\"relabelPlugin\">$opts</select></td>
 					</tr>
 					<tr>
-						<td><input type=\"button\" value=\"".$text["select"]."\" onclick=\"contextMenu.update('mUserdata','".($identifier == "2" ? "relabel" : "hide").":'+$('relabelPlugin').value.split(':')[1], $('relabelPlugin').value.split(':')[1]);\" /></td>
+						<td><input type=\"button\" value=\"".$text["select"]."\" onclick=\"phynxContextMenu.update('mUserdata','".($identifier == "2" ? "relabel" : "hide").":'+$('relabelPlugin').value.split(':')[1], $('relabelPlugin').value.split(':')[1]);\" /></td>
 					</tr>
 					<tr>
 						<td><img src=\"./images/navi/warning.png\" style=\"float:left;margin-right:4px;\" />".$text["maybeHidden"]."</td>
@@ -244,7 +244,7 @@ class mUserdataGUI extends mUserdata implements iGUIHTML2, icontextMenu {
 						<td><select id=\"relabelPlugin\">$opts</select></td>
 					</tr>
 					".($identifier == 4 ? "<tr>
-						<td><input type=\"button\" value=\"".$text["selectPluginButton"]."\" onclick=\"contextMenu.update('mUserdata','pS:'+$('relabelPlugin').value.split(':')[0], $('relabelPlugin').value.split(':')[0]);\" /></td>
+						<td><input type=\"button\" value=\"".$text["selectPluginButton"]."\" onclick=\"phynxContextMenu.update('mUserdata','pS:'+$('relabelPlugin').value.split(':')[0], $('relabelPlugin').value.split(':')[0]);\" /></td>
 					</tr>" : "<tr>
 						<td><input type=\"button\" value=\"".$text["selectPluginButton"]."\" onclick=\"addHidePlugin();\" /></td>
 					</tr>")."

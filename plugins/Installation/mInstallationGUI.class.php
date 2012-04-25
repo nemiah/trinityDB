@@ -19,13 +19,12 @@
  */
 class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 
-	function updateAllTables(){
+	/*function updateAllTables(){
 		parent::updateAllTables();
-	}
+	}*/
 	
 	function getHTML($id){
 		$showHelp = true;
-
 
 		if($this->collector == null) $this->lCV3($id);
 		$singularLanguageClass = $this->loadLanguageClass("Installation");
@@ -73,7 +72,7 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 
 			$help = "
 	<script type=\"text/javascript\">
-		rme('mInstallation','','getHelp','true','if(checkResponse(transport)) { Popup.create(\'123\', \'Installation\', \'Hilfe\'); Popup.update(transport, \'123\', \'Installation\'); }');
+		contentManager.rmePCR('mInstallation','','getHelp','true','if(checkResponse(transport)) { Popup.create(\'123\', \'Installation\', \'Hilfe\'); Popup.update(transport, \'123\', \'Installation\'); }');
 	</script>";
 
 		try {
@@ -85,7 +84,37 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 			return $g.$t->getHTML().$help;
 		}
 		catch (NoDBUserDataException $e) { 
-			$t->addRow(isset($text["wrongData"]) ? $text["wrongData"] : "Die angegebenen Datenbank-Zugangsdaten sind nicht korrekt.<br /><br />Wenn sie korrekt sind, wird hier eine Liste der Plugins angezeigt.");
+			$t->addRow(isset($text["wrongData"]) ? $text["wrongData"] : "Mit den angegebenen Datenbank-Zugangsdaten kann keine Verbindung aufgebaut werden.<br /><br />Wenn sie korrekt sind, wird hier eine Liste der Plugins angezeigt.");
+			
+			if(PHYNX_MAIN_STORAGE == "MySQL") {
+				try {
+					$DB1 = new DBStorageU();
+					
+					$B = new Button("Hinweis", "notice", "icon");
+					$B->style("float:left;margin-right:10px;");
+					
+					$File = new File(Util::getRootPath()."system/connect.php");
+					
+					$BR = new Button("DB-Verbindung\numstellen", "lieferschein");
+					$BR->style("float:right;margin-left:10px;");
+					$BR->rmePCR("mInstallation", "-1", "switchDBToMySQLo", "", "Installation.reloadApp();");
+					
+					$BR = "Verwenden Sie den nebenstehenden Knopf, um die Verbindungsart auf die ältere Version umzustellen.<br />$BR Sie müssen sich anschließend erneut anmelden.";
+					
+					$BReload = new Button("Ansicht\naktualisieren","refresh");
+					$BReload->onclick("contentManager.emptyFrame('contentLeft'); contentManager.loadFrame('contentRight', 'mInstallation', -1, 0, 'mInstallationGUI;-');Popup.closeNonPersistent();");
+					$BReload->style("float:right;margin:10px;");
+					
+					if(!$File->A("FileIsWritable"))
+						$BR = "Bitte machen Sie die Datei /system/connect.php für den Webserver beschreibbar, damit phynx auf die ältere Verbindungsart umstellen kann.<br /><br />Verwenden Sie dazu Ihr FTP-Programm. Klicken Sie mit der rechten Maustaste auf die Datei auf dem Server, wählen Sie \"Eigenschaften\", und geben Sie den Modus 666 an, damit sie durch den Besitzer, die Gruppe und alle Anderen les- und schreibbar ist.$BReload";
+					$t->addRow(array("$B <b>Möglicherweise ist die MySQLi-Erweiterung auf Ihrem Server nicht korrekt konfiguriert.</b><br /><br />$BR"));
+					$t->addRowClass("backgroundColor0");
+					
+				} catch (Exception $e){
+					#echo "MySQL geht auch nicht!";
+				}
+			}
+			
 			return $g.$t->getHTML().$help;
 		}
 		catch (DatabaseNotFoundException $e) {
@@ -109,31 +138,22 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 
 			$BackupTab->addRow($BackupButton);
 
+			$BUT = new Button((isset($text["alle Tabellen aktualisieren"]) ? $text["alle Tabellen aktualisieren"] : "alle Tabellen\naktualisieren"), "update");
+			$BUT->rmePCR("mInstallation", "", "updateAllTables", "", "$('contentLeft').update(transport.responseText);");
+
 			$g .= "
 	<div style=\"height:30px;\"></div>
 	$BackupTab
 	<div class=\"Tab backgroundColor1\"><p>Plugins</p></div>
 	<table>
 		<colgroup>
-			<col style=\"width:100px;\" class=\"backgroundColor3\" />
-			<col class=\"backgroundColor2\" />
+			<col style=\"width:100px;\" class=\"backgroundColor2\" />
+			<col class=\"backgroundColor3\" />
 		</colgroup>
 		<tr>
-			<td colspan=\"3\" class=\"backgroundColor3\">
-				<input
-					type=\"button\"
-					value=\"".(isset($text["neue Plugins laden"]) ? $text["neue Plugins laden"] : "neue Plugins\nladen")."\"
-					style=\"float:right;background-image:url(./images/navi/refresh.png);\"
-					class=\"bigButton backgroundColor2\"
-					onclick=\"reloadApp();\"
-				/>
-				<input
-					type=\"button\"
-					value=\"".(isset($text["alle Tabellen aktualisieren"]) ? $text["alle Tabellen aktualisieren"] : "alle Tabellen\naktualisieren")."\"
-					style=\"background-image:url(./images/navi/update.png);\"
-					class=\"bigButton backgroundColor2\"
-					onclick=\"rme('mInstallation','','updateAllTables','','$(\'contentLeft\').update(transport.responseText);');\"
-				/>
+			<td colspan=\"3\">
+				<span style=\"float:right;\">".Installation::getReloadButton()."</span>
+				$BUT
 			</td>
 		</tr>
 		<tr>
@@ -194,7 +214,7 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 			$MailServer = LoginData::get("MailServerUserPass");
 			$MailServerID = $MailServer == null ? -1 : $MailServer->getID();
 			$BMail = $ST->addButton("Mail-Server\neintragen", "./plugins/Installation/serverMail.png");
-			$BMail->popup("mailServer", "Mail-Server", "LoginData", $MailServerID, "getPopup", "", "LoginDataGUI;preset:mailServer");
+			$BMail->popup("edit", "Mail-Server", "LoginData", $MailServerID, "getPopup", "", "LoginDataGUI;preset:mailServer");
 		} catch(Exception $e){}
 
 		return (!$showHelp ? $ST : "").$g.$help;
@@ -211,7 +231,7 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 		$BH->type("icon");
 
 		$BReload = new Button("Ansicht\naktualisieren","refresh");
-		$BReload->onclick("contentManager.emptyFrame('contentLeft'); contentManager.loadFrame('contentRight', 'mInstallation', -1, 0, 'mInstallationGUI;-');$('windows').update('');");
+		$BReload->onclick("contentManager.emptyFrame('contentLeft'); contentManager.loadFrame('contentRight', 'mInstallation', -1, 0, 'mInstallationGUI;-');Popup.closeNonPersistent();");
 
 		echo "<p style=\"padding:5px;\">
 		$BH
@@ -237,34 +257,34 @@ class mInstallationGUI extends mInstallation implements iGUIHTML2 {
 	public function testMailGUI(){
 		$F = new HTMLForm("mailTest", array("mailfrom","mailto"));
 
-		$F->setSaveRMEP("Mailversand testen", "./images/i2/save.gif", "mInstallation", -1, "testMail", "if(checkResponse(transport)) $(\'mailTestDetailsContent\').update(transport.responseText);");
+		$F->setSaveRMEPCR("Mailversand testen", "./images/i2/save.gif", "mInstallation", -1, "testMail", "function(transport){ $('mailTestDetailsContent').update(transport.responseText); }");
 
 		$F->setLabel("mailfrom", "Absender");
 		$F->setDescriptionField("mailfrom", "E-Mail-Adresse");
 		$F->setLabel("mailto", "Empfänger");
 		$F->setDescriptionField("mailto", "E-Mail-Adresse");
 
-		echo $F;
+		echo $F."<div id=\"mailTestDetailsContent\"></div>";
 	}
 
-	public function testMail($data){
-		parse_str($data, $out);
+	public function testMail($mailfrom, $mailto){
+		#parse_str($data, $out);
 		#print_r($out);
 
-		if($out["mailfrom"] == "")
+		if($mailfrom == "")
 			Red::errorD("Bitte geben Sie einen Absender ein!");
 
-		if($out["mailto"] == "")
+		if($mailto == "")
 			Red::errorD("Bitte geben Sie einen Empfänger ein!");
 
 		$mail = new htmlMimeMail5();
-		$mail->setFrom("phynx Mailtest <".$out["mailfrom"].">");
-		if(!ini_get('safe_mode')) $mail->setReturnPath($out["mailfrom"]);
+		$mail->setFrom("phynx Mailtest <".$mailfrom.">");
+		if(!ini_get('safe_mode')) $mail->setReturnPath($mailfrom);
 		$mail->setSubject("phynx Mailtest");
 
 		$mail->setText(wordwrap("Diese Nachricht wurde vom phynx Mailtester erzeugt. Ihre E-Mail-Einstellungen sind korrekt.",80));
 		$adressen = array();
-		$adressen[] = $out["mailto"];
+		$adressen[] = $mailto;
 		if($mail->send($adressen))
 			echo "<p style=\"padding:5px;color:green;\">E-Mail erfolgreich übergeben.</p>";
 		else

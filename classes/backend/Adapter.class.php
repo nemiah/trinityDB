@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class Adapter {
@@ -27,6 +27,8 @@ class Adapter {
 	private $storage = "";
 	
 	protected $selectStatement = null;
+	
+	protected $hasParsers = false;
 	
 	/**
 	 * Creates a new instance of this class. ID and Tablename are set.
@@ -199,10 +201,6 @@ class Adapter {
 		return $this->DBS->alterTable($CIA);
 	}
 	
-	/*function makeSearch($query){
-		
-	}*/
-	
 	/**
 	 * Adds a parser for the supplied attribute.
 	 * 
@@ -211,10 +209,12 @@ class Adapter {
 	 */
 	function addParser($attribute,$function) {
 		$this->parsers[$attribute] = $function;
+		$this->hasParsers = true;
 	}
 
 	function resetParsers(){
 		$this->parsers = array();
+		$this->hasParsers = false;
 	}
 	
 	/**
@@ -226,12 +226,13 @@ class Adapter {
 	 * @param $forWhat[optional](String) Tablename to be used
 	 * @param $typsicher[optional](Boolean) Determines if execution is typesafe
 	 */
-	function loadSingle2($forWhat = "", $typsicher = false){
+	function loadSingle2($forWhat = ""/*, $typsicher = false*/){
 		if($this->DBS == null) $this->getConnection();
 		if($forWhat == "") $forWhat = str_replace("Adapter","",get_class($this));
 		
-		if(!$typsicher) $A = $this->DBS->loadSingle2($forWhat, $this->ID);
-		else $A = $this->DBS->loadSingleT($forWhat, $this->ID);
+		#if(!$typsicher) 
+		$A = $this->DBS->loadSingle2($forWhat, $this->ID);
+		#else $A = $this->DBS->loadSingleT($forWhat, $this->ID);
 
 		foreach($this->parsers AS $key => $value)
 			if(isset($A->$key)) {
@@ -242,17 +243,6 @@ class Adapter {
 			#if(isset($A->$key)) eval("\$A->\$key = ".$value."(\"".$A->$key."\",\"load\");");
 
 		return $A;
-	}
-	
-	/**
-	 * Same as loadSingle2 but typesafe
-	 * 
-	 * @return see loadSingle2
-	 * 
-	 * @param $forWhat[optional](String) see loadSingle2
-	 */
-	function loadSingleT($forWhat = ""){
-		return $this->loadSingle2($forWhat, true);
 	}
 	
 	/**
@@ -268,7 +258,7 @@ class Adapter {
 				if(isset($A->$key)) {
 					$s = explode("::",$value);
 					$method = new ReflectionMethod($s[0], $s[1]);
-					$A->$key = $method->invoke(null, $A->$key, "store");
+					$A->$key = $method->invoke(null, $A->$key, "store", $A);
 				}
 		return $A;
 	}
@@ -284,24 +274,6 @@ class Adapter {
 		$_SESSION["messages"]->addMessage("Saving class $forWhat into DB...");
 		$A = $this->doParsing($A);
 		$this->DBS->saveSingle2($forWhat, $this->ID, $A);
-	}
-	
-	/**
-	 * This function is deprecated.
-	 * 
-	 * @param $forWhat(String)
-	 * @param $A(Object)
-	 */
-	function saveSingle($forWhat,Attributes $A){
-		throw new FunctionDeprecatedException("Adapter","saveSingle");
-		
-	/*	if($this->DBS == null) $this->getConnection();
-		$_SESSION["messages"]->addMessage("Saving class $forWhat into DB...");
-
-		$A = $this->doParsing($A);
-
-		$this->DBS->saveSingle("$forWhat",$forWhat."ID",$this->ID,PMReflector::getAttributesArray($forWhat."Attributes"),$A);
-	*/
 	}
 	
 	/**
@@ -364,15 +336,6 @@ class Adapter {
 	}
 
 	/**
-	 * Typesafe version of lCV4
-	 * 
-	 * @return Object See lCV4
-	 */
-	function lCT(){
-		return $this->lCV4(true);
-	}
-	
-	/**
 	 * This function will return all entries from database matching previously set selectStatement.
 	 * 
 	 * @return Object All objects matching selectStatement
@@ -392,8 +355,14 @@ class Adapter {
 		$this->DBS->setParser($this->parsers);
 		if($this->affectedRowsOnly) $this->affectedRowsOnly = false;
 
-		if(!$typsicher) return $this->DBS->loadMultipleV4($this->selectStatement);
-		else return $this->DBS->loadMultipleT($this->selectStatement);
+		#if(!$typsicher)
+		$return = $this->DBS->loadMultipleV4($this->selectStatement);
+		#else return $this->DBS->loadMultipleT($this->selectStatement);
+		if($return != null AND is_array($return))
+			foreach($return AS $k => $v)
+				$v->parsers = $this->hasParsers;
+		
+		return $return;
 	}
 	
 	/**
@@ -402,7 +371,6 @@ class Adapter {
 	 * @return Object All objects matching selectStatement
 	 */
 	function lCV3(){
-		
 		$this->parseSearchString();
 		if($this->DBS == null) $this->getConnection();
 		
@@ -417,7 +385,12 @@ class Adapter {
 		$this->DBS->setParser($this->parsers);
 		if($this->affectedRowsOnly) $this->affectedRowsOnly = false;
 		
-		return $this->DBS->loadMultipleV3($this->selectStatement);
+		$return = $this->DBS->loadMultipleV3($this->selectStatement);
+		if($return != null AND is_array($return))
+			foreach($return AS $k => $v)
+				$v->parsers = $this->hasParsers;
+		
+		return $return;
 	}
 }
 ?>

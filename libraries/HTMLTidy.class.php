@@ -22,6 +22,7 @@ class HTMLTidy {
 	private $makeUTF8 = false;
 	private $done = false;
 	private $cleanedFile;
+	private $errorsFile;
 
 	function __construct($uri = null){
 		if($uri != null)
@@ -50,15 +51,16 @@ class HTMLTidy {
 
 		$temp = Util::getTempFilename(session_id(), "html");
 		$this->cleanedFile = Util::getTempFilename(session_id(), "xhtml");
+		$this->errorsFile = Util::getTempFilename(session_id()."_errors", "txt");
 		file_put_contents($temp, $this->content);
 
 		$SC = new SystemCommand();
 		if(!Util::isWindowsHost())
-			$SC->setCommand("tidy -asxhtml -numeric < $temp > $this->cleanedFile");
+			$SC->setCommand("tidy -asxhtml -numeric < $temp > $this->cleanedFile 2> $this->errorsFile");
 		else
 			$SC->setCommand("c:/tidy.exe -asxhtml -numeric < $temp > $this->cleanedFile");
 		$SC->execute();
-
+		#echo file_get_contents("php://stderr");
 		$this->done = true;
 	}
 

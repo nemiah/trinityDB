@@ -24,8 +24,14 @@ class mInstallation extends anyC {
 		$this->collectionOf = "Installation";
 		$this->storage = "phpFileDB";
 	}
+	
+	public function switchDBToMySQLo(){
+		file_put_contents(Util::getRootPath()."system/connect.php", str_replace("\n#define(\"PHYNX_MAIN_STORAGE\",\"MySQLo\");\n", "\ndefine(\"PHYNX_MAIN_STORAGE\",\"MySQLo\");\n", file_get_contents(Util::getRootPath()."system/connect.php")));
+	
+		#$DB = new DBStorageU();
+	}
 
-	protected function updateAllTables(){
+	public function updateAllTables(){
 			$p = array_flip($_SESSION["CurrentAppPlugins"]->getAllPlugins());
 			
 			echo "
@@ -58,15 +64,15 @@ class mInstallation extends anyC {
 				if($key == "CIs") continue;
 
 				#$c = new $className();
+				if($c->checkIfMyTableExists() AND $c->checkIfMyDBFileExists()){
 				echo "
 				<tr>
 					<td style=\"text-align:right;\">".$value.":</td><td>";
-				if($c->checkIfMyTableExists() AND $c->checkIfMyDBFileExists()){
 					$c->checkMyTables();
-				} else echo "keine Tabelle(n) / keine DB-Info-Datei";
 				echo "
 					</td>
 				</tr>";
+				} #else echo "keine Tabelle(n) / keine DB-Info-Datei";
 			}
 			echo "
 			</table>";

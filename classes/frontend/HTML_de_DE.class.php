@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class HTML_de_DE {
 	public function getEditTexts(){
@@ -54,7 +54,7 @@ class HTML_de_DE {
 		"hochladen" => "hochladen",
 		"<=100KB" => "Es wird nicht empfohlen, Bilder über 100kB hochzuladen",
 		"Suche" => "Suche",
-		"versionError" => "Sie verwenden eine alte Version dieses Plugins (%1) mit einer neueren Version des Frameworks (%2).<br />Bitte korrigieren Sie diesen Fehler, um das Plugin zu verwenden.");
+		"versionError" => "Sie verwenden eine alte Version dieses Plugins (%1) mit einer neueren Version des Frameworks (%2).<br />Wenn Sie diese Anwendung aktualisiert haben, verwenden Sie bitte nachfolgenden Knopf, um sie neu zu laden.");
 	}
 }
 ?>

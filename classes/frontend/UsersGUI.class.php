@@ -15,10 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class UsersGUI extends Users implements iGUIHTML2{
 	public function getHTML($id){
+		$allowedUsers = Environment::getS("allowedUsers", null);
+		
 		$this->addOrderV3("name");
 		if($this->A == null) $this->lCV3($id);
 		
@@ -33,7 +35,7 @@ class UsersGUI extends Users implements iGUIHTML2{
 				<col class=\"backgroundColor3\" />
 			</colgroup>
 			<tr>
-				<td><input onclick=\"rme('Users','','convertPasswords','','reloadRightFrame();');\" type=\"button\" style=\"float:right;background-image:url(./images/navi/keys.png);\" class=\"bigButton backgroundColor2\" value=\"Passwörter\nkonvertieren\" />In Ihrer Datenbank befinden sich noch unkonvertierte Passwörter.</td>
+				<td><input onclick=\"rme('Users','','convertPasswords','','contentManager.reloadFrameRight();');\" type=\"button\" style=\"float:right;background-image:url(./images/navi/keys.png);\" class=\"bigButton backgroundColor2\" value=\"Passwörter\nkonvertieren\" />In Ihrer Datenbank befinden sich noch unkonvertierte Passwörter.</td>
 			</tr>
 		</table>";
 
@@ -41,11 +43,11 @@ class UsersGUI extends Users implements iGUIHTML2{
 
 		$I = new HTMLInput("AppServer", "text", mUserdata::getGlobalSettingValue("AppServer", ""));
 		$I->onEnter("contentManager.rmePCR('Users', '-1', 'saveAppServer', [this.value], ' ');");
-
-		$T->addRow($I."<br /><small>Wenn Sie einen Application Server bertreiben, tragen Sie hier bitte die URL ein, um die Benutzer mit diesem Server zu authorisieren.</small>");
+		if($allowedUsers === null)
+			$T->addRow($I."<br /><small>Wenn Sie einen Application Server bertreiben, tragen Sie hier bitte die URL ein, um die Benutzer mit diesem Server zu authorisieren.</small>");
 
 		$gui = new HTMLGUI();
-		if($this->collector != null) $gui->setAttributes($this->collector);
+		$gui->setObject($this);
 		$gui->setName("Benutzer");
 		$gui->setCollectionOf($this->collectionOf,"Benutzer");
 		#$gui->setObject($this);
@@ -66,13 +68,33 @@ class UsersGUI extends Users implements iGUIHTML2{
 				$gui->setIsDisplayMode(true);
 			}
 		}
-		return $g.$gui->getBrowserHTML($id).($id == -1 ? $T : "");
+		
+		$TR = new HTMLTable(1);
+		if($allowedUsers !== null AND $id == -1){
+			$B = new Button("", "notice", "icon");
+			$B->style("float:left;margin-right:10px;");
+			$TR->addRow(array($B."Bitte beachten Sie: Sie können insgesamt $allowedUsers Benutzer ohne Admin-Rechte anlegen."));
+		}
+		
+		$gui->customize($this->customizer);
+		
+		return $TR.$g.$gui->getBrowserHTML($id).($id == -1 ? $T : "");
+	}
+	
+	function doCertificateLogin($application, $sprache, $cert) {
+		echo parent::doCertificateLogin($application, $sprache, $cert);
 	}
 	
 	function doLogin($ps){
+		$args = func_get_args();
+		if(count($args) > 1){
+			$ps = array();
+			$ps["loginUsername"] = $args[0];
+			$ps["loginSHAPassword"] = $args[1];
+			$ps["anwendung"] = $args[2];
+			$ps["loginSprache"] = $args[3];
+		}
 		echo parent::doLogin($ps);
-		#if($r != "0") echo $r;
-		#else echo $r;
 	}
 	
 	function doLogout(){
@@ -96,7 +118,7 @@ class UsersGUI extends Users implements iGUIHTML2{
 
 	public function saveAppServer($value){
 		mUserdata::setUserdataS("AppServer", $value, "", -1);
-		echo "message:GlobalMessages.M002";
+		Red::messageSaved();
 	}
 }
 ?>

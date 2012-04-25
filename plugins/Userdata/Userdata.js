@@ -19,25 +19,25 @@
  */
 function addUserRestriction(){
 	var cEs = $('cant'+$('uRestAction').value).value.split(":");
-	rme("mUserdata","-1","setUserdata",new Array("cant"+$('uRestAction').value+cEs[0],"cant"+$('uRestAction').value+cEs[1],"uRest",lastLoadedLeft),"reloadLeftFrame()");
+	rme("mUserdata","-1","setUserdata",new Array("cant"+$('uRestAction').value+cEs[0],"cant"+$('uRestAction').value+cEs[1],"uRest",lastLoadedLeft),"contentManager.reloadFrameLeft()");
 }
 
 function saveFieldRelabeling(){
-	rme("mUserdata","-1","setUserdata",new Array("relabel"+$('relabelPlugin').value+":"+$('relabelField').value, $('relabelTo').value, "relab", lastLoadedLeft),"reloadLeftFrame()");
+	rme("mUserdata","-1","setUserdata",new Array("relabel"+$('relabelPlugin').value+":"+$('relabelField').value, $('relabelTo').value, "relab", lastLoadedLeft),"contentManager.reloadFrameLeft()");
 }
 
 function saveFieldHiding(){
-	rme("mUserdata","-1","setUserdata",new Array("hideField"+$('hidePlugin').value+":"+$('hideField').value, "", "hideF", lastLoadedLeft),"reloadLeftFrame()");
+	rme("mUserdata","-1","setUserdata",new Array("hideField"+$('hidePlugin').value+":"+$('hideField').value, "", "hideF", lastLoadedLeft),"contentManager.reloadFrameLeft()");
 }
 
 function savePluginSpecificRestriction(){
-	rme("mUserdata","-1","setUserdata",new Array($('pSSelect').value.split(":")[0],$('pSSelect').value.split(":")[1], "pSpec", lastLoadedLeft),"reloadLeftFrame()");
+	rme("mUserdata","-1","setUserdata",new Array($('pSSelect').value.split(":")[0],$('pSSelect').value.split(":")[1], "pSpec", lastLoadedLeft),"contentManager.reloadFrameLeft()");
 }
 
 function addHidePlugin(){
-	rme("mUserdata","-1","setUserdata",new Array("hidePlugin"+$('relabelPlugin').value.split(":")[0],$('relabelPlugin').value.split(":")[0], "pHide", lastLoadedLeft),"reloadLeftFrame()");
+	rme("mUserdata","-1","setUserdata",new Array("hidePlugin"+$('relabelPlugin').value.split(":")[0],$('relabelPlugin').value.split(":")[0], "pHide", lastLoadedLeft),"contentManager.reloadFrameLeft()");
 }
 
 function copyFromOtherUser(fromUserId){
-	rme("User",lastLoadedLeft,"copyUserRestrictions",new Array(fromUserId),"reloadLeftFrame()");
+	rme("User",lastLoadedLeft,"copyUserRestrictions",new Array(fromUserId),"contentManager.reloadFrameLeft()");
 }

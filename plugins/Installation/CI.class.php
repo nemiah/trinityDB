@@ -35,7 +35,6 @@ class CI extends PersistentObject {
 	}
 	
 	function __construct($ID) {
-		#$this->myAdapterClass = "CIAdapter";
 		parent::__construct($ID);
 		$this->storage = "phpFileDB";	
 	}

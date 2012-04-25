@@ -20,6 +20,7 @@
 class mFile extends anyC {
 	private $hideDirs = false;
 
+	
 	public function __construct(){
 		$this->storage = "File";
 		$this->setCollectionOf("File");

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class ExtConn {
 	protected $absolutePath;
@@ -32,7 +32,9 @@ class ExtConn {
 		if(!defined("PHYNX_MAIN_STORAGE"))
 			if(function_exists("mysqli_connect")) define("PHYNX_MAIN_STORAGE","MySQL");
 			else define("PHYNX_MAIN_STORAGE","MySQLo");
-		
+
+		define("PHYNX_VIA_INTERFACE", true);
+
 		if($absolutePathToPhynx{strlen($absolutePathToPhynx) - 1} != "/") $absolutePathToPhynx .= "/";
 		
 		$this->absolutePath = $absolutePathToPhynx;
@@ -58,6 +60,7 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/exceptions/o3AException.class.php";
 		$this->paths[] = $this->absolutePath."classes/exceptions/StorageException.class.php";
 		$this->paths[] = $this->absolutePath."classes/exceptions/NoDBUserDataException.class.php";
+		$this->paths[] = $this->absolutePath."classes/exceptions/AOPNoAdviceException.class.php";
 		
 		$this->paths[] = $this->absolutePath."classes/toolbox/SysMessages.class.php";
 		$this->paths[] = $this->absolutePath."classes/toolbox/SystemCommand.class.php";
@@ -68,6 +71,8 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/toolbox/Factory.class.php";
 		$this->paths[] = $this->absolutePath."classes/toolbox/ISO3166.class.php";
 		$this->paths[] = $this->absolutePath."classes/toolbox/Aspect.class.php";
+		$this->paths[] = $this->absolutePath."classes/toolbox/EUCountries.class.php";
+		$this->paths[] = $this->absolutePath."classes/toolbox/Registry.class.php";
 
 		$this->paths[] = $this->absolutePath."classes/interfaces/iFileBrowser.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iLDAPExport.class.php";
@@ -82,7 +87,7 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/interfaces/iGUIHTML2.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iGUIHTMLMP2.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iPluginSpecificRestrictions.class.php";
-		$this->paths[] = $this->absolutePath."classes/interfaces/iFPDF.class.php";
+		#$this->paths[] = $this->absolutePath."classes/interfaces/iFPDF.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iXMLExport.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iUnifiedTable.class.php";
 		$this->paths[] = $this->absolutePath."classes/interfaces/iPluginV2.class.php";
@@ -90,16 +95,21 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/frontend/Users.class.php";
 		#$this->paths[] = $this->absolutePath."classes/frontend/UserAttributes.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/AppPlugins.class.php";
+		$this->paths[] = $this->absolutePath."classes/frontend/Applications.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/HTMLGUI.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/HTMLGUI2.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/HTML_de_DE.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/HTML_en_US.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/UnifiedTable.class.php";
 		$this->paths[] = $this->absolutePath."classes/frontend/HTMLTable.class.php";
+		$this->paths[] = $this->absolutePath."classes/frontend/JSLoader.class.php";
 		
 		$this->paths[] = $this->absolutePath."plugins/Userdata/mUserdata.class.php";
 		$this->paths[] = $this->absolutePath."plugins/Userdata/Userdata.class.php";
 		#$this->paths[] = $this->absolutePath."plugins/Userdata/UserdataAttributes.class.php";
+
+		$this->paths[] = $this->absolutePath."classes/toolbox/LoginData.class.php";//Or else will not find Userdata
+		$this->paths[] = $this->absolutePath."classes/toolbox/Environment.class.php";
 		
 		$this->setPaths();
 		
@@ -114,14 +124,20 @@ class ExtConn {
 		if(isset($_SESSION["BPS"]) AND !is_object($_SESSION["BPS"]) AND get_class($_SESSION["BPS"]) != "BackgroundPluginState")
 			die($this->getErrorMessage("12"));
 		
+		if(!isset($_SESSION["S"]))
+			$_SESSION["S"] = new Session();
 		
-		$_SESSION["S"] = new Session();
+		SysMessages::init();
 		$_SESSION["messages"]->startLogging();
 		$_SESSION["BPS"] = new BackgroundPluginState();
 
 		$_SESSION["viaInterface"] = true;
 	}
 
+	function forbidCustomizers(){
+		define("PHYNX_FORBID_CUSTOMIZERS", true);
+	}
+	
 	function addClassPath($absolutePath){
 		$dir = new DirectoryIterator($absolutePath);
 
@@ -137,6 +153,10 @@ class ExtConn {
 		}
 	}
 
+	public function setFlag($class, $flag, $value){
+		BPS::setProperty($class, $flag, $value);
+	}
+	
 	function useDefaultMySQLData($httpHost = "*"){
 		$PFDB = new PhpFileDB();
 		$PFDB->setFolder($this->absolutePath."system/DBData/");

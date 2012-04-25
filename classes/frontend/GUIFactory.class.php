@@ -50,6 +50,8 @@ class GUIFactory {
 	private $isSelection = false;
 	#private $features;
 
+	private $blacklists = array();
+
 	function  __construct($className, $collectionName = null) {
 		$this->className = $className;
 
@@ -157,7 +159,7 @@ class GUIFactory {
 		$B = new Button("Auswahl\nbeenden","stop");
 		$B->onclick(str_replace(array("%CLASSNAME"),array($this->className), $this->functionAbort));
 		$B->style("margin-left:10px;margin-bottom:10px;");
-
+		$B->className("selectionAbortButton");
 		return $B;
 	}
 
@@ -165,7 +167,7 @@ class GUIFactory {
 		$B = new Button("Auswahl hinzufügen","./images/i2/cart.png");
 		$B->onclick(str_replace(array("%COLLECTIONNAME","%CLASSNAME", "%CLASSID"), array($this->collectionName,$this->className, $this->classID), $this->functionSelect));
 		$B->type("icon");
-
+		$B->className("selectionButton");
 		return $B;
 	}
 
@@ -193,6 +195,7 @@ class GUIFactory {
 
 		$B = $this->getButton("Eintrag erstellen", "./images/i2/$icon");
 		$B->type("icon");
+		$B->id("buttonNewEntry".$this->className);
 		if($this->functionNew != null)
 			$B->onclick(str_replace(array("%COLLECTIONNAME","%CLASSNAME", "%CLASSID"), array($this->collectionName, $this->className, -1), $this->functionNew));
 
@@ -202,7 +205,7 @@ class GUIFactory {
 	private function getSettingsButton(){
 		$B = $this->getButton("Einstellungen anzeigen", "./images/i2/settings.png");
 		$B->type("icon");
-		$B->onclick("contextMenu.start(this, 'HTML','multiPageSettings:$this->collectionName','Einstellungen:');");
+		$B->onclick("phynxContextMenu.start(this, 'HTML','multiPageSettings:$this->collectionName','Einstellungen:');");
 
 		return $B;
 	}
@@ -210,7 +213,7 @@ class GUIFactory {
 	private function getQuicksearchButton(){
 		$B = $this->getButton("Suche-Details anzeigen", "./images/i2/search.png");
 		$B->type("icon");
-		$B->onclick("contextMenu.start(this, '$this->collectionName','searchHelp','Suche:','left');");
+		$B->onclick("phynxContextMenu.start(this, '$this->collectionName','searchHelp','Suche:','left');");
 		$B->style("cursor: help;");
 
 		return $B;
@@ -258,7 +261,7 @@ class GUIFactory {
 		#$I->hasFocusEvent(true);
 		$I->id("quickSearch$this->collectionName");
 		$I->onkeyup("AC.update(event.keyCode, this, '$this->collectionName','quickSearchLoadFrame');");
-		$I->autocomplete(false);
+		$I->autocompleteBrowser(false);
 		$I->onfocus("focusMe(this); ACInputHasFocus=true; AC.start(this); if(this.value != '') AC.update('10', this, '$this->collectionName', 'quickSearchLoadFrame');");
 		$I->onblur("blurMe(this); ACInputHasFocus=false; AC.end(this);");
 
@@ -277,6 +280,7 @@ class GUIFactory {
 
 		if($this->mode == "HTML"){
 			if($this->tableMode == "CRMSubframeContainer") $caption = null;
+			if($this->tableMode == "popup") $caption = null;
 			
 			$T = new HTMLTable(count($this->referenceLine), $caption);
 
@@ -285,6 +289,9 @@ class GUIFactory {
 			if($this->tableMode == "CRMSubframeContainer")
 				$T->setTableStyle("width:100%;margin-left:0px;");
 
+			if($this->tableMode == "screen")
+				$T->setTableStyle("font-size:10px;");
+			
 			if($colStyles != null)
 				foreach($colStyles AS $k => $v)
 					$this->setColStyle($k, $v);
@@ -327,7 +334,7 @@ class GUIFactory {
 			</div>";
 		}
 
-		if($this->tableMode == "BrowserRight" OR $this->tableMode == "BrowserLeft" OR $this->tableMode == "popup"){
+		if($this->tableMode == "BrowserRight" OR $this->tableMode == "BrowserLeft" OR $this->tableMode == "popup" OR $this->tableMode == "screen"){
 			$abort = "";
 			if($this->isSelection)
 				$abort = $this->getAbortButton();
@@ -341,6 +348,7 @@ class GUIFactory {
 
 		switch($this->tableMode){
 			case "popup":
+			case "screen":
 			case "BrowserRight":
 				if($this->classID == null AND $this->showEdit) {
 					$List[] = "%EDIT";
@@ -352,7 +360,15 @@ class GUIFactory {
 					return;
 				}
 
-				if($this->showEdit AND $this->classID != -1) $List[] = $this->getEditButton();
+				
+				if($this->showEdit AND $this->classID != -1) {
+					if(!isset($this->blacklists[0][$this->classID]))
+						$List[] = $this->getEditButton();
+					else
+						$List[] = "";
+				}
+				
+
 				if($this->showNew AND $this->classID == -1) $List[] = $this->getNewButton();
 			break;
 
@@ -378,7 +394,12 @@ class GUIFactory {
 					$List[] = "%TRASH";
 					break;
 				}
-				if($this->showTrash AND $this->classID != -1) $List[] = $this->getDeleteButton();
+				if($this->showTrash AND $this->classID != -1){
+					if(!isset($this->blacklists[1][$this->classID]))
+						$List[] = $this->getDeleteButton();
+					else
+						$List[] = "";
+				}
 				#else $List[] = "";
 			break;
 
@@ -412,6 +433,9 @@ class GUIFactory {
 
 	// <editor-fold defaultstate="collapsed" desc="buildGroupLine">
 	public function buildGroupLine($label = ""){
+		if($label === false)
+			return;
+		
 		if($label != ""){
 			$this->table->addRow($label);
 			$this->table->addRowColspan(1, $this->numCols);
@@ -491,8 +515,11 @@ class GUIFactory {
 
 		$this->buildLine(-1, $newLine);
 
-		if($this->tableMode == "BrowserRight")
-		$this->table->addRowColspan(2, count($this->referenceLine) - 1);
+		if($this->tableMode == "BrowserRight"){
+			$this->table->addRowColspan(2, count($this->referenceLine) - 1);
+			$this->table->addCellStyle(2, "cursor:pointer;text-align:left;");
+			$this->table->addCellEvent(2, "click", str_replace(array("%CLASSNAME", "%CLASSID"), array($this->className, -1), $this->functionNew));
+		}
 
 		if($this->tableMode == "BrowserLeft"){
 			$this->table->addRowColspan(1, count($this->referenceLine) - 1);
@@ -543,6 +570,10 @@ class GUIFactory {
 	}
 	// </editor-fold>
 
+	public function blacklists(array $IDs){
+		$this->blacklists = array(array_flip($IDs[0]), array_flip($IDs[1]));
+	}
+
 	// <editor-fold defaultstate="collapsed" desc="setTableMode">
 	public function setTableMode($TM){
 		if($TM == null)
@@ -568,6 +599,9 @@ class GUIFactory {
 
 		if($this->tableMode == "BrowserRight")
 			$this->multiPageDetails["target"] = "contentRight";
+		
+		if($this->tableMode == "screen")
+			$this->multiPageDetails["target"] = "contentScreen";
 		
 	}
 	// </editor-fold>
@@ -595,5 +629,25 @@ class GUIFactory {
 	}
 	// </editor-fold>
  */
+	
+	public function spellBookEntry($name, $icon, $text, $go, $add = ""){
+		
+		if(is_object($icon) AND $icon instanceof Button)
+			$icon->style("float:left;margin-right:10px;margin-top:-7px;margin-left:-5px;");
+		
+		if(is_object($go) AND $go instanceof Button){
+			$go->style("float:right;margin-top:-7px;");
+			$go->type("icon");
+		}
+		return "
+		<div style=\"width:33%;float:left;\">
+			<div style=\"margin:10px;border-radius:5px;\" class=\"borderColor1 spell\">
+				<div class=\"backgroundColor2\" style=\"padding:10px;padding-bottom:5px;border-top-left-radius:5px;border-top-right-radius:5px;\">
+					$go$add$icon<h2 style=\"margin-bottom:0px;width:200px;\">$name</h2>
+				</div>
+				".($text != "" ? "<div style=\"padding:7px;height:130px;overflow:auto;\">$text</div>" : "")."
+			</div>
+		</div>";
+	}
 }
 ?>

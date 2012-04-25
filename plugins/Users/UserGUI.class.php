@@ -19,6 +19,7 @@
  */
 class UserGUI extends User implements iGUIHTML2 {
 	function getHTML($id){
+		$this->customize();
 		
 		#if($this->A == null AND $id != -1) $this->loadMe();
 		#if($id == -1) $this->A = new UserAttributes();
@@ -35,7 +36,7 @@ class UserGUI extends User implements iGUIHTML2 {
 				<col class=\"backgroundColor3\" />
 			</colgroup>
 			<tr>
-				<td><input onclick=\"rme('Users','','convertPasswords','','reloadRightFrame();');\" type=\"button\" style=\"float:right;background-image:url(./images/navi/keys.png);\" class=\"bigButton backgroundColor2\" value=\"Passwörter\nkonvertieren\" />In Ihrer Datenbank befinden sich noch unkonvertierte Passwörter.</td>
+				<td><input onclick=\"rme('Users','','convertPasswords','','contentManager.reloadFrameRight();');\" type=\"button\" style=\"float:right;background-image:url(./images/navi/keys.png);\" class=\"bigButton backgroundColor2\" value=\"Passwörter\nkonvertieren\" />In Ihrer Datenbank befinden sich noch unkonvertierte Passwörter.</td>
 			</tr>
 		</table>";
 		$this->A->password = ";;;-1;;;";
@@ -48,7 +49,7 @@ class UserGUI extends User implements iGUIHTML2 {
 		$gui->setLabel("SHApassword","Passwort");
 		$gui->setLabel("language","Sprache");
 		$gui->setType("language","select");
-		$gui->setOptions("language",array("de_DE", "en_US"),array("Deutsch (Deutschland)", "English (United States)"));
+		$gui->setOptions("language",array("de_DE", "de_CH", "en_US"),array("Deutsch (Deutschland)", "Deutsch (Schweiz)", "English (United States)"));
 		$gui->setFieldDescription("SHApassword","Zum Ändern eingeben.");
 		$gui->setType("password","hidden");
 		$gui->setType("SHApassword","password");
@@ -67,18 +68,8 @@ class UserGUI extends User implements iGUIHTML2 {
 		$gui->setType("isAdmin","checkbox");
 		#$gui->setOptions("isAdmin",array("1","0"),array("ja ","nein"));
 		$gui->setStandardSaveButton($this);
-		/*$gui->setSaveButtonOnClick("
-			saveClass(
-				'".get_parent_class($this)."',
-				'".$this->ID."',
-				function() { 
-					".($this->ID != -1 ? 
-					"new Ajax.Updater('BrowserMain".$this->ID."','./interface/loadFrame.php?p=Users&amp;id=".$this->ID."&amp;type=main');" 
-					: 
-					"new Ajax.Updater('contentRight','./interface/loadFrame.php?p=Users');
-					$('contentLeft').update('');")."
-				}
-			);");*/
+		
+		$gui->customize($this->customizer);
 					
 		$mUD = new mUserdataGUI();
 		$mUD->addAssocV3("UserID","=",$this->ID);

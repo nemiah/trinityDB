@@ -17,6 +17,7 @@
  *
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
+
 if(count($_GET) == 0){
 	header("location: info.php?p=Adressen&bps=AdressenGUI;selectionMode:singleSelection,Auftrag,1,getAdresseCopy,Auftraege,contentLeft,Auftrag,1");
 	exit;
@@ -129,6 +130,7 @@ $e1 = mysql_error();
 @mysql_connect('127.0.0.1','','');
 $e2 = mysql_error();
 $mysql = false;
+
 if(preg_match("/^Access denied for user/", $e1)) $mysql = true;
 if(preg_match("/^Access denied for user/", $e2)) $mysql = true;
 echo "PHP-Version:				<span style=\"color:".(version_compare(phpversion(), "5", ">=") ? "green" : "red").";\">".phpversion()."</span>\n";
@@ -166,8 +168,21 @@ echo "JavaScript:				<span style=\"color:red;\" id=\"jstest\">nicht aktiviert</s
 echo "MySQL-Server:				".generic($mysql,"erreichbar")." (es werden nur localhost und 127.0.0.1 getestet)\n";
 
 while($t = $pf->pfdbFetchAssoc()){
-	echo "	<b>".str_pad($t["host"],20)."".str_pad($t["datab"],20)."   ".$t["user"]."</b>\n";
-	$r = mysql_connect($t["host"],$t["user"],$t["password"]);
+	echo "	<b>".str_pad($t["host"],20)."".str_pad($t["datab"],20)."</b>\n";
+	
+	$r = mysql_connect($t["host"], $t["user"], $t["password"]);
+	
+	echo "		MySQL server: ".mysql_get_server_info()."\n";
+	echo "		MySQL client: ".mysql_get_client_info()."\n";
+	
+	if(extension_loaded("mysqli")){
+		$ri = new mysqli($t["host"], $t["user"], $t["password"], $t["datab"]);
+		#print_r($ri);
+		echo "		MySQLi client: ".$ri->client_info."\n";
+	}
+	$ts = mysql_fetch_assoc(mysql_query("SELECT @@sql_mode"));
+	echo "		Mode: ".str_replace(array("STRICT_TRANS_TABLES", "STRICT_ALL_TABLES"), array("<span style=\"color:red;\">STRICT_TRANS_TABLES</span>", "<span style=\"color:red;\">STRICT_ALL_TABLES</span>"), $ts["@@sql_mode"]);
+	echo "\n";
 	
 	if($r){
 		#$qG = mysql_query("SHOW GRANTS");

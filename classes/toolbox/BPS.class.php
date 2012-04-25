@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class BPS {
 	public static $variable = "BPS";
@@ -30,7 +30,21 @@ class BPS {
 	}
 
 	public static function getProperty($className, $propertyName, $defaultValue = null){
+		if(!isset($_SESSION[self::$variable]))
+			return null;
+		
 		return $_SESSION[self::$variable]->getProperty($className, $propertyName, $defaultValue);
+	}
+
+	public static function popProperty($className, $propertyName, $defaultValue = null){
+		if(!isset($_SESSION[self::$variable]))
+			return null;
+		
+		$v = $_SESSION[self::$variable]->getProperty($className, $propertyName, $defaultValue);
+		
+		self::unsetProperty($className, $propertyName);
+		
+		return $v;
 	}
 
 	public static function unsetProperty($className, $propertyName){

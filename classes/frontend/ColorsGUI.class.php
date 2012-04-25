@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class ColorsGUI implements icontextMenu {
@@ -33,19 +33,19 @@ class ColorsGUI implements icontextMenu {
 		}
 		
 		$gui = new HTMLGUI();
-		
-		echo $gui->getContextMenu($kal, 'Colors','1',$sk,'contextMenu.stop();if(confirm(GlobalMessages.C001)) document.location.reload();');
+		$message = "Achtung: Die Seite muss neu geladen werden, damit die Einstellungen wirksam werden. Jetzt neu laden?";
+		echo $gui->getContextMenu($kal, 'Colors','1',$sk,"phynxContextMenu.stop(); if(confirm('$message')) document.location.reload();");
 		
 		
 		if(!isset($_COOKIE["phynx_layout"])) $sk2 = "horizontal";
 		else $sk2 = $_COOKIE["phynx_layout"];
 		echo '<div class="backgroundColor1" style="height: 10px;"></div>';
-		echo $gui->getContextMenu(array("horizontal" => "horizontal", "vertical" => "vertikal", "desktop" => "Desktop", "fixed" => "fixiert"), "Colors", "2", $sk2, 'contextMenu.stop();if(confirm(GlobalMessages.C001)) document.location.reload();');
+		echo $gui->getContextMenu(array("horizontal" => "horizontal", "vertical" => "vertikal", "desktop" => "Desktop", "fixed" => "fixiert"), "Colors", "2", $sk2, 'phynxContextMenu.stop(); if(confirm(\''.$message.'\')) document.location.reload();');
 		
 		$ud = new mUserdata();
 		$al = $ud->getUDValue("noAutoLogout","false");
 		echo '<div class="backgroundColor1" style="padding:5px;font-weight:bold;">Automatisch ausloggen:</div>';
-		echo $gui->getContextMenu(array("false" => "ja", "true" => "nein"), "Colors", "3", $al, 'contextMenu.stop();if(confirm(GlobalMessages.C001)) document.location.reload();');
+		echo $gui->getContextMenu(array("false" => "ja", "true" => "nein"), "Colors", "3", $al, 'phynxContextMenu.stop(); if(confirm(\''.$message.'\')) document.location.reload();');
 		
 	}
 

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class DBStorageU {
 	protected $instance;
@@ -23,20 +23,44 @@ class DBStorageU {
 	private $parsers;
 	protected $affectedRowsOnly = false;
 	
+	public static $globalConnection = array();
+	
 	function __construct(){
-
+		if(!isset(self::$globalConnection[get_class($this)]))
+			self::$globalConnection[get_class($this)] = null;
+		
+		if(self::$globalConnection[get_class($this)] == null)
+			$this->renewConnection();
+		else
+			$this->connection = self::$globalConnection[get_class($this)];
+			
+		/*
 		$this->connection = mysql_pconnect($_SESSION["DBData"]["host"],$_SESSION["DBData"]["user"],$_SESSION["DBData"]["password"]);# or die ("MySQL-DB nicht erreichbar");
-		if(mysql_error() AND (mysql_errno() == 1045 OR mysql_errno() == 2002)) throw new NoDBUserDataException();
+		if(mysql_error() AND (mysql_errno() == 1045 OR mysql_errno() == 2002 OR mysql_errno() == 2003 OR mysql_errno() == 2005)) throw new NoDBUserDataException();
 		echo mysql_error();
 		mysql_select_db($_SESSION["DBData"]["datab"], $this->connection);# or die ("Datenbank nicht gefunden");
 		#mysql_set_charset("utf8");
-		if(mysql_error() AND (mysql_errno() == 1049 OR mysql_errno() == 1044)) throw new DatabaseNotFoundException();
+		if(mysql_error() AND (mysql_errno() == 1049 OR mysql_errno() == 1044)) throw new DatabaseNotFoundException();*/
 	}
 	
 	public function setGetAffectedRowsOnly($bool){
 		$this->affectedRowsOnly = $bool;
 	}
 	
+	
+	public function renewConnection(){
+		$this->connection = @mysql_pconnect($_SESSION["DBData"]["host"],$_SESSION["DBData"]["user"],$_SESSION["DBData"]["password"]);# or die ("MySQL-DB nicht erreichbar");
+		if(mysql_error() AND (mysql_errno() == 1045 OR mysql_errno() == 2002 OR mysql_errno() == 2003 OR mysql_errno() == 2005)) throw new NoDBUserDataException();
+		if(mysql_error() AND mysql_errno() == 1049) throw new DatabaseNotFoundException();
+		#echo mysql_error();
+		@mysql_select_db($_SESSION["DBData"]["datab"], $this->connection);
+		if(mysql_error() AND (mysql_errno() == 1049 OR mysql_errno() == 1044)) throw new DatabaseNotFoundException();
+		
+		mysql_query("SET SESSION sql_mode = ''");
+		
+		self::$globalConnection[get_class($this)] = $this->connection;
+	}
+	/*
 	public function renewConnection(){
 		#if($this->connection) mysql_close($this->connection);
 		$this->connection = @mysql_pconnect($_SESSION["DBData"]["host"],$_SESSION["DBData"]["user"],$_SESSION["DBData"]["password"]);# or die ("MySQL-DB nicht erreichbar");
@@ -44,7 +68,7 @@ class DBStorageU {
 		if(mysql_error() AND mysql_errno() == 1049) throw new DatabaseNotFoundException();
 		#echo mysql_error();
 		@mysql_select_db($_SESSION["DBData"]["datab"], $this->connection);# or die ("Datenbank nicht gefunden");
-	}
+	}*/
 
 	public function getConnection(){
 		return $this->connection;
@@ -176,30 +200,30 @@ class DBStorageU {
 
 		$fields = PMReflector::getAttributesArrayAnyObject($t);
 		
-		if($typsicher){
+		/*if($typsicher){
 			$types = array();
 			$qc = mysql_query("SHOW COLUMNS FROM $table");
 			while($tc = mysql_fetch_object($qc))
 				$types[$tc->Field] = $this->mysql2Object($tc->Type);
-		}
+		}*/
 		
 		foreach($fields AS $key => $value){
 			$t->$value = $this->fixUtf8(stripslashes($t->$value));
 						
-			if($typsicher){
+			/*if($typsicher){
 				if(isset($types[$value])) $typObj = $types[$value];
 				else throw new DataTypeNotDefinedException($value);
 				
 				$t->$value = new $typObj($t->$value);
-			}
+			}*/
 		}
 		
 		return $t;
 	}
 	
-	function loadSingleT($table, $id) {
+	/*function loadSingleT($table, $id) {
 		return $this->loadSingle2($table, $id, true);
-	}
+	}*/
 	
 	static function createTable($CIA){
 		$view = false;
@@ -277,7 +301,8 @@ class DBStorageU {
 			}
 			$currentWhereValue = $statement->whereValues[$key];
 			if($currentWhereValue != "NULL" 
-				AND $currentWhereValue != "NOT NULL") 
+				AND $currentWhereValue != "NOT NULL"
+				AND substr($currentWhereValue, 0, 3) != "t1.") 
 				$currentWhereValue = "'".mysql_real_escape_string($currentWhereValue)."'";
 				
 			$where .= ($where != "(" ? " ".$statement->whereLogOp[$key]." ".($addOpenBracket ? "(" : "") : "")./*(in_array($statement->whereFields[$key], $nJAs) ? "t1." : "").*/"".$statement->whereFields[$key]." ".$statement->whereOperators[$key]." ".$currentWhereValue."";
@@ -338,7 +363,7 @@ class DBStorageU {
 			return mysql_affected_rows();
 		}
 
-		if($typsicher){
+		/*if($typsicher){
 			$types = array();
 			$qc = mysql_query("SHOW COLUMNS FROM ".$statement->table[0]);
 			while($tc = mysql_fetch_object($qc))
@@ -352,7 +377,7 @@ class DBStorageU {
 			
 			foreach($statement->dataTypes AS $kc => $vc)
 				$types = array_merge($types, $vc);
-		}
+		}*/
 
 		$fields = null;
 		while(@$t = mysql_fetch_object($q)){
@@ -363,7 +388,7 @@ class DBStorageU {
 			foreach($fields AS $key => $value){
 				$A->$value = $this->fixUtf8(stripslashes($t->$value));
 				
-				if($typsicher){
+				/*if($typsicher){
 					if(isset($types[$value])) $typObj = $types[$value];
 					else throw new DataTypeNotDefinedException($value);
 					
@@ -371,7 +396,7 @@ class DBStorageU {
 					#echo "<pre>";
 					#print_r($A);
 					#echo "</pre>";
-				}
+				}*/
 			}
 			
 			if(count($this->parsers) > 0) foreach($this->parsers as $key => $value)
@@ -391,9 +416,9 @@ class DBStorageU {
 		return $collector;
 	}
 	
-	function loadMultipleT(SelectStatement $statement){
+	/*function loadMultipleT(SelectStatement $statement){
 		return $this->loadMultipleV4($statement, true);
-	}
+	}*/
 	
 	function loadMultipleV3(SelectStatement $statement){
 
@@ -412,8 +437,7 @@ class DBStorageU {
 			$currentWhereValue = $statement->whereValues[$key];
 			if($currentWhereValue != "NULL" 
 				AND $currentWhereValue != "NOT NULL" 
-				/*AND ($statement->whereValues[$key] == "" 
-					/*OR $statement->whereValues[$key]{0} != "'")*/) 
+				AND substr($currentWhereValue, 0, 3) != "t1.") 
 				$currentWhereValue = "'".mysql_real_escape_string($currentWhereValue)."'";
 			
 			$where .= ($where != "(" ? " ".$statement->whereLogOp[$key]." ".($addOpenBracket ? "(" : "") : "").(in_array($statement->whereFields[$key],$nJAs) ? "t1." : "")."".$statement->whereFields[$key]." ".$statement->whereOperators[$key]." ".$currentWhereValue."";
@@ -536,7 +560,7 @@ class DBStorageU {
 		mysql_query($sql);
 		$_SESSION["messages"]->addMessage("executing MySQL: $sql");
 	}
-	
+	/*
 	private function mysql2Object($type){
 		$k = strpos($type, "(");
 		if($k !== false) $type = substr($type, 0, $k);
@@ -549,7 +573,7 @@ class DBStorageU {
 		$values["tinyint"] = "B";
 		
 		return isset($values[$type]) ? $values[$type] : "S";
-	}
+	}*/
 }
 
 ?>

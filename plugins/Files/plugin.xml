@@ -25,6 +25,7 @@
 
 		<icon>./images/navi/computer.png</icon>
 		<folder>Files</folder>
+		<javascript>File.js</javascript>
 
 		<deploy>
 			<table name="Datei" />

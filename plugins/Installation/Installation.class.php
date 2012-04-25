@@ -24,18 +24,30 @@ class Installation extends PersistentObject {
 		if($this->A == null) $this->loadMe();
 		return $this->A;
 	}
-	
+
+	public static function getReloadButton(){
+		$B = new Button("Anwendung\nneu laden", "refresh");
+		$B->onclick("Installation.reloadApp();");
+
+		return $B;
+	}
+
 	function __construct($ID) {
-		#$this->myAdapterClass = "InstallationAdapter";
 		parent::__construct($ID);
 		$this->storage = "phpFileDB";	
 	}
 
 	function saveMe($checkUserData = true, $output = false){
-        parent::saveMe($checkUserData, $output);
+        parent::saveMe($checkUserData, false);
         
         $_SESSION["DBData"] = $_SESSION["S"]->getDBData();
-        $DB = new DBStorage();
+
+		if(PHYNX_MAIN_STORAGE == "MySQL")
+			$DB = new DBStorage();
+		else
+			$DB = new DBStorageU();
+		
+		Red::messageSaved();
 	}
 	
 	

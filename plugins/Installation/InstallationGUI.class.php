@@ -45,16 +45,12 @@ class InstallationGUI extends Installation implements iGUIHTML2 {
 		$gui->translate($this->loadTranslation());
 		$gui->setJSEvent("onSave","
 				function() { 
-					reloadRightFrame();
+					contentManager.reloadFrameRight();
 					$('contentLeft').update('');"."
 				}");
 		$gui->setStandardSaveButton($this);
 		
 		return $gui->getEditHTML();
-	}
-
-	public function reloadApplication(){
-		session_destroy();
 	}
 }
 ?>

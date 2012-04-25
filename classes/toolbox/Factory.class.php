@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Factory {
 	private $className;
@@ -79,15 +79,18 @@ class Factory {
 		if($this->newParameter == -1) {
 			$this->object->setA($this->attributes);
 			return $this->lastNewID = $this->object->newMe($checkUserData, $output);
-		}
-		else $this->object->saveMe($checkUserData, $output);
+		} else
+			$this->object->saveMe($checkUserData, $output);
 	}
 
-	public function verify(){
+	public function verify($resetParsers = false){
 		if($this->lastNewID == null)
 			throw new FactoryException("No new entry to verify");
 
 		$O = new $this->className($this->lastNewID);
+		if($resetParsers)
+			$O->resetParsers();
+		
 		foreach($this->setAttributes AS $k){
 			if($k == $this->className."ID") continue;
 

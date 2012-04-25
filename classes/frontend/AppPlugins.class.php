@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class AppPlugins {
 	private $folders = array();
@@ -31,17 +31,35 @@ class AppPlugins {
 	private $isGeneric = array();
 	private $genericPlugins = array();
 	private $versions = array();
-	private $blacklist = array();
+	public $blacklist = array();
+	
+	private static $sessionVariable = "CurrentAppPlugins";
 
-	public function blacklistPlugin($pluginName){
-		$this->blacklist[$pluginName] = true;
+	public static function init(){
+		$_SESSION[self::$sessionVariable] = new AppPlugins();
+	}
+	
+	public function  __construct($appFolder = null) {
+		$this->scanPlugins($appFolder);
 	}
 
-	public function resetBlacklist(){
-		$this->blacklist = array();
+	public static function blacklistPlugin($pluginName){
+		if(isset($_SESSION[self::$sessionVariable]))
+			$_SESSION[self::$sessionVariable]->blacklist[$pluginName] = true;
+	}
+
+	public static function resetBlacklist(){
+		if(isset($_SESSION[self::$sessionVariable]))
+			$_SESSION[self::$sessionVariable]->blacklist = array();
 	}
 
 	public function scanPlugins($appFolder = null){
+		#file_put_contents(Util::getRootPath()."debug.txt", print_r(debug_backtrace(), true));
+		#echo "<pre>";
+		#print_r();
+		#echo "</pre>";
+		
+		
 		foreach($this->appFolder AS $key => $value){
 			if($value == "plugins") continue;
 			
@@ -55,8 +73,9 @@ class AppPlugins {
 			if($_SESSION["applications"]->getActiveApplication() != "nil") $folder = $_SESSION["applications"]->getActiveApplication();
 		} else $folder = $appFolder;
 
-		$allowedPlugins = "noSaaS";
-		
+		#$allowedPlugins = "noSaaS";
+		$allowedPlugins = Environment::getS("allowedPlugins", array());
+		#print_r($allowedPlugins);
 		/*if($folder != "plugins" AND $_SERVER["HTTP_HOST"] != "dev.furtmeier.lan"){
 			try {
 				$saas = new SaaS(-1);
@@ -107,7 +126,7 @@ class AppPlugins {
 				if($f[0]{0} == "-") continue;
 				
 				if($f[1] == "xml") {
-					$c = new XMLPlugin("$p/$folder/$file");
+					$c = new XMLPlugin("$p/$folder/$file", $allowedPlugins);
 				} else {
 					require_once "$p/$folder/$file";
 					$f = $f[0];
@@ -116,7 +135,7 @@ class AppPlugins {
 				
 				$_SESSION["messages"]->startMessage("trying to register ".$c->registerName().": ");
 				
-				if($allowedPlugins != "noSaaS" AND !in_array($c->registerName(), $allowedPlugins)){
+				if(count($allowedPlugins) > 0 AND !in_array($c->registerClassName(), $allowedPlugins)){
 					$_SESSION["messages"]->endMessage(" not allowed");
 					continue;
 				}
@@ -153,9 +172,13 @@ class AppPlugins {
 					
 				$this->versions[$c->registerClassName()] = $c->registerVersion();
 				
-				if($c->registerJavascriptFile() != "" AND isset($_SESSION["JS"]))
-					$_SESSION["JS"]->addScript($c->registerJavascriptFile(),($c->registerJavascriptFolder() != "" ? $c->registerJavascriptFolder() : $c->registerFolder()), $c->registerClassName(), $folder);
-				
+				if($c->registerJavascriptFile() != "" AND isset($_SESSION["JS"])){
+					if(is_array($c->registerJavascriptFile())){
+						foreach($c->registerJavascriptFile() AS $v)
+							JSLoader::addScriptS($v,$c->registerFolder(), $c->registerClassName(), $folder);
+					} else
+						JSLoader::addScriptS($c->registerJavascriptFile(),$c->registerFolder(), $c->registerClassName(), $folder);
+				}
 				#if(method_exists($c, "registerUseGenericClasses"))
 				#	$this->isGeneric[$c->registerName()] = $c->registerUseGenericClasses();
 					
@@ -234,13 +257,14 @@ class AppPlugins {
 	}
 	
 	public function getIsAdminOnly($plugin){
-
+		$plugin = str_replace("GUI", "", $plugin);
+		
 		if(isset($this->isAdminOnlyByPlugin[$plugin])) return $this->isAdminOnlyByPlugin[$plugin];
 
 		$c = array();
 		foreach($this->collectors AS $k => $v)
 			$c[$v] = $k;
-
+		
 		#$c = array_flip($this->collectors); //deprecated
 
 		if(!isset($c[$plugin])) return false;

@@ -40,7 +40,7 @@ body {
 	margin-top:-50px;
 }
 
-#navigation div div {
+#navigation .navTab {
 	background-color:transparent;
 	border:0px;
 	font-size:12px;
@@ -83,18 +83,18 @@ body {
 #navigation div.theOne:hover {
 	background-color:transparent;
 }
-#navTabsWrapper div:hover {
+#navTabsWrapper .navTab:hover {
 	background-color:transparent;
 	opacity:0.5;
 	filter:alpha(opacity=50);
 }
 
 #footer {
-	position:absolute;
-	z-index:-10;
-	bottom:0px;
+	/*position:absolute;*/
+	/*z-index:-10;*/
+	/*bottom:0px;*/
 	height:40px;
-	background-color:white;
-	left:0px;
-	width:100%;
+	margin-top:20px;
+	/*left:0px;*/
+	/*width:100%;*/
 }

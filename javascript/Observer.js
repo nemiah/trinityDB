@@ -19,43 +19,11 @@
  */
 
  var Observer = {
-	
 	lastMouseX: 0,
-	lastMouseY: 0,
-	handler: null,
-	ismsie: true,
-	
-	mouseMove: function(event){
-	    event = Observer.chkEvH(event);
-	
-	    if (Observer.ismsie) {
-	
-			// ab MSIE 6
-		    if (document.documentElement && document.documentElement.scrollTop) {
-		        var yFromTop = document.documentElement.scrollTop;
-		    } else {
-		        var yFromTop = document.body.scrollTop;
-		    }
-	    } else if (self.pageYOffset) {
-	    	var yFromTop = self.pageYOffset;
-	    } else {
-	    	var yFromTop = 0;
-	    }
-	
-	    Observer.lastMouseX = event.clientX;
-	    Observer.lastMouseY = yFromTop + event.clientY;
-
-	    return false;
-	},
-	
-	chkEvH: function(event) {
-		if (typeof event == 'undefined') event = window.event;
-		if (typeof event.layerX == 'undefined') event.layerX = event.offsetX;
-		if (typeof event.layerY == 'undefined') event.layerY = event.offsetY;
-		return event;
-	}
-	
-
+	lastMouseY: 0
 }
 
-Event.observe(document, "mousemove", Observer.mouseMove);
+$j(document).mousemove(function(event){
+	Observer.lastMouseX = event.pageX;
+	Observer.lastMouseY = event.pageY;
+});

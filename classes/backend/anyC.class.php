@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class anyC extends Collection {
 	
@@ -30,7 +30,35 @@ class anyC extends Collection {
 		$this->collectionOf = trim($collectionOf);
 		#}
 	}
-	
+
+	/**
+	 * @param string $collectionOf
+	 * @param string $field
+	 * @param string $value
+	 * @return anyC
+	 */
+	public static function get($collectionOf, $field = "", $value = ""){
+		$AC = new anyC();
+		$AC->setCollectionOf($collectionOf);
+		if($field != "")
+			$AC->addAssocV3($field, "=", $value);
+
+		return $AC;
+	}
+
+	/**
+	 * @param string $collectionOf
+	 * @param string $field
+	 * @param string $value
+	 * @return PersistentObject
+	 */
+	public static function getFirst($collectionOf, $field = "", $value = ""){
+		$AC = self::get($collectionOf, $field, $value);
+		$AC->setLimitV3("1");
+
+		return $AC->getNextEntry();
+	}
+
 	/**
 	 * Changes type of the collection
 	 * 
@@ -58,6 +86,15 @@ class anyC extends Collection {
 
 		if($returnCollector) $this->collector = $this->Adapter->lCV4();
 		else return $this->Adapter->lCV4();
+	}
+	
+	public function toArray($valueFieldName){
+		$r = array();
+		
+		while($E = $this->getNextEntry())
+			$r[$E->getID()] = $E->A($valueFieldName);
+		
+		return $r;
 	}
 }
 ?>

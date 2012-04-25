@@ -15,13 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class LoginDataGUI extends LoginData implements iGUIHTML2 {
 	function getHTML($id){
 		$gui = $this->getGUI($id);
 
-		$gui->setStandardSaveButton($this,"mLoginData");
+		#$gui->setStandardSaveButton($this,"mLoginData");
 
 		return $gui->getEditHTML();
 	}
@@ -32,24 +32,28 @@ class LoginDataGUI extends LoginData implements iGUIHTML2 {
 		if($id == -1)
 			$this->A->typ = "LoginData";
 
-		$gui = new HTMLGUI();
-		$gui->setObject($this);
-		$gui->setName("LoginData");
+		$gui = new HTMLGUIX($this);
+		$gui->name("LoginData");
 
-		$gui->setLabel("UserID", "Benutzer");
-		$gui->setLabel("name", "Typ");
+		$gui->label("UserID", "Benutzer");
+		$gui->label("name", "Typ");
+		$gui->label("passwort", "Passwort");
+		$gui->label("optionen", "Optionen");
+		$gui->label("benutzername", "Benutzername");
+		$gui->label("server", "Server");
 
-		$gui->setType("typ", "hidden");
-		$gui->setType("wert", "hidden");
-		$gui->setType("passwort", "password");
+		$gui->type("typ", "hidden");
+		$gui->type("wert", "hidden");
+		$gui->type("passwort", "password");
 
 
 
-		$onkeyup = "$('wert').value = $('benutzername').value+'::::'+$('passwort').value+($('server').value != '' ? '::::s:'+$('server').value : '')+($('optionen').value != '' ? '::::o:'+$('optionen').value : '')";
-		$gui->setInputJSEvent("benutzername", "onkeyup", $onkeyup);
-		$gui->setInputJSEvent("server", "onkeyup", $onkeyup);
-		$gui->setInputJSEvent("passwort", "onkeyup", $onkeyup);
-		$gui->setInputJSEvent("optionen", "onkeyup", $onkeyup);
+		$onkeyup = "$('editLoginDataGUI').wert.value = $('editLoginDataGUI').benutzername.value+'::::'+$('editLoginDataGUI').passwort.value+($('editLoginDataGUI').server.value != '' ? '::::s:'+$('editLoginDataGUI').server.value : '')+($('editLoginDataGUI').optionen.value != '' ? '::::o:'+$('editLoginDataGUI').optionen.value : '')";
+		$gui->addFieldEvent("benutzername", "onKeyup", $onkeyup);
+		$gui->addFieldEvent("server", "onKeyup", $onkeyup);
+		$gui->addFieldEvent("passwort", "onKeyup", $onkeyup);
+		$gui->addFieldEvent("optionen", "onKeyup", $onkeyup);
+
 
 		$U = new Users();
 		$U->addAssocV3("isAdmin", "=", "0");
@@ -59,12 +63,10 @@ class LoginDataGUI extends LoginData implements iGUIHTML2 {
 		while($t = $U->getNextEntry())
 			$Users[$t->getID()] = $t->A("name");
 
-		$gui->setType("UserID", "select");
-		$gui->setOptions("UserID", array_keys($Users), array_values($Users));
+		$gui->type("UserID", "select", $Users);
 
 		$dataTypes = LoginData::getNames();
-		$gui->setType("name", "select");
-		$gui->setOptions("name", array_keys($dataTypes), array_values($dataTypes));
+		$gui->type("name", "select", $dataTypes);
 
 		return $gui;
 	}
@@ -74,42 +76,68 @@ class LoginDataGUI extends LoginData implements iGUIHTML2 {
 		
 		$gui = $this->getGUI($this->getID());
 
-		$gui->setJSEvent("onSave", "function() { Popup.close('', 'mailServer'); contentManager.reloadFrame('contentRight'); }");
+		$gui->addToEvent("onSave", "Popup.close('LoginData', 'edit');");
 
-		$gui->setStandardSaveButton($this,"mLoginData");
+		#$gui->setJSEvent("onSave", "function() { Popup.close('', 'mailServer'); contentManager.reloadFrame('contentRight'); }");
+
+		#$gui->setStandardSaveButton($this,"mLoginData");
+
+		$gui->displayMode("popup");
 
 		$html = "";
 		$html2 = "";
 		if($bps != -1 AND isset($bps["preset"]) AND $bps["preset"] == "mailServer"){
 			$BAbort = new Button("Abbrechen", "stop");
-			$BAbort->onclick("Popup.close('', 'mailServer');");
+			$BAbort->onclick("Popup.close('LoginData', 'edit');");
 			$BAbort->style("float:right;");
 			
 			$html = "<p style=\"padding:5px;\">{$BAbort}<small>Sie müssen hier nur Einstellungen vornehmen, wenn Sie diese Anwendung lokal auf einem Windows-Rechner betreiben oder direkt über einen SMTP-Server versenden möchten (z.B. Newsletter).</small></p>";
 
-			$gui->setType("UserID", "hidden");
+			$gui->type("UserID", "hidden");
 			$this->changeA("UserID", "-1");
 
-			$gui->setType("name", "hidden");
+			$gui->type("name", "hidden");
 			$this->changeA("name", "MailServerUserPass");
-/*
-			$gui->insertSpaceAbove("testMailOnSave");
-			$gui->setType("testMailOnSave", "checkbox");
-			$gui->setInputJSEvent("testMailOnSave", "onchange", "contentManager.toggleFormFields(this.checked ? 'show' : 'hide', ['testMailOnSaveSender', 'testMailOnSaveRecipient']);");
-			$gui->setLabel("testMailOnSave", "testen?");
-			$gui->setFieldDescription("testMailOnSave", "Sollen die Daten beim Speichern getestet werden?");
 
-			$gui->setLabel("testMailOnSaveSender", "Absender");
-			$gui->setFieldDescription("testMailOnSaveSender", "E-Mail-Adresse");
-			$gui->setLabel("testMailOnSaveRecipient", "Empfänger");
-			$gui->setFieldDescription("testMailOnSaveRecipient", "E-Mail-Adresse");
+			$gui->type("optionen", "hidden");
+		}
+		
+		if($bps != -1 AND isset($bps["preset"]) AND $bps["preset"] == "backupFTPServer"){
+			$BAbort = new Button("Abbrechen", "stop");
+			$BAbort->onclick("Popup.close('LoginData', 'edit');");
+			$BAbort->style("float:right;");
+			
+			$html = "<p style=\"padding:5px;\">{$BAbort}<small>Sie müssen hier nur Einstellungen vornehmen, wenn Sie die Backups automatisch auf einen FTP-Server hochladen möchten.</small></p>";
 
-			$gui->setLineStyle("testMailOnSaveSender", "display:none;");
-			$gui->setLineStyle("testMailOnSaveRecipient", "display:none;");
-*/
-			$gui->setType("optionen", "hidden");
-		} else
-			$gui->insertSpaceAbove("server");
+			$gui->type("UserID", "hidden");
+			$this->changeA("UserID", "-1");
+
+			$gui->type("name", "hidden");
+			$this->changeA("name", "BackupFTPServerUserPass");
+
+			$gui->descriptionField("optionen", "Bitte geben Sie hier das Unterverzeichnis an, in das die Datei hochgeladen werden soll");
+			$gui->label("optionen", "Verzeichnis");
+			#$gui->type("optionen", "hidden");
+		}
+
+		#
+		
+		if($bps != -1 AND isset($bps["preset"]) AND $bps["preset"] == "googleData"){
+
+			$html = "<p>Bitte beachten Sie: Es werden nur Ihre eigenen Termine synchronisiert.</p>";
+			
+			$gui->type("UserID", "hidden");
+			$this->changeA("UserID", Session::currentUser()->getID());
+
+			$gui->type("name", "hidden");
+			$this->changeA("name", "GoogleAccountUserPass");
+			$gui->type("optionen", "hidden");
+			$gui->type("server", "hidden");
+		}
+
+		$gui->label("benutzername", "Benutzername");
+		$gui->label("passwort", "Passwort");
+		$gui->label("server", "Server");
 
 		echo $html.$gui->getEditHTML();
 	}

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class XMLPlugin extends PluginV2 {
 	private $file;
@@ -36,12 +36,12 @@ class XMLPlugin extends PluginV2 {
 	
 	private $version;
 	
-	function __construct($file){
+	function __construct($file, $allowedPlugins = null){
 		$this->file = $file;
-		$this->parse();
+		$this->parse($allowedPlugins);
 	}
 	
-	private function parse(){
+	private function parse($allowedPlugins){
 		$content = file($this->file);
 		$content = implode("", $content);
 		$p = xml_parser_create();
@@ -67,7 +67,14 @@ class XMLPlugin extends PluginV2 {
 		if(isset($index["menuName"]) AND isset($vals[$index["menuName"][0]]) AND isset($vals[$index["menuName"][0]]["value"]))
 			$this->menuName = $vals[$index["menuName"][0]]["value"];
 		
-		if(isset($index["javascript"]) AND isset($vals[$index["javascript"][0]])) $this->javascript = $vals[$index["javascript"][0]]["value"];
+		if(isset($index["javascript"]) AND isset($vals[$index["javascript"][0]])) {
+			$JS = array();
+			foreach($index["javascript"] AS $k => $v)
+				$JS[] = $vals[$index["javascript"][$k]]["value"];
+			
+			$this->javascript = $JS;#$vals[$index["javascript"][0]]["value"];
+		}
+		
 		if(isset($index["adminOnly"]) AND isset($vals[$index["adminOnly"][0]])) 
 			$this->adminOnly = $vals[$index["adminOnly"][0]]["value"];
 		else
@@ -76,10 +83,28 @@ class XMLPlugin extends PluginV2 {
 		
 		if(isset($index["doSomethingElse"]) AND isset($vals[$index["doSomethingElse"][0]])) $this->doSomethingElse = $vals[$index["doSomethingElse"][0]]["value"];
 		if(isset($index["menuEntryTarget"]) AND isset($vals[$index["menuEntryTarget"][0]])) $this->menuEntryTarget = $vals[$index["menuEntryTarget"][0]]["value"];
-		
+
 		if(isset($index["version"]) AND isset($vals[$index["version"][0]]) AND isset($vals[$index["version"][0]]["value"]))
 			$this->version = $vals[$index["version"][0]]["value"];
+
 		
+		if(count($allowedPlugins) > 0 AND !in_array($this->registerClassName(), $allowedPlugins))
+			return;
+		
+		if(isset($index["registry"]) AND isset($vals[$index["registry"][0]]))
+			foreach($index["registry"] AS $k => $v){
+				$call = explode(";", $vals[$index["registry"][$k]]["value"]);
+				#print_r($call);
+				
+				if(count($call) == 3)
+					Registry::setCallback($call[0], $call[1], $call[2]);
+
+				if(count($call) == 2)
+					Registry::setCallback($call[0], $call[1]);
+					#echo "callbacks:";
+				#print_r(Registry::getCallbacks($call[0], $call[2]));
+			}
+
 		
 		if(isset($index["collectionGUI"]))
 			for($i = $index["collectionGUI"][0]; $i <= $index["collectionGUI"][count($index["collectionGUI"])-1]; $i++){

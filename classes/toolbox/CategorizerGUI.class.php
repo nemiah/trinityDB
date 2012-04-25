@@ -15,11 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class CategorizerGUI extends UnpersistentClass {
-	
+	private $E030 = "Das Interface iCategorizer wird von der Klasse nicht implementiert.";
+	private $E031 = "Sie müssen gleiche Typen verwenden";
+	private $E032 = "Der zweite Eintrag muss eine höhere Nummer besitzen als der Erste.";
+	private $E033 = "Bitte wählen Sie eine Kategorie";
+			
 	public function getWindowHTML(){
 		$bps = $this->getMyBPSData();
 		
@@ -68,7 +72,7 @@ class CategorizerGUI extends UnpersistentClass {
 			class=\"bigButton backgroundColor3\"
 			value=\"Kategorisieren\"
 			style=\"background-image:url(./images/navi/okCatch.png);float:right;\"
-			onclick=\"rme('Categorizer','','categorize',Array($('categorizeWithCategory').value),'if(checkResponse(transport)) { Popup.close(\'Categorizer\', 0); reloadRightFrame(); }');\" />"));
+			onclick=\"rme('Categorizer','','categorize',Array($('categorizeWithCategory').value),'if(checkResponse(transport)) { Popup.close(\'Categorizer\', 0); contentManager.reloadFrameRight(); }');\" />"));
 			$t->addRowColspan(1,2);
 		}
 		
@@ -90,13 +94,13 @@ class CategorizerGUI extends UnpersistentClass {
 			$s[0] .= "GUI";
 		
 		if(!PMReflector::implementsInterface($s[0],"iCategorizer"))
-			die("error:GlobalMessages.E030");
+			Red::errorD($this->E030);
 		
 		if($bps != -1 AND isset($bps["BisClass"]) AND $bps["BisClass"] != $s[0])
-			die("error:GlobalMessages.E031");
+			Red::errorD($this->E031);
 			
 		if($bps != -1 AND isset($bps["BisID"]) AND $bps["BisID"] < $s[1])
-			die("error:GlobalMessages.E032");
+			Red::errorD($this->E032);
 			
 		$_SESSION["BPS"]->setACProperty("VonClass",$s[0]);
 		$_SESSION["BPS"]->setACProperty("VonID",$s[1]);
@@ -113,13 +117,13 @@ class CategorizerGUI extends UnpersistentClass {
 			$s[0] .= "GUI";
 		
 		if(!PMReflector::implementsInterface($s[0],"iCategorizer"))
-			die("error:GlobalMessages.E030");
+			Red::errorD($this->E030);
 		
 		if($bps != -1 AND isset($bps["VonClass"]) AND $bps["VonClass"] != $s[0])
-			die("error:GlobalMessages.E031");
+			Red::errorD($this->E031);
 		
 		if($bps != -1 AND isset($bps["VonID"]) AND $bps["VonID"] > $s[1])
-			die("error:GlobalMessages.E032");
+			Red::errorD($this->E032);
 			
 		$_SESSION["BPS"]->setACProperty("BisClass",$s[0]);
 		$_SESSION["BPS"]->setACProperty("BisID",$s[1]);
@@ -133,7 +137,7 @@ class CategorizerGUI extends UnpersistentClass {
 		$_SESSION["BPS"]->unregisterClass("CategorizerGUI");
 		
 		if($KategorieID == 0)
-			die("error:GlobalMessages.E033");
+			Red::errorD($this->E033);
 		
 		$c = "m".$bps["VonClass"];
 		$c = new $c();

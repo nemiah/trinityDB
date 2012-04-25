@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 abstract class OFCDefault {
 
@@ -98,8 +98,12 @@ abstract class OFCDefault {
 		$this->ofc->bg_colour = $val;
 	}
 
-	protected function xSteps($number){
+	protected function ySteps($number){
 		$this->yAxis->steps = $number;
+	}
+
+	protected function xSteps($number){
+		$this->xAxis->steps = $number;
 	}
 
 	protected function xOffset($val){
@@ -201,9 +205,10 @@ abstract class OFCDefault {
 		return $elements;
 	}
 
-	protected function newLine($label = "", $color = "#000000", $dotStyle = null){
+	protected function newLine($label = "", $color = "#000000", $dotStyle = null, $onShow = null){
 		$elements = $this->newDefaultLine("line", $label, $color);
 		$elements->dotStyle = $dotStyle;
+		$elements->onShow = $onShow;
 		return $elements;
 	}
 
@@ -218,8 +223,9 @@ abstract class OFCDefault {
 		return $this->newDefaultLine("bar_filled", $label, $color);
 	}
 
-	public function getOFC(){
-		$this->getData();
+	public function getOFC($load = true){
+		if($load)
+			$this->getData();
 
 		$json = str_replace("fillAlpha","fill-alpha", json_encode($this->ofc));
 		$json = str_replace("gridColour","grid-colour",$json);

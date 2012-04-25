@@ -22,7 +22,6 @@ class CIs extends anyC {
 	private $myDBFolder = "";
 
 	function __construct() {
-		#$this->myAdapterClass = "CIsAdapter";
 		$this->setCollectionOf("CI");
 		$this->storage = "phpFileDB";
 	}

@@ -20,7 +20,7 @@
 <phynx>
 	<plugin>
 		<name>User</name>
-		<menuName>Users</menuName>
+		<menuName>Benutzer</menuName>
 		<collection>Users</collection>
 		
 		<icon>./images/navi/users.png</icon>

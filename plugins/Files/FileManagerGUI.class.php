@@ -20,14 +20,98 @@
 class FileManagerGUI extends mFileGUI implements iGUIHTMLMP2 {
 
 	public function setOwner($className, $classID){
-		BPS::setProperty("FileManagerGUI", "root", $className."ID".($classID < 10 ? "0" : "").($classID < 100 ? "0" :"").($classID < 1000 ? "0" : "").$classID);
+		BPS::setProperty("FileManagerGUI", "root", $className.($classID != "" ? "ID".($classID < 10 ? "0" : "").($classID < 100 ? "0" :"").($classID < 1000 ? "0" : "").$classID : ""));
 	}
 
+	/*public function getTinyMCEManager($fieldName, $type){
+		$this->setOwner("MailContent", "");
+		
+		$B = new Button("Aktualisieren", "../images/navi/refresh.png", "icon");
+		$B->onclick("document.location.reload();");
+		$html = "$B$fieldName:$type";
+		
+		
+		$pathing = $this->setPath();
+		if($pathing !== true)
+			return $pathing;
+		
+		$this->hideDirs(true);
+
+		$gui = new HTMLGUIX();
+
+		$gui->object($this);
+		$gui->name("Datei");
+		$gui->colWidth("FileIsDir", 20);
+
+		$gui->attributes(array("FileIsDir","FileName"));
+
+		$gui->parser("FileIsDir","mFileGUI::popupIsDirParser2");
+		$gui->parser("FileName","mFileGUI::nameParser2");
+
+		#$gui->addToEvent("onDelete", BPS::getProperty("FileManagerGUI", "reloadFunction", "contentManager.reloadFrame('contentLeft');"));
+
+		$gui->options(true, false, false);
+
+		#$gui->displayMode(BPS::getProperty("FileManagerGUI", "displayMode", "CRMSubframeContainer"));
+		#$gui->displayMode("popup");
+
+		$html .= $gui->getBrowserHTML(-1);
+		
+		echo Util::getBasicHTML($html, "");
+	}*/
+
+	public function setPath(){
+		$bps = $this->getMyBPSData();
+		#Aspect::registerOnetimePointCut("aboveList", "GUIFactory::getContainer", "FileManagerGUI::adviceAboveList");
+		$rootDir = null;
+		if($bps != -1 AND isset($bps["root"])) $rootDir = preg_replace("/^([A-Z])%/", "\\1:", $bps["root"]);
+	#echo $rootDir;
+		if($rootDir != null){
+			$T = new HTMLTable(1);
+
+			#$rel = "specifics/$rootDir";
+			#$root = Util::getRootPath().$rel;
+			$root = FileStorage::getFilesDir().$rootDir;
+			
+			$_SESSION["BPS"]->setProperty("FileManagerGUI", "path", preg_replace("/^([A-Z]):/", "\\1%", $root));
+			$_SESSION["BPS"]->setProperty("FileManagerGUI", "root", preg_replace("/^([A-Z]):/", "\\1%", $root));
+
+			$F = new File($root);
+			$F->loadMe();
+
+			if($F->getA() == null){
+				if(is_writable(FileStorage::getFilesDir()))
+					mkdir($root);
+				
+				else {
+					$B = new Button("", "stop");
+					$B->type("icon");
+					$B->style("float:left;margin-right:10px;");
+
+					$T->addRow($B."Das Verzeichnis <code>$rel</code> existiert nicht und kann nicht automatisch angelegt werden, da keine Schreibberechtigung für <code>specifics</code> vorliegt.");
+					return $T;
+				}
+			}
+		}
+
+		$bps = $this->getMyBPSData(); //go again
+
+		#print_r($bps);
+
+		if(isset($bps["path"]) AND strpos($bps["path"], $bps["root"]) === false)
+			$bps["path"] = preg_replace("/^([A-Z])%/", "\\1:", $bps["root"]);#$bps["root"];
+		
+
+		if($bps != -1 AND isset($bps["path"]))
+			$this->setDir(preg_replace("/^([A-Z])%/", "\\1:", $bps["path"]));
+		
+		return true;
+	}
 	
 	public function getHTML($id, $page){
-		$bps = $this->getMyBPSData();
+		#$bps = $this->getMyBPSData();
 		Aspect::registerOnetimePointCut("aboveList", "GUIFactory::getContainer", "FileManagerGUI::adviceAboveList");
-		$rootDir = null;
+		/*$rootDir = null;
 		if($bps != -1 AND isset($bps["root"])) $rootDir = $bps["root"];
 	
 		if($rootDir != null){
@@ -52,24 +136,27 @@ class FileManagerGUI extends mFileGUI implements iGUIHTMLMP2 {
 					$B->style("float:left;margin-right:10px;");
 
 					$T->addRow($B."Das Verzeichnis <code>$rel</code> existiert nicht und kann nicht automatisch angelegt werden, da keine Schreibberechtigung für <code>specifics</code> vorliegt.");
-					die($T);
+					return $T;
 				}
 			}
 		}
 
-		$bps = $this->getMyBPSData();
+		$bps = $this->getMyBPSData(); //go again
 
 		#print_r($bps);
 
 		if(isset($bps["path"]) AND strpos($bps["path"], $bps["root"]) === false)
 			$bps["path"] = $bps["root"];
 		
+		
 
-		if($bps != -1 AND isset($bps["path"])){
-			$this->setDir($bps["path"]);
-			#$p = realpath($bps["path"]);
-		}
-
+		if($bps != -1 AND isset($bps["path"]))
+			$this->setDir($bps["path"]);*/
+		
+		$pathing = $this->setPath();
+		if($pathing !== true)
+			return $pathing;
+		
 		$this->hideDirs(true);
 
 		$gui = new HTMLGUIX();
@@ -95,9 +182,39 @@ class FileManagerGUI extends mFileGUI implements iGUIHTMLMP2 {
 
 	public static function adviceAboveList(){
 		$bps = BPS::getAllProperties("FileManagerGUI");
-
+		#
+		$bps["path"] = str_replace('\\', "/", preg_replace("/^([A-Z]):/", "\\1%", $bps["path"]));
+		#print_r($bps);
 		$mF = new mFileGUI();
 		return $mF->getUploadForm($bps["path"], BPS::getProperty("FileManagerGUI", "reloadFunction", "contentManager.reloadFrame('contentLeft');")/*"contentManager.reloadFrame('contentLeft');"*/, false, "width:100%;");
+	}
+	
+	public static function getHistorieData($ownerClass, $ownerClassID, HistorieTable $Tab){
+		$FM = new FileManagerGUI();
+		$FM->setOwner("WAdresse", $ownerClassID);
+		
+		$pathing = $FM->setPath();
+		if($pathing !== true)
+			return true;
+		
+		$FM->hideDirs(true);
+		$files = array();
+		while($D = $FM->getNextEntry()){
+			$files[$D->A("FileCreationDate")] = $D;
+		}
+		
+		arsort($files);
+		
+		$i = 0;
+		foreach($files As $F){
+			$Tab->addHistorie("Datei", "computer", $F->A("FileCreationDate"), $F->A("FileName")."");
+			
+			$i++;
+			if($i == 9)
+				break;
+		}
+		
+		return true;
 	}
 }
 ?>

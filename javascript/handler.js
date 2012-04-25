@@ -30,52 +30,16 @@ var cookieManager = {
 	}
 }
 
-var GlobalMessages = {
-	E001: "Die Datenbank-Tabelle dieses Plugins wurde noch nicht angelegt.\nBitte verwenden Sie das Installations-Plugin im Administrationsbereich.",
-	E002: "Keine Datenbank ausgewählt.\nBitte verwenden Sie das Installations-Plugin im Administrationsbereich.",
-	E003: "Die Datenbank-Zugangsdaten sind falsch.\nBitte verwenden Sie das Installations-Plugin im Administrationsbereich.",
-	E004: "Wurde dieses Plugin aktualisiert? Ein oder mehrere Felder existieren nicht in der Datenbank.\nBitte aktualisieren Sie über das Installations-Plugin im Administrationsbereich die Tabelle des Plugins.",
-	E005: "Zugriff verweigert!",
-	E006: "Sie haben keine Berechtigung, diese Seite zu betrachten!",
-	E007: function(plugin) {return "Class "+plugin+"GUI needs to implement the interface iGUIHTML2 or iGUIHTMLMP2!";},
-	//E008: "The interface iHTMLGUI is deprecated and should not be used. Use iHTMLGUI2 instead.",
-	E009: function(Klasse) {return "Die Klasse "+Klasse+" konnte nicht gefunden werden. Die Anfrage wird abgebrochen.";},
-	
-	E010: function(Extension) {return "Die PHP-Erweiterung '"+Extension+"' wurde nicht geladen. Anfrage wird abgebrochen.";},
-	E011: "Dieser Datensatz existiert nicht (mehr). Eventuell wurde er gelöscht.",
-	E012: function(Value) {return "Der Wert "+Value+" wurde bereits vergeben";},
-	
-	E020: "Das Verzeichnis kann nicht gelöscht werden, es ist nicht leer!",
-	E021: "Die Datei kann wegen fehlender Berechtigung nicht gelöscht werden!",
-	
-	E030: "Das Interface iCategorizer wird von der Klasse nicht implementiert.",
-	E031: "Sie müssen gleiche Typen verwenden",
-	E032: "Der zweite Eintrag muss eine höhere Nummer besitzen als der Erste.",
-	E033: "Bitte wählen Sie eine Kategorie",
-	
-	E040: function(classMethod) {return "Die Methode "+classMethod+" existiert nicht";},
-	
-	A001: "Bitte geben Sie eine Zahl ein",
-	A002: "Der letzte Datensatz wurde erreicht",
-	A003: "Der erste Datensatz wurde erreicht",
-	A004: "Ein Datensatz mit dieser ID existiert nicht",
-	A005: "Ihre Sitzung ist abgelaufen, bitte loggen Sie sich erneut ein.",
-
-
-	M001: "Änderungen gespeichert",
-	M002: "Daten gespeichert",
-	M003: "Datensatz erstellt",
-	
-	C001: "Achtung: Die Seite muss neu geladen werden, damit die Einstellungen wirksam werden. Jetzt neu laden?"
-}
-
 Ajax.Responders.register({
 	onCreate: function(){
 		Interface.startLoading();
 	},
 
 	onFailure: function(transport) {
-		alert("An error occured: "+transport.responseText);
+		console.log(transport);
+		showMessage("<b style=\"color:red\">Server nicht<br />erreichbar</b>");
+		Interface.endLoading();
+		//alert("An error occured: "+transport);
 	},
 	
 	onComplete: function(){
@@ -87,9 +51,14 @@ function checkResponse(transport, hideError) {
 	if(typeof hideError == "undefined") hideError = false;
 
 	if(transport.responseText == "SESSION EXPIRED"){
-		alert(GlobalMessages.A005);
+		alert("Ihre Sitzung ist abgelaufen, bitte loggen Sie sich erneut ein.");
 		window.location.reload();
-		return;
+		return false;
+	}
+	
+	if(transport.responseText.search(/^redirect:/) > -1){
+		eval(transport.responseText.replace(/redirect:/,""));
+		return false;
 	}
 	
 	if(transport.responseText.search(/^error:/) > -1){
@@ -110,7 +79,7 @@ function checkResponse(transport, hideError) {
 		else alert(message);
 		return true;
 	}
-	if(transport.responseText.search(/Fatal error/) > -1){
+	if(transport.responseText.search(/^Fatal error/) > -1){
 		if(!hideError) alert(transport.responseText.replace(/<br \/>/g,"\n").replace(/<b>/g,"").replace(/<\/b>/g,"").replace(/&gt;/g,">").replace(/^\s+/, '').replace(/\s+$/, ''));
 		return false;
 	}
@@ -164,7 +133,10 @@ function rmeP(targetClass, targetClassId, targetMethod, targetMethodParameters, 
  }
  
  
-function windowWithRme(targetClass, targetClassId, targetMethod, targetMethodParameters, bps){
+function windowWithRme(targetClass, targetClassId, targetMethod, targetMethodParameters, bps, target){
+	if(typeof target == "undefined")
+		target = "window";
+
  	if(typeof targetMethodParameters != "string"){
  		for(var i=0;i<targetMethodParameters.length;i++)
  			targetMethodParameters[i] = "'"+encodeURIComponent(targetMethodParameters[i])+"'";
@@ -172,47 +144,14 @@ function windowWithRme(targetClass, targetClassId, targetMethod, targetMethodPar
  		targetMethodParameters = targetMethodParameters.join(",");
  	}
  	else targetMethodParameters = "'"+targetMethodParameters+"'";
- 	
-	window.open(contentManager.getRoot()+'interface/rme.php?class='+targetClass+'&constructor='+targetClassId+'&method='+targetMethod+'&parameters='+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : ""),'Druckansicht','height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes');
-}
-
-function iframeWithRme(targetClass, targetClassId, targetMethod, targetMethodParameters, bps){
- 	if(typeof targetMethodParameters != "string"){
- 		for(var i=0;i<targetMethodParameters.length;i++)
- 			targetMethodParameters[i] = "'"+targetMethodParameters[i]+"'";
- 			
- 		targetMethodParameters = targetMethodParameters.join(",");
- 	}
- 	else targetMethodParameters = "'"+targetMethodParameters+"'";
- 	
-	element = Builder.node('iframe',{src:'./interface/rme.php?class='+targetClass+'&constructor='+targetClassId+'&method='+targetMethod+'&parameters='+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : ""), style:"display:none;"});
-	$("contentLeft").appendChild(element);
-}
-
-/**
- * @deprecated
- **/
-function loadFrameV2(target, plugin, bps, page){
-	alert("JS function loadFrameV2() deprecated, use contentManager.loadFrame instead!");
-	if(target == "contentRight"){
-		lastLoadedRightPlugin = plugin;
-		lastLoadedRightPage = page;
-	}
-	if(target == "contentLeft"){
-		lastLoadedLeft = -2;
-		lastLoadedLeftPlugin = plugin;
-	}
 	
-	new Ajax.Request('./interface/loadFrame.php?p='+plugin+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : "")+((page != "" && typeof page != "undefined") ? "&page="+page : ""), {
-	method: 'get',
-	onSuccess: function(transport) {
-		if(transport.responseText == "-1"){
-			overlayBox.show();
-			return;
-		}
-    	if(plugin != "" && checkResponse(transport)) $(target).update(transport.responseText);
-	}});
+ 	if(target == "window")
+		window.open(contentManager.getRoot()+'interface/rme.php?class='+targetClass+'&constructor='+targetClassId+'&method='+targetMethod+'&parameters='+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : "")+"&r="+Math.random()+(Ajax.physion != "default" ? "&physion="+Ajax.physion : ""),'Druckansicht','height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes');
+ 	
+	if(target == "tab")
+		window.open(contentManager.getRoot()+'interface/rme.php?class='+targetClass+'&constructor='+targetClassId+'&method='+targetMethod+'&parameters='+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : "")+"&r="+Math.random()+(Ajax.physion != "default" ? "&physion="+Ajax.physion : ""));
 }
+
 
 function saveClass(className, id, onSuccessFunction, formName){
 	formID = "AjaxForm";
@@ -224,15 +163,16 @@ function saveClass(className, id, onSuccessFunction, formName){
 	var dots = ".";
 	if(document.location.pathname.search(/interface/) > -1) dots = "..";
 	
-	setString = dots+"/interface/set.php";
+	setString = dots+"/interface/set.php?random="+Math.random();
 
 	new Ajax.Request(setString, {
 	method: 'post',
-	parameters: "class="+className+joinFormFields(formID)+"&id="+id+"&random="+Math.random(),
+	parameters: "class="+className+joinFormFields(formID)+"&id="+id,
 	onSuccess: function(transport) {
 		if(checkResponse(transport)) {
 			//showMessage(transport.responseText);
-			onSuccessFunction(transport);
+			if(typeof onSuccessFunction == "function")
+				onSuccessFunction(transport);
 		}
 	}});
 }
@@ -273,7 +213,7 @@ function joinFormFieldsToString(formID){
  * @deprecated
  **/
 function reloadLeftFrame(bps){
-	//alert("JS function reloadLeftFrame() deprecated, use contentManager.reloadFrame instead!");
+	alert("JS function reloadLeftFrame() deprecated, use contentManager.reloadFrame instead!");
 
 	if(lastLoadedLeft == -1) {
 		alert("Can't reload! lastLoadedLeft = -1");
@@ -288,14 +228,13 @@ function reloadLeftFrame(bps){
  * @deprecated
  **/
 function reloadRightFrame(bps){
-	//alert("JS function reloadRightFrame() deprecated, use contentManager.reloadFrame instead!");
+	alert("JS function reloadRightFrame() deprecated, use contentManager.reloadFrame instead!");
 
 	if(lastLoadedRightPlugin == "") {
 		alert("Can't reload! lastLoadedRightPlugin = ''");
 		return;
 	}
 	contentManager.loadFrame('contentRight', lastLoadedRightPlugin, -1, lastLoadedRightPage, bps);
-	//contentManager.reloadFrame("contentRight");
 }
 
 /**
@@ -304,16 +243,7 @@ function reloadRightFrame(bps){
 function loadLeftFrameV2(plugin, withId, onSuccessFunction){
 	//alert("JS function loadLeftFrameV2() deprecated, use contentManager.reloadFrame instead!");
 
-	//lastLoadedLeft = withId;
-	//lastLoadedLeftPlugin = plugin;
-
 	contentManager.loadFrame("contentLeft", plugin, withId, 0, "bps", onSuccessFunction);
-
-	/*new Ajax.Request('./interface/loadFrame.php?p='+plugin+'&id='+withId, {onSuccess: function(transport){
-		if(checkResponse(transport)) $('contentLeft').update(transport.responseText);
-		
-		if(typeof onSuccessFunction != "undefined" && onSuccessFunction != "") onSuccessFunction();
-	}});*/
 }
 
 
@@ -323,26 +253,8 @@ function deleteClass(className, id, onSuccessFunction, question){
 	if (Check == false) return;
 
 	contentManager.rmePCR(className, id, "deleteMe", "", onSuccessFunction);
-
-	/*
-	setString = "./interface/del.php?class="+className+"&id="+id+"&r="+Math.random();
-
-	new Ajax.Request(setString, {
-	method: 'get',
-	onSuccess: function(transport) {
-		if(checkResponse(transport)) {
-			showMessage(transport.responseText);
-
-			if(typeof onSuccessFunction != "undefined" && onSuccessFunction != "") onSuccessFunction();
-		}
-	}});*/
 }
-/*
-function loadRightWithSelection(pluginToLoad,mode){
-	alert("The function loadRightWithSelection is deprecated and should not be used!");
-	
-	new Ajax.Updater('contentRight','./interface/loadFrame.php?p='+pluginToLoad+'&mode='+mode);
-}*/
+
 
 function saveSelection(classe, classId, saveFunction, idToSave, targetFrame, targetClass, targetId){
 	new Ajax.Request("./interface/rme.php", {
@@ -352,7 +264,7 @@ function saveSelection(classe, classId, saveFunction, idToSave, targetFrame, tar
 		if(checkResponse(transport)){
 			if(transport.responseText.search(/^message:/) == -1)showMessage(transport.responseText);
 
-			if(targetId != -1) contentManager.loadFrame(targetFrame, targetClass, targetId);//new Ajax.Updater(targetFrame,'./interface/loadFrame.php?p='+targetClass+'&id='+targetId);
+			if(targetId != -1) contentManager.loadFrame(targetFrame, targetClass, targetId);
 		}
 	}});
 
@@ -360,14 +272,19 @@ function saveSelection(classe, classId, saveFunction, idToSave, targetFrame, tar
 
 function saveMultiEditInput(classe, eid, feld, onsuccessFunction){
 	oldValue = $(feld+'ID'+eid).value;
+	var field = $(feld+'ID'+eid);
 	
-	new Ajax.Request("./interface/rme.php?class="+classe+"&constructor="+eid+"&method=saveMultiEditField&parameters="+encodeURIComponent("'"+feld+"','"+$(feld+'ID'+eid).value+"'"), {
+	var value = field.value;
+	if(field.type == "checkbox")
+		value = field.checked ? "1" : "0";
+	
+	new Ajax.Request("./interface/rme.php?class="+classe+"&constructor="+eid+"&method=saveMultiEditField&parameters="+encodeURIComponent("'"+feld+"','"+value+"'"), {
 	method: 'get',
 	onSuccess: function(transport) {
 		if(checkResponse(transport)){
-			if(transport.responseText.search(/^message:/) == -1) showMessage(transport.responseText);
+			//if(transport.responseText.search(/^message:/) == -1) showMessage(transport.responseText);
 			
-			if(typeof onsuccessFunction != "undefined" && onsuccessFunction != "") onsuccessFunction();
+			if(typeof onsuccessFunction != "undefined" && onsuccessFunction != "") onsuccessFunction(transport);
 		}
 	}});
 }

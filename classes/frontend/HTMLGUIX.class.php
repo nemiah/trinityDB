@@ -28,6 +28,8 @@ class HTMLGUIX {
 	protected $showEdit = true;
 	protected $showNew = true;
 	protected $showQuicksearch = false;
+	protected $showSave = true;
+	protected $showInputs = true;
 
 	protected $colWidth = array();
 	protected $colStyle = array();
@@ -52,11 +54,31 @@ class HTMLGUIX {
 	protected $languageClass;
 
 	protected $sideButtons = array();
+	protected $topButtons = array();
+	protected $fieldButtons = array();
+	protected $fieldEvents = array();
+	protected $hiddenLines = array();
+	protected $hiddenUseInit = false;
 
 	protected $labels = array();
 	protected $types = array();
+	protected $options = array();
+	protected $descriptionsField = array();
+	protected $spaces = array();
+	protected $formID;
 
-	protected $functionEntrySave = "function(transport){ /*ADD*/ }";
+	protected $header;
+	
+	protected $functionEntrySave = "function(transport){ contentManager.reloadFrame('contentRight'); /*ADD*/ }";
+
+	protected $blacklists;
+
+	protected $inputStyles = array();
+	
+	protected $sortable;
+	
+	protected $autocomplete = array();
+	protected $tip = "";
 
 	public function __construct($object = null, $collectionName = null){
 		if($object != null)
@@ -65,16 +87,206 @@ class HTMLGUIX {
 		$this->languageClass = $this->loadLanguageClass("HTML");
 	}
 
+	public function tip(){
+		$targetClass = $this->object->getClearClass();
+		
+		$this->tip = self::tipJS($targetClass);
+	}
+	
+	public static function tipJS($plugin){
+		$targetClass = $plugin;
+		if(mUserdata::getUDValueS("hideTooltips", "0"))
+			return;
+		
+		$hide = mUserdata::getUDValueS("hideTooltip$targetClass", "0");
+		if($hide)
+			return;
+		
+		$xml = SpellbookGUI::getSpell($targetClass);
+		
+		$entries = $_SESSION["CurrentAppPlugins"]->getMenuEntries();
+		
+		return OnEvent::script("\$j('#{$targetClass}MenuImage').qtip(\$j.extend({}, qTipSharedRed, {
+		content: {
+			text: '".$xml->plugin[0]->description."<br /><div style=\"margin-top:10px;\"><a href=\"#\" style=\"color:grey;\" onclick=\"".addslashes(OnEvent::rme(new mUserdata(-1), "setUserdata", array("'hideTooltip$targetClass'", "'1'", "''", "0", "1")))." return false;\">Diesen Tipp nicht mehr anzeigen</a></div><div style=\"clear:both;margin-top:5px;\"><a href=\"#\" style=\"color:grey;\" onclick=\"".addslashes(OnEvent::rme(new mUserdata(-1), "setUserdata", array("'hideTooltips'", "'1'", "''", "0", "1")))." return false;\">Keine Tipps mehr anzeigen</a></div>', 
+			title: {
+				text: '".array_search($targetClass, $entries)."',
+				button: true
+			}
+		}
+	}));");
+	}
+	
 	public function name($name){
 		$this->name = $name;
 	}
 
-	public function addSideButton($label, $image = ""){
-		$B = new Button($label, $image);
+	public function autoComplete($fieldName, $targetClass, $onSelectionFunction = null){
+		$this->autocomplete[$fieldName] = array($targetClass, $onSelectionFunction);
+	}
+	
+	public function blacklists(array $EditIDs, array $DeleteIDs = null){
+		if($DeleteIDs == null)
+			$DeleteIDs = $EditIDs;
+		
+		$this->blacklists = array($EditIDs, $DeleteIDs);
+	}
 
+	/**
+	 * @param string/Object $labelOrButton
+	 * @param string $image
+	 * @return Button
+	 */
+	public function addTopButton($labelOrButton, $image = ""){
+		if(!is_object($labelOrButton))
+			$B = new Button($labelOrButton, $image);
+		else
+			$B = $labelOrButton;
+
+		$this->topButtons[] = $B;
+
+		return $B;
+	}
+
+	public function operationsButton(){
+		$pluginName = str_replace("GUI", "", get_class($this->object));
+		$id = $this->object->getID();
+		
+		$userCanDelete = mUserdata::isDisallowedTo("cantDelete".$pluginName);
+		$userCanCreate = mUserdata::isDisallowedTo("cantCreate".$pluginName);
+		/*if($this->texts == null) {
+			$c = $this->loadLanguageClass("HTML");
+			$this->texts = $c->getEditTexts();
+		}*/
+
+		$html = "";
+		if(PMReflector::implementsInterface($pluginName,"iNewWithValues") AND $userCanCreate) $os = "1";
+		else $os = "0";
+
+		if(PMReflector::implementsInterface($pluginName,"iCloneable") AND $userCanCreate) $os .= "1";
+		else $os .= "0";
+		
+		if((PMReflector::implementsInterface($pluginName,"iDeletable") OR PMReflector::implementsInterface($pluginName,"iDeletable2")) AND $userCanDelete) $os .= "1";
+		else $os .= "0";
+		
+		if(PMReflector::implementsInterface($pluginName,"iRepeatable") AND Session::isPluginLoaded("mRepeatable")) $os .= "1";
+		else $os .= "0";
+		
+		if(PMReflector::implementsInterface($pluginName,"iXMLExport")) $os .= "1";
+		else $os .= "0";
+
+		if($id != -1 AND $os != "00000"){
+			$B = new Button("Operationen", "./images/i2/settings.png", "icon");
+			$B->style("float:right;");
+			$B->contextMenu("HTML", "operations:$pluginName:$id:$os", "Operationen");
+			
+			$html = $B;
+		}
+			#$html .= "<img title=\"Operationen\" id=\"".$pluginName."Operations\" src=\"./images/i2/settings.png\" onclick=\"phynxContextMenu.start(this, 'HTML','operations:$pluginName:$id:$os','".$this->texts["Operationen"].":');\" style=\"float:right;\" />";
+
+		return $html;
+	}
+	
+	public function header(array $header){
+		$this->header = $header;
+	}
+	
+	/**
+	 * @param string/Object $labelOrButton
+	 * @param string $image
+	 * @return Button
+	 */
+	public function addSideButton($labelOrButton, $image = ""){
+		if($labelOrButton == null)
+			return;
+		
+		if(!is_object($labelOrButton))
+			$B = new Button($labelOrButton, $image);
+		else
+			$B = $labelOrButton;
+		
 		$this->sideButtons[] = $B;
 
 		return $B;
+	}
+
+	public function addFieldButton($fieldName, $labelOrButton, $image = ""){
+		if(!is_object($labelOrButton)){
+			$B = new Button($labelOrButton, $image);
+		} else
+			$B = $labelOrButton;
+		
+		$B->type("icon");
+		$B->style("float:right;");
+		
+		$this->fieldButtons[$fieldName] = $B;
+
+		return $B;
+	}
+
+	public function inputStyle($fieldName, $style){
+		$this->inputStyles[$fieldName] = $style;
+	}
+	
+	public function addFieldEvent($fieldName, $onEvent, $action){
+		$this->fieldEvents[] = array($fieldName, $onEvent, $action);
+	}
+
+	public function toggleFieldsInit($fieldName, $initiallyHide){
+		$this->addFieldEvent($fieldName, "onChange", "contentManager.toggleFormFields('hide', [".(count($initiallyHide) > 0 ? "'".implode("','", $initiallyHide)."'" : "")."], 'edit".get_class($this->object)."');");
+	
+		foreach($initiallyHide AS $field)
+			$this->hideLine($field);
+		
+		$this->hiddenUseInit = true;
+	}
+	
+	public function toggleFields($fieldName, $values, $showOnTrue, $showOnFalse = null){
+		if(!is_array($values))
+			$values = array($values);
+
+		if(!is_array($showOnTrue))
+			$showOnTrue = array($showOnTrue);
+
+		if(!is_array($showOnFalse) AND $showOnFalse != null)
+			$showOnFalse = array($showOnFalse);
+
+		$cTest = false;
+		$test = "";
+		foreach ($values AS $v){
+			$test .= ($test != "" ? "OR" : "").((isset($this->types[$fieldName]) AND $this->types[$fieldName] != "checkbox") ? "this.value == '$v'" : "this.checked");
+
+			if($this->object->A($fieldName) == $v)
+				$cTest = true;
+		}
+
+		if($cTest){
+			if($showOnFalse != null)
+				$this->hideLine($showOnFalse);
+			
+			$this->showLine($showOnTrue);
+		} elseif(!$this->hiddenUseInit)
+			$this->hideLine($showOnTrue);
+		
+		$this->addFieldEvent($fieldName, "onChange", "contentManager.toggleFormFieldsTest(($test), [".(count($showOnTrue) > 0 ? "'".implode("','", $showOnTrue)."'" : "")."], [".($showOnFalse != null ? "'".implode("','", $showOnFalse)."'" : "")."], 'edit".get_class($this->object)."', ".($this->hiddenUseInit ? "true" : "false").");");
+	}
+
+	public function showLine($fieldNames){
+		if(!is_array($fieldNames))
+			$fieldNames = array($fieldNames);
+
+		foreach($fieldNames AS $field){
+			$pos = array_search($field, $this->hiddenLines);
+			if($pos !== false)
+				unset($this->hiddenLines[$pos]);
+		}
+	}
+	
+	public function hideLine($fieldNames){
+		if(is_array($fieldNames))
+			$this->hiddenLines = array_merge($this->hiddenLines, $fieldNames);
+		else
+			$this->hiddenLines[] = $fieldNames;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="displayGroup">
@@ -87,12 +299,45 @@ class HTMLGUIX {
 		$this->labels[$fieldName] = $label;
 	}
 
-	public function type($fieldName, $type){
+	public function labels($fieldName = null){
+		if($fieldName != null){
+			if(isset($this->labels[$fieldName]))
+				return $this->labels[$fieldName];
+			else
+				return ucfirst($fieldName);
+		}
+		
+		return $this->labels;
+	}
+	
+	public function formID($formID){
+		$this->formID = $formID;
+	}
+
+	public function type($fieldName, $type, $options = null, $labelField = null, $zeroEntry = null){
 		$this->types[$fieldName] = $type;
+		if(is_object($options) AND $options instanceof Collection){
+			$opt = array();
+
+			if($zeroEntry != null)
+				$opt[0] = $zeroEntry;
+
+			while($O = $options->getNextEntry())
+				$opt[$O->getID()] = $O->A($labelField);
+
+			$options = $opt;
+		}
+		
+
+ 		$this->options[$fieldName] = $options;
 	}
 
 	public function descriptionField($fieldName, $description){
 		$this->descriptionsField[$fieldName] = $description;
+	}
+
+	public function space($fieldName, $label = ""){
+		$this->spaces[$fieldName] = $label;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="displayMode">
@@ -105,14 +350,30 @@ class HTMLGUIX {
 	 *
 	 * @param string $DM
 	 */
-	public function displayMode($DM){
+	public function displayMode($DM = null, $targetFrame = null){
+		if($DM == null) return $this->displayMode;
+		
 		$this->displayMode = $DM;
 
 		if($DM == "popup")
-			$this->addToEvent("onSave", "contentManager.reloadFrame('contentLeft'); Popup.close('".$this->object->getClearClass()."', 'edit');");
+			$this->addToEvent("onSave", "/*ADD*/ contentManager.reloadFrame('contentLeft'); Popup.close('".$this->object->getClearClass("GUI")."', 'edit');");
+		
+		if($DM == "popupS")
+			$this->addToEvent("onSave", "/*ADD*/ contentManager.reloadFrame('contentScreen'); Popup.close('".$this->object->getClearClass("GUI")."', 'edit');");
+
+		if($DM == "popupL")
+			$this->replaceEvent("onSave", "function() { contentManager.reloadFrame('contentLeft'); Popup.close('".$this->object->getClearClass("GUI")."', 'edit'); }");
+			
+		if($DM == "popupC")
+			$this->addToEvent("onSave", "/*ADD*/ contentManager.reloadFrame('contentLeft'); Popup.close('m".$this->object->getClearClass("GUI")."', 'edit');");
+
+		if($DM == "popup" AND $this->object instanceof Collection)
+			$this->addToEvent("onDelete", "Popup.refresh('".$this->object->getClearClass()."');");
+
+		return $this->displayMode;
 	}
 	// </editor-fold>
-	
+
 
 	// <editor-fold defaultstate="collapsed" desc="caption">
 	public function caption($defaultCaption){
@@ -197,6 +458,12 @@ class HTMLGUIX {
 
 	public function replaceEvent($event, $function){
 		$this->GUIFactory->replaceEvent($event, $function);
+
+		switch($event){
+			case "onSave":
+				$this->functionEntrySave = $function;
+			break;
+		}
 	}
 
 	public function insertAttribute($where, $fieldName, $insertedFieldName){
@@ -205,11 +472,18 @@ class HTMLGUIX {
 
 		if($where == "before")
 			$add = 0;
+
+		$resetKeys = array();
+		foreach($this->attributes AS $v)
+			$resetKeys[] = $v;
+		
+		$this->attributes = $resetKeys;
 		
 		$first = array_splice($this->attributes, 0, array_search($fieldName, $this->attributes) + $add);
 		$last = array_splice($this->attributes, array_search($fieldName, $this->attributes));
 
 		$this->attributes = array_merge($first, array($insertedFieldName), $last);
+		
 	}
 
 	public function removeAttribute($fieldName){
@@ -231,28 +505,60 @@ class HTMLGUIX {
 	}
 	// </editor-fold>
 
+	public function optionsEdit($showSave = true, $showInputs = true){
+		$this->showSave = $showSave;
+		$this->showInputs = $showInputs;
+	}
+
 	function getEditHTML(){
 		$this->object->loadMeOrEmpty();
 
-		$F = new HTMLForm("edit".get_class($this->object), $this->object, $this->displayMode != "popup" ? $this->name : null);
-		$F->getTable()->setColWidth(1, 120);
-		$F->setSaveClass(get_class($this->object), $this->object->getID(), $this->functionEntrySave);
+		if($this->object->getID() == -1)
+			$this->addToEvent("onSave", "$('contentLeft').update('');");
 
-		foreach($this->labels AS $n => $l)
-			$F->setLabel($n, $l);
+		$F = new HTMLForm($this->formID == null ? "edit".get_class($this->object) : $this->formID, $this->attributes == null ? $this->object : $this->attributes, strpos($this->displayMode, "popup") === false ? $this->operationsButton().$this->name : null);
+		$F->getTable()->setColWidth(1, 120);
+		if($this->showSave)
+			$F->setSaveClass(get_class($this->object), $this->object->getID(), $this->functionEntrySave, $this->name);
+
+		$F->isEditable($this->showInputs);
+
+		foreach($this->object->getA() AS $n => $v){
+			$F->setValue($n, $v);
+			$F->setLabel($n, str_replace($this->object->getClearClass(), "", $n));
+		}
 
 		foreach($this->types AS $n => $l)
-			$F->setType($n, $l);
+			$F->setType($n, $l, null, isset($this->options[$n]) ? $this->options[$n] : null);
+		
+		foreach($this->labels AS $n => $l)
+			$F->setLabel($n, $l);
 
 		foreach($this->descriptionsField AS $n => $l)
 			$F->setDescriptionField($n, $l);
 
-		foreach($this->object->getA() AS $n => $v)
-			$F->setValue($n, $v);
+		foreach($this->parsers AS $n => $l)
+			$F->setType($n, "parser", null, array($l, $this->object));
 
+		foreach($this->spaces AS $n => $l)
+			$F->insertSpaceAbove($n, $l);
 
+		foreach($this->fieldButtons AS $n => $B)
+			$F->addFieldButton($n, $B);
 
-		return $F;
+		foreach($this->fieldEvents AS $k => $v)
+			$F->addJSEvent($v[0], $v[1], $v[2]);
+
+		foreach($this->hiddenLines AS $n)
+			$F->inputLineStyle($n, "display:none;");
+		
+		foreach($this->inputStyles AS $k => $n)
+			$F->setInputStyle($k, $n);
+		
+		foreach($this->autocomplete AS $k => $a)
+			$F->setAutoComplete($k, $a[0], $a[1]);
+		
+		return $this->topButtons().$this->sideButtons().$F;
 	}
 
 	/**
@@ -262,15 +568,20 @@ class HTMLGUIX {
 	 * @param int $lineWithId
 	 */
 	// <editor-fold defaultstate="collapsed" desc="getBrowserHTML">
-	function getBrowserHTML($lineWithId = -1){
+	function getBrowserHTML($lineWithId = -1, $useBPS = true){
 
 		$bps = BPS::getAllProperties("m".$this->className."GUI");
-
+		if(!$useBPS)
+			$bps = false;
+		
 		$GUIF = $this->GUIFactory;
 		$GUIF->setMultiPageDetails($this->multiPageDetails);
 		$GUIF->setTableMode($this->displayMode);
 		$GUIF->options($this->showTrash, $this->showEdit, $this->showNew);
-		
+
+		if($this->blacklists != null)
+			$GUIF->blacklists($this->blacklists);
+
 		if(isset($bps["selectionMode"]))
 			$GUIF->selection($bps["selectionMode"]);
 
@@ -293,10 +604,14 @@ class HTMLGUIX {
 
 
 		$Tab = $GUIF->getTable($this->attributes, $this->colStyle, $this->caption);
-
+		$Tab->setTableID("Browserm$this->className");
+		
+		if($this->header != null)
+			$Tab->addHeaderRow($this->header);
+		
 		if($lineWithId == -1) {
 			if($this->showQuicksearch) $GUIF->buildQuickSearchLine();
-			
+
 			if($this->multiPageDetails["total"] > $this->multiPageDetails["perPage"])
 				$GUIF->buildFlipPageLine("top");
 
@@ -317,7 +632,7 @@ class HTMLGUIX {
 			if($lineWithId == -1 AND $this->displayGroup != null AND $DisplayGroup != $E->A($this->displayGroup[0])){
 				if($this->displayGroup[1] != null){
 					$DGP = explode("::", $this->displayGroup[1]);
-					$GUIF->buildGroupLine(Util::invokeStaticMethod($DGP[0], $DGP[1], $E->A($this->displayGroup[0])));
+					$GUIF->buildGroupLine(Util::invokeStaticMethod($DGP[0], $DGP[1], array($E->A($this->displayGroup[0]), $E)));
 				} else
 					$GUIF->buildGroupLine($E->A($this->displayGroup[0]));
 			}
@@ -349,18 +664,61 @@ class HTMLGUIX {
 		}
 		else
 			return $Tab->getHTMLForUpdate();
-		
+
+		return $this->topButtons($bps).$this->sideButtons($bps).$GUIF->getContainer($Tab, $this->caption).str_replace("%CLASSNAME", $this->className, $this->sortable).$this->tip;
+	}
+	// </editor-fold>
+
+	public function sortable($handleClass = null){
+		$this->sortable = "<script type=\"text/javascript\">
+			\$j('#Browserm%CLASSNAME tbody').sortable({
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						\$j(this).width(\$j(this).width());
+					});
+
+					return ui;
+				},
+				update: function(){
+					var newOrder = \$j(this).sortable('serialize', {expression: /([a-zA-Z]+)([0-9]+)/}).replace(/\[\]=/g, '').replace(/&/g, ';').replace(/[a-zA-Z]*/g, '');
+					contentManager.rmePCR('m%CLASSNAME', '-1', 'saveOrder', newOrder);
+				},
+				axis: 'y'".($handleClass != null ? ",
+				handle: \$j('.$handleClass')" : "")."
+			}).disableSelection();
+		</script>";
+	}
+	
+	private function topButtons($bps = null){
+		$TT = "";
+		if(count($this->topButtons) > 0 AND ($bps == null OR !isset($bps["selectionMode"]))){
+			$TT = new HTMLTable(1);
+
+			foreach($this->topButtons AS $B)
+				$TT->addRow($B);
+		}
+
+		return $TT;
+	}
+
+	private function sideButtons($bps = null){
 		$ST = "";
-		if(count($this->sideButtons) > 0){
-			$ST = new HTMLSideTable("right");
+		if(count($this->sideButtons) > 0 AND ($bps == null OR !isset($bps["selectionMode"]))){
+			$position = "left";
+			if($this->object instanceof PersistentObject) $position = "right";
+
+			if($this->displayMode == "BrowserLeft")
+				$position = "right";
+
+			$ST = new HTMLSideTable($position);
+			$ST->setTableID("SideTable".get_class($this->object));
 
 			foreach($this->sideButtons AS $B)
 				$ST->addRow($B);
 		}
 
-		return $ST.$GUIF->getContainer($Tab, $this->caption);
+		return $ST;
 	}
-	// </editor-fold>
 
 	// <editor-fold defaultstate="collapsed" desc="invokeParser">
 	protected function invokeParser($function, $value, $element){
@@ -405,7 +763,7 @@ class HTMLGUIX {
 
 	/**
 	 * Finds, loads and returns the language class for the given class name
-	 * 
+	 *
 	 * @param string $class
 	 * @return unknown_type
 	 */
@@ -436,6 +794,7 @@ class HTMLGUIX {
 
 			$t = new HTMLTable(1);
 			$t->addRow(str_replace(array("%1","%2"),array($_SESSION["CurrentAppPlugins"]->getVersionOfPlugin($plugin), $_SESSION["applications"]->getRunningVersion()),$l["versionError"]));
+			$t->addRow(Installation::getReloadButton());
 			die($t->getHTML());
 		}
 	}
@@ -466,7 +825,7 @@ class HTMLGUIX {
 			case "CRMEditAbove":
 				#$this->features["CRMEditAbove"] = "";
 				$new = "contentManager.loadFrame('subFrameEdit%COLLECTIONNAME', '%CLASSNAME', %CLASSID, 0, '', function(transport) { if($('subFrameEdit%COLLECTIONNAME').style.display == 'none') new Effect.BlindDown('subFrameEdit%COLLECTIONNAME', {duration:0.5}); });";
-				
+
 				$this->GUIFactory->replaceEvent("onNew", $new);
 				$this->GUIFactory->replaceEvent("onDelete", "deleteClass('%CLASSNAME','%CLASSID', function() { contentManager.reloadFrame('contentLeft'); },'Eintrag wirklich löschen?');");
 				$this->GUIFactory->replaceEvent("onEdit", $new);
@@ -475,7 +834,7 @@ class HTMLGUIX {
 				#$this->functionEdit = $this->functionNew;
 			break;
 			case "editInPopup":
-				$new = "contentManager.editInPopup('%CLASSNAME', %CLASSID, 'Eintrag bearbeiten');";
+				$new = "contentManager.editInPopup('%CLASSNAME', %CLASSID, 'Eintrag bearbeiten', ''".($par1 != null ? ", $par1" : "").");";
 				$this->GUIFactory->replaceEvent("onNew", $new);
 				$this->GUIFactory->replaceEvent("onEdit", $new);
 			break;

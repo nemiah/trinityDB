@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class FieldDoesNotExistException extends StorageException {
 
@@ -28,6 +28,10 @@ class FieldDoesNotExistException extends StorageException {
 		
 		parent::__construct();
 		$_SESSION["messages"]->addMessage("The database tells me that no field named '$field' exists. Check your query in the $where.");
+	}
+
+	function getField(){
+		return $this->field;
 	}
 
 	function getErrorMessage(){

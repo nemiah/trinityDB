@@ -15,13 +15,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class DBImageGUI implements iGUIHTML2  {
-
-	public static function imageLink($className, $classID, $classAttribute){
-		return "./interface/loadFrame.php?p=DBImage&id=$className:::$classID:::$classAttribute";
+	protected $image;
+	
+	public function __construct($image = null) {
+		$this->image = $image;
+	}
+	
+	protected function stringify($mimeType, $path){
+		return $mimeType.":::".filesize($path).":::".base64_encode(addslashes(file_get_contents($path)));
+	}
+	
+	public static function stringifyS($mimeType, $path){
+		return $mimeType.":::".filesize($path).":::".base64_encode(addslashes(file_get_contents($path)));
+	}
+	
+	public function loadMe(){
+		
+	}
+	
+	public function A($val){
+		
+	}
+	
+	public static function imageLink($className, $classID, $classAttribute, $inWindow = false, $randomize = false){
+		return ($inWindow ? "." : "")."./interface/loadFrame.php?p=DBImage&id=$className:::$classID:::$classAttribute".($randomize ? "&r=".rand(1, 99999999) : "").(isset($_GET["physion"]) ? "&physion=".$_GET["physion"] : "");
 	}
 
 	protected function showError($message){
@@ -50,7 +71,7 @@ class DBImageGUI implements iGUIHTML2  {
 		if(!isset($i[0])) return;
 		if(!isset($i[1])) return;
 		if(!isset($i[2])) return;
-
+		
 		header("Content-type: $i[0]");
 		header("Content-length: $i[1]");
 		echo stripslashes(base64_decode($i[2]));

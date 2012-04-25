@@ -55,13 +55,14 @@ var DesktopLink = {
 	},
 
 	init: function(){
-		if(DesktopLink.isInit) return;
+		if(DesktopLink.isInit)
+			return;
 
 		var DLW = Builder.node("div", {"id": "DesktopLinkWrapper", "class" : "backgroundColor1 borderColor1", "style" : "display:none;"});
 		var DLH = Builder.node("div", {"id": "DesktopLinkHandle", "class" : "backgroundColor1 borderColor1", "style" : ""});
 		var DLC = Builder.node("div", {"id": "DesktopLink", "class" : "backgroundColor0 borderColor1", "style" : "display:none;"});
 
-		$("wrapper").insertBefore(DLW, $('wrapperTable'))
+		$("wrapper").insertBefore(DLW, $('wrapperTable'));
 		$("DesktopLinkWrapper").appendChild(DLH);
 		$("DesktopLinkWrapper").appendChild(DLC);
 
@@ -96,5 +97,3 @@ var DesktopLink = {
 		rmeP("DesktopLink", "", "updateOrder", Sortable.serialize("DesktopLinkElements").replace(/\[\]/gi,"").replace(/&/g,";").replace(/DesktopLinkElements=/g,""));
 	}
 }
-
-DesktopLink.init();

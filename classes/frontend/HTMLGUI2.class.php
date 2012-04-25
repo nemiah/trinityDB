@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class HTMLGUI2 extends HTMLGUI {
 	private $displaySide = "default";
@@ -64,7 +64,7 @@ class HTMLGUI2 extends HTMLGUI {
 	 * @param $par2
 	 * @param $par3
 	 */
-
+	
 	function activateFeature($feature, $class, $par1 = null, $par2 = null, $par3 = null){
 		switch($feature){
 			case "multiEdit":
@@ -97,6 +97,19 @@ class HTMLGUI2 extends HTMLGUI {
 		}
 	}
 
+	public function insertAttribute($where, $fieldName, $insertedFieldName){
+		if($where == "after")
+			$add = 1;
+
+		if($where == "before")
+			$add = 0;
+
+		$first = array_splice($this->showAttributes, 0, array_search($fieldName, $this->showAttributes) + $add);
+		$last = array_splice($this->showAttributes, array_search($fieldName, $this->showAttributes));
+
+		$this->showAttributes = array_merge($first, array($insertedFieldName), $last);
+	}
+	
 	function setMode($mode){
 		if($mode != "") {
 			$m = explode(",",$mode);
@@ -159,7 +172,7 @@ class HTMLGUI2 extends HTMLGUI {
 					<img style=\"float:left;margin-right:10px;\" src=\"./images/navi/warning.png\" />
 					<b>Es ".(count($_SESSION["phynx_errors"]) != 1 ? "liegen" : "liegt")." ".count($_SESSION["phynx_errors"])." PHP-Fehler vor:</b><br />
 					<a href=\"javascript:windowWithRme('Util','','showPHPErrors','');\">Fehler anzeigen</a>,<br />
-					<a href=\"javascript:rme('Util','','deletePHPErrors','','reloadRightFrame();');\">Fehler löschen</a>");
+					<a href=\"javascript:rme('Util','','deletePHPErrors','','contentManager.reloadFrameRight();');\">Fehler löschen</a>");
 
 
 		/**
@@ -179,7 +192,7 @@ class HTMLGUI2 extends HTMLGUI {
 		 * DELETE-BUTTON
 		 */
 		if((!$this->onlyDisplayMode OR $this->deleteInDisplayMode) AND $userCanDelete AND !$this->isSelection AND $this->showDeleteButton)  $this->newColsRight["delete"]  = "
-			<img class=\"mouseoverFade\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "reloadLeftFrame();" : "reloadRightFrame(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".str_replace("%1",$this->singularName, $this->texts["%1 wirklich löschen?"])."');\" src=\"./images/i2/delete.gif\" />";
+			<img class=\"mouseoverFade\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "contentManager.reloadFrameLeft();" : "contentManager.reloadFrameRight(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".str_replace("%1",$this->singularName, $this->texts["%1 wirklich löschen?"])."');\" src=\"./images/i2/delete.gif\" />";
 		elseif(!$userCanDelete) $this->newColsRight["delete"] = "<img src=\"./images/i2/empty.png\" />";
 
 
@@ -280,7 +293,7 @@ class HTMLGUI2 extends HTMLGUI {
 			else $pageLinks = $this->getMultiPageButtons();
 			/*if($lineWithId == -1) $multiPageRow = "
 					<tr>
-						".($userDefinedEntriesPerPage ? "<td><img class=\"mouseoverFade\" src=\"./images/i2/settings.png\" onclick=\"contextMenu.start(this, 'HTML','multiPageSettings:{$this->multiPageMode[4]}','".$this->texts["Einstellungen"].":');\" /></td>" : "")."
+						".($userDefinedEntriesPerPage ? "<td><img class=\"mouseoverFade\" src=\"./images/i2/settings.png\" onclick=\"phynxContextMenu.start(this, 'HTML','multiPageSettings:{$this->multiPageMode[4]}','".$this->texts["Einstellungen"].":');\" /></td>" : "")."
 						<td colspan=\"".($colspan+1+($userDefinedEntriesPerPage ? 0 : 1))."\"><input type=\"text\"onkeydown=\"if(event.keyCode == 13) loadFrameV2('".$this->multiPageMode[3]."','".$this->multiPageMode[4]."','',this.value - 1);\" style=\"width:30px;float:right;text-align:right;\" value=\"".($this->multiPageMode[1]+1)."\" onfocus=\"focusMe(this);\" onblur=\"blurMe(this);\" />".$this->multiPageMode[0]." ".($this->multiPageMode[0] == 1 ? $this->texts["Eintrag"] : $this->texts["Einträge"])."<!--, ".$pages." ".($pages != 1 ? $this->texts["Seiten"] : $this->texts["Seite"])."--></td>
 					</tr>
 					<tr>
@@ -332,7 +345,7 @@ class HTMLGUI2 extends HTMLGUI {
 			$dB = new Button($this->texts["Filter löschen"],"./images/i2/delete.gif");
 			$dB->style("float:right;");
 			$dB->type("icon");
-			$dB->rme("HTML","","saveContextMenu",array("'deleteFilters'","'{$this->showFilteredCategoriesWarning[1]}'"), "if(checkResponse(transport)) reloadRightFrame();");
+			$dB->rme("HTML","","saveContextMenu",array("'deleteFilters'","'{$this->showFilteredCategoriesWarning[1]}'"), "if(checkResponse(transport)) contentManager.reloadFrameRight();");
 			/*$separator = "
 			<tr>
 				<td class=\"backgroundColor0\"".((isset($this->showFilteredCategoriesWarning[0]) AND $this->showFilteredCategoriesWarning[0] == true) ? "<img src=\"./images/i2/note.png\" /></td><td class=\"backgroundColor0\" colspan=\"".($determinedNumberofCols - 2)."\" style=\"color:grey;\" >".$this->texts["Anzeige wurde gefiltert"]."</td><td class=\"backgroundColor0\">$dB</td>" : " >")."</td>
@@ -350,6 +363,7 @@ class HTMLGUI2 extends HTMLGUI {
 		if(!$this->onlyDisplayMode /*AND $this->selectionRow == ""*/ AND $userCanCreate AND $this->showNewButton AND $lineWithId == -1){
 			$BNew = new Button("","./images/i2/new.gif");
 			$BNew->type("icon");
+			$BNew->id("buttonNewEntry$this->singularClass");
 			#$BNew->onclick($this->JSOnNew == null ? "contentManager.newClassButton('$this->singularClass','');" : $this->JSOnNew);
 
 			if($this->displaySide == "left"){
@@ -477,7 +491,7 @@ class HTMLGUI2 extends HTMLGUI {
 		if($lineWithId != -1)
 			$valuesTab = $valuesTab->getHTMLForUpdate();
 
-		return $errorTab.$returnTab.$valuesTab;
+		return $errorTab.$returnTab.$valuesTab.($lineWithId == -1 ? $this->tip : "");
 	}
 }
 ?>

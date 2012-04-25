@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class UnpersistentClass {
 	private $collectionOf;
@@ -27,25 +27,16 @@ class UnpersistentClass {
 	/**
 	 * If active, customizes this class.
 	 *
-	 * If updated, please also update Collection::customizer
+	 * If updated, please also update Collection::customizer and Environment::customizer
 	 */
 	public function customize(){
-
 		try {
 			$active = mUserdata::getGlobalSettingValue("activeCustomizer");
 			if($active == null) return;
 
 			$this->customizer = new $active();
 			$this->customizer->customizeClass($this);
-		} catch (ClassNotFoundException $e){
-
-		} catch (NoDBUserDataException $e){
-
-		} catch (TableDoesNotExistException $e){
-
-		} catch (DatabaseNotFoundException $e){
-			
-		}
+		} catch (Exception $e){	}
 	}
 
 	function getClearClass(){

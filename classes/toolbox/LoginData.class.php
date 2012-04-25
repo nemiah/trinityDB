@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class LoginData extends Userdata {
 	public function loadMe(){
@@ -48,13 +48,54 @@ class LoginData extends Userdata {
 		}
 	}
 
+	public static function getButtonU($name, $label, $icon){
+		$LD = self::getU($name);
+		if($LD == null)
+			$ID = -1;
+		else
+			$ID = $LD->getID();
+
+		$preset = "default";
+		if($name == "GoogleAccountUserPass")
+			$preset = "googleData";
+
+		$B = new Button($label, $icon);
+		$B->popup("edit", "Benutzerdaten", "LoginData", $ID, "getPopup", "", "LoginDataGUI;preset:$preset");
+
+		return $B;
+	}
+
 	/**
+	 * Get global login data
+	 *
 	 * @param string $name
 	 * @return LoginData
 	 */
 	public static function get($name){
 		$UD = new mUserdata();
 		$UD->addAssocV3("UserID", "=", "-1");
+		$UD->addAssocV3("name", "=", $name);
+
+		$e = $UD->getNextEntry();
+		if($e == null) return null;
+
+		$LD = new LoginData($e->getID());
+		$LD->loadMe();
+		return $LD;
+	}
+
+	/**
+	 * Get login data for current user
+	 * 
+	 * @param string $name
+	 * @return LoginData
+	 */
+	public static function getU($name, $userID = null){
+		if($userID == null)
+			$userID = Session::currentUser()->getID();
+		
+		$UD = new mUserdata();
+		$UD->addAssocV3("UserID", "=", $userID);
 		$UD->addAssocV3("name", "=", $name);
 
 		$e = $UD->getNextEntry();
@@ -85,7 +126,9 @@ class LoginData extends Userdata {
 			"SPuserAndPass" => "signaturportal",
 			"LDAPServerUserPass" => "LDAP-Server",
 			"MailServerUserPass" => "Mail-Server",
-			"AmazonAPIKey" => "Amazon Api key");
+			"GoogleAccountUserPass" => "Google",
+			"AmazonAPIKey" => "Amazon Api key",
+			"GemeinschaftServerUserPass" => "Gemeinschaft-Server");
 
 		if($w == "") return $n;
 		else return $n[$w];

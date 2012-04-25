@@ -66,7 +66,7 @@ var AC = {
 
 	reloadChecker: function(transport){
 		if(ACDiv.style.display == "none") Effect.Appear(ACDiv,{duration:0.4});
-		ACDiv.update(transport.responseText);
+		$('ACDiv').update(transport.responseText);
 		if($('AutoCompleteNumRows') && $('AutoCompleteNumRows').value == "1")
 			AC.update(40);	
 	},
@@ -159,7 +159,13 @@ var AC = {
 	},
 
 	doRequest: function(forField, targetClass){
-		if(forField.value != "") new Ajax.Request('./interface/rme.php', {method:"get", parameters:'class='+targetClass+"&method=getACHTML&constructor=''&parameters='"+forField.id+"','"+htmlReplaces(forField.value)+"'", onSuccess: AC.reloadChecker});
+		if(forField.value != "") 
+			contentManager.rmePCR(targetClass, '', "getACHTML", [forField.id, htmlReplaces(forField.value)], AC.reloadChecker);
+			/*new Ajax.Request('./interface/rme.php', {
+			
+			method:"get", 
+			parameters:'class='+targetClass+"&method=getACHTML&constructor=''&parameters='"+forField.id+"','"+htmlReplaces(forField.value)+"'", 
+			onSuccess: AC.reloadChecker});*/
 	},
 	
 	start: function(forField){
@@ -169,8 +175,8 @@ var AC = {
 		ACDiv.className = "AutoComplete backgroundColor0 borderColor1";
 		ACDiv.id = "ACDiv";
 		ACDiv.style.display="none";
-		if (navigator.appName.indexOf("Explorer") != -1) ACDiv.style.marginLeft="-327px";
-		if (navigator.appName.indexOf("Explorer") != -1) ACDiv.style.marginTop="21px";
+		//if (navigator.appName.indexOf("Explorer") != -1) ACDiv.style.marginLeft="-327px";
+		//if (navigator.appName.indexOf("Explorer") != -1) ACDiv.style.marginTop="21px";
 		forField.parentNode.appendChild(ACDiv);
 	},
 	

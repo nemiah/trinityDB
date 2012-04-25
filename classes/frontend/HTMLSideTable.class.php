@@ -15,21 +15,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class HTMLSideTable extends HTMLTable  {
 	function  __construct($where) {
 		parent::__construct(1);
+		$this->setColClass(1, "");
 
 		switch($where){
 			case "left":
-				$this->setTableStyle("width:160px;margin:0px;margin-left:-170px;float:left;");
+				$this->setTableStyle("float:left;");
 			break;
 		
 			case "right":
-				$this->setTableStyle("width:160px;margin:0px;margin-right:-170px;float:right;");
+				$this->setTableStyle("float:right;");
 			break;
 		}
+		
+		$this->addTableClass("sideTable".ucfirst($where));
 	}
 
 	/**
@@ -40,8 +43,8 @@ class HTMLSideTable extends HTMLTable  {
 	 * @param string $image
 	 * @return Button
 	 */
-	function addButton($label, $image = ""){
-		$B = new Button($label, $image);
+	function addButton($label, $image = "", $type = "bigButton"){
+		$B = new Button($label, $image, $type);
 
 		$this->addRow($B);
 
@@ -50,7 +53,10 @@ class HTMLSideTable extends HTMLTable  {
 
 	function addRow($content){
 		parent::addRow($content);
-		$this->addRowClass("backgroundColor0");
+		#$this->addRowClass("backgroundColor0");
+		#$this->addCellStyle(1, "background-color:transparent;");
+		#$this->addColStyle(1, "background-color:transparent;");
+		#$this->addRowStyle("background-color:transparent;");
 	}
 }
 ?>

@@ -14,7 +14,7 @@
 
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * 
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 abstract class Collection {
@@ -27,42 +27,34 @@ abstract class Collection {
 	protected $storage = PHYNX_MAIN_STORAGE;#"MySQL";
 
 	protected $myAdapterClass;
-
+	
 	protected $VxMessenger = array();
-
+	
 	protected $lI = null;
-
+	
 	protected $customizer;
 
 	protected $loadedTotal;
 	protected $loadedPage;
 	protected $loadedPerPage;
 	protected $isFiltered = false;
-
+	
 	/**
 	 * If active, customizes this class.
 	 *
-	 * If updated, please also update UnpersistentClass::customizer
+	 * If updated, please also update UnpersistentClass::customizer and Environment::customizer
 	 */
 	public function customize(){
-
+		if(defined("PHYNX_FORBID_CUSTOMIZERS"))
+			return;
+		
 		try {
 			$active = mUserdata::getGlobalSettingValue("activeCustomizer");
 			if($active == null) return;
 
 			$this->customizer = new $active();
 			$this->customizer->customizeClass($this);
-		} catch (ClassNotFoundException $e){
-
-		} catch (NoDBUserDataException $e){
-
-		}  catch (DatabaseNotSelectedException $e){
-
-		} catch (TableDoesNotExistException $e){
-
-		} catch (DatabaseNotFoundException $e){
-
-		}
+		} catch (Exception $e){ }
 	}
 
 	public function getMultiPageDetails(){
@@ -75,44 +67,44 @@ abstract class Collection {
 
 	/**
 	 * Returns BPS Data of this object.
-	 *
+	 * 
 	 * @return Array BPS Data
 	 */
 	protected function getMyBPSData(){
 		return BPS::getAllProperties(get_class($this));
 	}
-
+	
 	/**
 	 * Returns the collector of this object.
-	 *
+	 * 
 	 * @return Object Collector
 	 */
 	public function getCollector(){
 		return $this->collector;
 	}
-
+	
 	/**
 	 * Checks if the table associated to this object exists.
-	 *
+	 * 
 	 * @return Boolean true, if the table exists, otherwise false
 	 */
 	function checkIfMyTableExists(){
 		$this->loadAdapter();
 		return $this->Adapter->checkIfTableExists($this->collectionOf);
 	}
-
+	
 	/**
 	 * Returns the database table associated to this object.
-	 *
+	 * 
 	 * @return String Database table associated to this object
 	 */
 	function getCollectionOf(){
 		return $this->collectionOf;
 	}
-
+	
 	/**
 	 * Checks if the DB File exists for the plugin currently in use.
-	 *
+	 * 
 	 * @return Boolean true, if File exists, otherwise false
 	 */
 	function checkIfMyDBFileExists(){
@@ -120,10 +112,10 @@ abstract class Collection {
 		$p = str_replace("GUI","",get_class($this));
 		return file_exists("../".$_SESSION["CurrentAppPlugins"]->getAppFolderOfPlugin($p)."/".$_SESSION["CurrentAppPlugins"]->getFolderOfPlugin($p)."/CI.pfdb.php");
 	}
-
+	
 	/**
 	 * Returns the relative path to the current DB File.
-	 *
+	 * 
 	 * @return String Path to DB File
 	 */
 	function getMyDBFileName(){
@@ -131,10 +123,10 @@ abstract class Collection {
 		$p = str_replace("GUI","",get_class($this));
 		return "../".$_SESSION["CurrentAppPlugins"]->getAppFolderOfPlugin($p)."/".$_SESSION["CurrentAppPlugins"]->getFolderOfPlugin($p)."/CI.pfdb.php";
 	}
-
+	
 	/**
 	 * Returns the relative path to the folder where the current DB File resides.
-	 *
+	 * 
 	 * @return String Path to DB File Folder
 	 */
 	function getMyDBFolder(){
@@ -142,26 +134,26 @@ abstract class Collection {
 		$p = str_replace("GUI","",get_class($this));
 		return "../".$_SESSION["CurrentAppPlugins"]->getAppFolderOfPlugin($p)."/".$_SESSION["CurrentAppPlugins"]->getFolderOfPlugin($p)."/";
 	}
-
+	
 	/**
 	 * Retrieves all rows from the associated Database File.
-	 *
+	 * 
 	 * @return Array Rows of associated DB File, -1 on error
 	 */
 	function getMyTablesInfos(){
-
+		
 		$this->loadAdapter();
-
+		
 		if($this->checkIfMyDBFileExists()) {
 			$creates = new CIs();
 			$creates->setMyDBFolder($this->getMyDBFolder());
 			$creates->lCV3();
-
+			
 			return $creates;
 		} else $_SESSION["messages"]->addMessage("Database-information file for plugin ".str_replace("GUI","",get_class($this))." does not exist.");
 		return -1;
 	}
-
+	
 	/**
 	 * Creates a Database Table using the Informatio of the associated Database File.
 	 */
@@ -171,7 +163,7 @@ abstract class Collection {
 
 			$creates = $this->getMyTablesInfos();
 			$message = "Führe SQL aus...<br />";
-
+			
 			$CI = $creates->getNextEntry();
 			while($CI != null){
 				$CIA = $CI->getA();
@@ -210,7 +202,7 @@ abstract class Collection {
 	 */
 	function checkMyTables(){
 		$_SESSION["messages"]->addMessage("Checking tables of ".get_class($this).".");
-
+		
 		$creates = $this->getMyTablesInfos();
 
 		$changes = 0;
@@ -224,7 +216,7 @@ abstract class Collection {
 				$_SESSION["messages"]->addMessage("checking entry ".$CI->getID());
 				#$CIA = $CI->getA();
 				$c = $this->Adapter->checkMyTable($CI->getA());
-
+				
 				if($c >= 0) $changes+=$c;
 				#else return -1;
 			}
@@ -233,7 +225,7 @@ abstract class Collection {
 		}
 		echo $changes;
 	}
-
+	
 	/**
 	 * Selects the parser to be used with the associated adapter.
 
@@ -244,24 +236,24 @@ abstract class Collection {
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->addParser($a,$f);
 	}
-
+	
 	#   V3 functions ---------------------------------------------------------------------------------------------------
-
+	
 	/**
 	 * Adds the specified data type to the SelectStatement of the associated Adapter object.
-	 *
+	 * 
 	 * @param $field(String) The name of the field
 	 * @param $type(String) The type of the field
 	 */
 	function addDataType($field, $type){
 		if($this->Adapter == null) $this->loadAdapter();
-
+		
 		$this->Adapter->addSelectStatement("dataTypes",array($field => $type));
 	}
-
+	
 	/**
 	 * Adds an order statement to the SelectStatement of the associated Adapter object.
-	 *
+	 * 
 	 * @param $order(String) The column to be ordered by
 	 * @param $o[optional](String) The direction (ASC/DESC)
 	 */
@@ -271,11 +263,11 @@ abstract class Collection {
 		$this->Adapter->addSelectStatement("order",$order);
 		$this->Adapter->addSelectStatement("orderAscDesc", $o);
 	}
-
+	
 	/**
 	 * Sets the order of the SelectStatement of the associated
 	 * Adapter object overwriting previously set ones.
-	 *
+	 * 
 	 * @param $order(String) The column to be ordered by
 	 * @param $o[optional](String) The direction (ASC/DESC)
 	 */
@@ -307,21 +299,21 @@ abstract class Collection {
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->setSelectStatement("className",$className);
 	}
-
+	
 	/**
 	 * Sets the fiels to be selected from the table.
-	 *
+	 * 
 	 * @param $fields(Array) Names of table fields
 	 */
 	function setFieldsV3($fields){
 		#$this->V3Used = true;
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->setSelectStatement("fields",$fields);
-	}
-
+	}	
+	
 	/**
 	 * Adds a field to be selected from the table.
-	 *
+	 * 
 	 * @param $field(String) Name of the field
 	 */
 	function addFieldV3($field){
@@ -329,10 +321,10 @@ abstract class Collection {
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->addSelectStatement("fields",$field);
 	}
-
+	
 	/**
 	 * Sets the limit for the SelectStatement.
-	 *
+	 * 
 	 * @param $limit(String) Limit for the table data
 	 */
 	function setLimitV3($limit){
@@ -341,10 +333,10 @@ abstract class Collection {
 		$this->limit = $limit;
 		$this->Adapter->setSelectStatement("limit",$limit);
 	}
-
+	
 	/**
 	 * Sets the restrictions for the SelectStatement.
-	 *
+	 * 
 	 * @param $field(Array) The names of the fields
 	 * @param $operator(Array) Operators for the fields
 	 * @param $value(Array) Values for the fiels
@@ -360,10 +352,10 @@ abstract class Collection {
 		$this->Adapter->setSelectStatement("whereLogOp",$logOperator);
 		$this->Adapter->setSelectStatement("whereBracketGroup",$bracketGroup);
 	}
-
+	
 	/**
 	 * Adds additional restrictions. See setAssocV3.
-	 *
+	 * 
 	 * @param $field(Array) The names of the fields
 	 * @param $operator(Array) Operators for the fields
 	 * @param $value(Array) Values for the fiels
@@ -379,10 +371,10 @@ abstract class Collection {
 		$this->Adapter->addSelectStatement("whereLogOp",$logOperator);
 		$this->Adapter->addSelectStatement("whereBracketGroup",$bracketGroup);
 	}
-
+	
 	/**
 	 * Adds a join with another table.
-	 *
+	 * 
 	 * @param $table(String) Name of the table
 	 * @param $field1(String) Name of the field in the first table
 	 * @param $operator[optional](String) Operator for the join
@@ -395,33 +387,33 @@ abstract class Collection {
 		$this->Adapter->addSelectStatement("joinTables",$table);
 		$this->Adapter->addSelectStatement("joinConditions",array($field1,$field2));
 		$this->Adapter->addSelectStatement("joinConditionOperators",$operator);
-
+		
 		if($ACN != "") $this->setACNV3($ACN);
 	}
-
+	
 	/**
 	 * Sets the class name for the attributes.
-	 *
+	 * 
 	 * @param $name(String) Name for the attribute
 	 */
 	function setACNV3($name){
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->setSelectStatement("AttributesClassName",$name);
 	}
-
+	
 	/**
 	 * Sets the search fields.
-	 *
+	 * 
 	 * @param $fields(Array) Search fields
 	 */
 	function setSearchFieldsV3($fields){
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->setSelectStatement("searchFields",$fields);
 	}
-
+	
 	/**
 	 * Sets the string to search for.
-	 *
+	 * 
 	 * @param $string(String) The string to be searched for
 	 */
 	function setSearchStringV3($string){
@@ -431,7 +423,7 @@ abstract class Collection {
 
 	/**
 	 * Adds the specified GROUP BY-parameter to the SelectStatement.
-	 *
+	 * 
 	 * @param $by(String) The name of the column to be grouped by
 	 */
 	function addGroupV3($by){
@@ -439,10 +431,10 @@ abstract class Collection {
 		#$this->V3Used = true;
 		$this->Adapter->addSelectStatement("group",$by);
 	}
-
+	
 	/**
 	 * Sets the specified GROUP BY-parameter to the SelectStatement.
-	 *
+	 * 
 	 * @param $by(String) The name of the column to be grouped by
 	 */
 	function setGroupV3($by){
@@ -451,34 +443,34 @@ abstract class Collection {
 		$this->Adapter->setSelectStatement("group",$by);
 	}
 	# / V3 functions ---------------------------------------------------------------------------------------------------
-
+	
 	/**
 	 * Returns the next entry of the associated Collector.
-	 *
+	 * 
 	 * @return persistentObject Next entry of Collector
 	 */
 	function getNextEntry(){
-		if($this->collector == null) $this->lCV3();
+		if($this->collector === null) $this->lCV3();
 		if(isset($this->collector[$this->i])) return $this->collector[$this->i++];
 		else return null;
 	}
-
+	
 	/**
 	 * Resets the pointer of the current Collector entry.
 	 */
 	function resetPointer(){
 		$this->i = 0;
 	}
-
+	
 	/**
 	 * Returns the adjusted classname of this instance.
-	 *
+	 * 
 	 * @return String Classname
 	 */
 	function getClearClass(){
 		if(isset($this->collectionOf) AND (get_class($this) == "mGenericGUI" OR get_class($this) == "anyC" OR get_parent_class($this) == "anyC"))
 			return "m".$this->collectionOf;
-
+			
 		$n = get_class($this);
 		if(strstr($n,"GUI")) $n = get_parent_class($this);
 		return $n;
@@ -490,7 +482,7 @@ abstract class Collection {
 	 */
 	function loadAdapter(){
 		if($this->Adapter == null) {
-
+			
 			$n = $this->myAdapterClass;
 			if($this->myAdapterClass != null){
 				$this->Adapter = new $n(-1,$this->storage);
@@ -500,56 +492,56 @@ abstract class Collection {
 			}
 		}
 	}
-
+	
 	/**
 	 * Executes the previously defined SelectStatement and returns the result.
-	 *
+	 * 
 	 * @return Array Result of the SelectStatement
-	 *
+	 * 
 	 * @param $id[optional](Integer) Only select object with specified ID
 	 * @param $returnCollector[optional](Boolean) If true, result is saved in collector-variable, otherwise the result is returned
 	 */
-	public function lCT($id = -1, $returnCollector = true){
-
+	/*public function lCT($id = -1, $returnCollector = true){
+		
 		if($this->Adapter == null) $this->loadAdapter();
-
+		
 		$gT = $this->Adapter->getSelectStatement("table");
 		if(count($gT) == 0) $this->Adapter->setSelectStatement("table",$this->collectionOf);
-
+		
 		if($id != -1)
 			$this->setAssocV3((count($gT) == 0 ? $this->collectionOf : $gT[0])."ID","=",$id);
-
+		
 		if($returnCollector) $this->collector = $this->Adapter->lCT();
 		else return $this->Adapter->lCT();
-	}
-
+	}*/
+	
 	/**
 	 * Executes the previously defined SelectStatement and returns the result.
-	 *
+	 * 
 	 * @return Array Result of the SelectStatement
-	 *
+	 * 
 	 * @param $id[optional](Integer) Only select object with specified ID
 	 * @param $returnCollector[optional](Boolean) If true, result is saved in collector-variable, otherwise the result is returned
 	 */
 	public function lCV3($id = -1, $returnCollector = true){
-
+		
 		if($this->Adapter == null) $this->loadAdapter();
-
+		
 		$gT = $this->Adapter->getSelectStatement("table");
 		if(count($gT) == 0) $this->Adapter->setSelectStatement("table",$this->collectionOf);
-
+		
 		if($id != -1)
 			$this->setAssocV3((count($gT) == 0 ? $this->collectionOf : $gT[0])."ID","=",$id);
-
+		
 		if($returnCollector) $this->collector = $this->Adapter->lCV3();
 		else return $this->Adapter->lCV3();
 	}
-
+	
 	/**
 	 * Sets the needed parameters for pagination of output.
-	 *
+	 * 
 	 * @return Integer Number of affected rows
-	 *
+	 * 
 	 * @param $id[optional](Integer) Specifies ID of object
 	 * @param $page[optional](Integer) Number of the current page
 	 * @param $entriesPerPage[optional](Integer) Number of entries per page
@@ -563,15 +555,15 @@ abstract class Collection {
 		}
 		$num = $this->getAffectedRows($id);
 		$this->setLimitV3($page * $entriesPerPage.",".$entriesPerPage);
-
+		
 		if(PMReflector::implementsInterface(get_class($this),"iOrderByField")){
 			$sort = new mUserdata();
 			$sort = $sort->getUDValue("OrderByFieldInHTMLGUI".$this->getClearClass());
 			if($sort != null) $this->setOrderV3(substr($sort,0,strpos($sort,";")),substr($sort,strpos($sort,";")+1));
 		}
-
+			
 		$this->lCV3($id);
-
+		
 		$this->loadedTotal = $num;
 		$this->loadedPage = $page;
 		$this->loadedPerPage = $entriesPerPage;
@@ -587,10 +579,10 @@ abstract class Collection {
 		$c = PMReflector::getAttributesArray($this->getClearClass()."Attributes");
 		for($i=0;$i<count($c);$i++) echo count($this->A->$c[$i])." ".$this->getClearClass()." geladen";
 	}
-
+	
 	/**
 	 * Returns the total number of rows.
-	 *
+	 * 
 	 * @return Integer Total number of rows
 	 */
 	public function getTotalNum(){
@@ -607,21 +599,21 @@ abstract class Collection {
 		if($e == null) return 0;
 		return $e->getA()->totalNum;
 	}
-
+	
 	/**
 	 * Returns the number of entries loaded in the last Database request stored in the Collector.
-	 *
+	 * 
 	 * @return Integer Number of entries in Collector
 	 */
 	public function numLoaded(){
 		return count($this->collector);
 	}
-
+	
 	/**
 	 * Get affected rows for specified SelectStatement.
-	 *
+	 * 
 	 * @return Integer Number of affected rows
-	 *
+	 * 
 	 * @param $id[optional](Integer) ID of specific row
 	 */
 	protected function getAffectedRows($id = -1){
@@ -630,14 +622,14 @@ abstract class Collection {
 		return $this->lCV3($id, false);
 		#return $this->loadCollectionV2($id, false);
 	}
-
+	
 	/**
 	 * Filters table data by specified categories.
-	 *
+	 * 
 	 * @return Boolean True if filters are applied
 	 */
 	protected function filterCategories(){
-
+		
 		$fC = false;
 		if(PMReflector::implementsInterface(get_class($this),"iCategoryFilter")){
 			$mU = new mUserdata();
@@ -647,7 +639,7 @@ abstract class Collection {
 				$Ks = explode(";",$K);
 				foreach($Ks as $k => $v)
 					$this->addAssocV3("$F","=",$v,($k == "0" ? "AND" : "OR"),"fCs");
-
+	
 				$fC = true;
 			}
 		}
@@ -655,25 +647,25 @@ abstract class Collection {
 
 		if(!PMReflector::implementsInterface(get_class($this),"iSearchFilter"))
 			return $fC;
-
+		
 		$mU = new mUserdata();
 
 		$K = $mU->getUDValue("searchFilterInHTMLGUI".$this->getClearClass());
 		$F = $this->getSearchedFields();
 		if($K == null OR $K == "") return $fC;
-		else
+		else 
 			foreach($F as $k => $v)
 				$this->addAssocV3("$v","LIKE",'%'.$K.'%',($k == 0 ? "AND" : "OR"),"sfs");
-
+			
 		$this->isFiltered = true;
 		return true;
 	}
-
+	
 	/**
 	 * Creates new instance of the specified class for the currently selected user language.
-	 *
+	 * 
 	 * @return Object The instance of the specified class
-	 *
+	 * 
 	 * @param $class(String) The name of the class
 	 */
 	function loadLanguageClass($class){
@@ -688,15 +680,15 @@ abstract class Collection {
 				return null;
 			}
 		}
-
+		
 		return $c;
 	}
-
+	
 	/**
 	 * Loads the next field from the database and returns the number of the next field.
-	 *
+	 * 
 	 * @return Integer Number of the next field
-	 *
+	 * 
 	 * @param $field(String) Name of the field
 	 */
 	public function getIncrementedField($field){
@@ -704,13 +696,37 @@ abstract class Collection {
 		$this->addOrderV3("CAST($field AS SIGNED)","DESC");
 		$this->setLimitV3("1");
 		$this->lCV3();
-
+		
 		if($this->numLoaded() == 0) return 1;
-
+		
 		$C = $this->getNextEntry();
 		$CA = $C->getA();
-
+		
 		return $CA->$field + 1;
+	}
+	
+	public function asXML(){
+		$xml = new XML();
+		$xml->setCollection($this);
+		
+		return $xml->getXML();
+	}
+	
+	public function asJSON(){
+		#$this->lCV3();
+		
+		$array = array();
+		while($A = $this->getNextEntry()){
+			$subArray = array();
+			foreach($A->getA() as $key => $value)
+				$subArray[$key] = $value;
+			
+			$array[] = $subArray;
+		}
+		
+		#$array[] = array("label" => "Test", "value" => "1");
+		#$array[] = array("label" => "Test2", "value" => "2");
+		return json_encode($array);
 	}
 }
 ?>

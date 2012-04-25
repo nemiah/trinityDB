@@ -15,27 +15,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class HTMLTable extends UnifiedTable implements iUnifiedTable  {
-	#private $numCols;
-	#private $caption;
-	#private $content = array();
 	private $colStyles = array();
-	#private $colWidths = array();
-	#private $rowStyles = array();
+
 	private $rowEvents = array();
-	#private $rowColspan = array();
-	#private $rowClasses = array();
+
 	private $rowIDs = array();
 	private $cellIDs = array();
-	#private $header = array();
-	#private $cellStyles = array();
-	#private $cellEvents = array();
+
 	private $hiddenCols = array();
 	private $colOrder;
 
-	#private $tableStyle;
 	private $uID;
 	
 	private $forms = array();
@@ -44,7 +36,8 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	private $insertSpaceBefore = array();
 	private $tabs = array();
 
-	#private $colClass = array();
+	private $maxHeight;
+	private $tableClass = "";
 
 	function __construct($numCols = 0, $caption = null){
 		$this->numCols = $numCols;
@@ -53,6 +46,10 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	
 	function __toString(){
 		return $this->getHTML();
+	}
+
+	function maxHeight($height){
+		$this->maxHeight = $height;
 	}
 
 	#function setColClass($colNumber,$class){
@@ -125,45 +122,20 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	function setCellStyles($styles){
 		$this->cellStyles = $styles;
 	}
+
+	function setCellClasses($classes){
+		$this->cellClasses = $classes;
+	}
 	
-	/*function addCellEvent($colNumber, $event, $action){
-		if(!isset($this->cellEvents[count($this->content) - 1]))
-			$this->cellEvents[count($this->content) - 1] = array();
-			
-		if(!isset($this->cellEvents[count($this->content) - 1][$colNumber]))
-			$this->cellEvents[count($this->content) - 1][$colNumber] = array();
-			
-		if(!isset($this->cellEvents[count($this->content) - 1][$colNumber][$event]))
-			$this->cellEvents[count($this->content) - 1][$colNumber][$event] = "";
-
-			
-		$this->cellEvents[count($this->content) - 1][$colNumber][$event] = $action;
-	}*/
-
 	public function setCellEvents($events){
 		$this->cellEvents = $events;
 	}
-	
-	#function addRow($content){
-	#	if(!is_array($content)) $content = array($content);
-	#	$this->content[] = $content;
-	#}
-	
-	#function addHeaderRow($content){
-	#	if(!is_array($content)) $content = array($content);
-	#	$this->header = $content;
-	#}
 	
 	function addRowEvent($event, $action){
 		if(!isset($this->rowEvents[count($this->content) - 1])) $this->rowEvents[count($this->content) - 1] = array();
 		if(!isset($this->rowEvents[count($this->content) - 1][$event])) $this->rowEvents[count($this->content) - 1][$event] = "";
 		$this->rowEvents[count($this->content) - 1][$event] .= $action;
 	}
-	
-	/*function addRowClass($class){
-		if(!isset($this->rowClasses[count($this->content) - 1])) $this->rowClasses[count($this->content) - 1] = "";
-		$this->rowClasses[count($this->content) - 1] .= " ".$class;
-	}*/
 
 	function setRowClasses($classes){
 		$this->rowClasses = $classes;
@@ -173,11 +145,6 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		if(!isset($this->colStyles[$colNumber])) $this->colStyles[$colNumber] = $style;
 		else $this->colStyles[$colNumber] .= $style;
 	}
-	
-	/*function addRowStyle($style){
-		if(!isset($this->rowStyles[count($this->content) - 1])) $this->rowStyles[count($this->content) - 1] = $style;
-		else $this->rowStyles[count($this->content) - 1] .= $style;
-	}*/
 
 	function setRowStyles($styles){
 		$this->rowStyles = $styles;
@@ -191,6 +158,10 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		if(!isset($this->cellIDs[count($this->content) - 1])) $this->cellIDs[count($this->content) - 1] = array();
 		
 		$this->cellIDs[count($this->content) - 1][$cellNo] = $ID;
+	}
+	
+	function addTableClass($class){
+		$this->tableClass = $class;
 	}
 
 	function getHTMLForUpdate($addTR = false){
@@ -255,7 +226,7 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 						$cellEvents .= " on$on=\"$ac\"";
 
 				$rows .= "
-				<td $cellEvents ".((isset($this->cellIDs[$K]) AND isset($this->cellIDs[$K][$j+1])) ? "id=\"".$this->cellIDs[$K][$j+1]."\"" : "")." ".((isset($this->rowColspan[$K]) AND $this->rowColspan[$K][0] == $j+1) ? "colspan=\"".$this->rowColspan[$K][1]."\"" : "")." ".((isset($this->colRowspan[$K]) AND $this->colRowspan[$K][0] == $j+1) ? "rowspan=\"".$this->colRowspan[$K][1]."\"" : "")." ".$style.">".(isset($this->content[$K][$j]) ? $this->content[$K][$j] : "")."</td>";
+				<td ".(isset($this->cellClasses[$K][$j+1]) ? "class=\"".$this->cellClasses[$K][$j+1]."\"" : "")." $cellEvents ".((isset($this->cellIDs[$K]) AND isset($this->cellIDs[$K][$j+1])) ? "id=\"".$this->cellIDs[$K][$j+1]."\"" : "")." ".((isset($this->rowColspan[$K]) AND $this->rowColspan[$K][0] == $j+1) ? "colspan=\"".$this->rowColspan[$K][1]."\"" : "")." ".((isset($this->colRowspan[$K]) AND $this->colRowspan[$K][0] == $j+1) ? "rowspan=\"".$this->colRowspan[$K][1]."\"" : "")." ".$style.">".(isset($this->content[$K][$j]) ? $this->content[$K][$j] : "")."</td>";
 
 				if(isset($this->rowColspan[$K]) AND $this->rowColspan[$K][0] == $j+1)
 					$l+= $this->rowColspan[$K][1] - 1;
@@ -309,18 +280,21 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 
 		$R = "
 		".($this->caption != null ? "
+			<div>
 			<div class=\"backgroundColor1 Tab\" $divStyle>
 				<p>$this->caption</p>
-			</div>" : "");
+			</div></div>" : "");
 		
 		if($this->tab == 1) $R .= "
-		<table ".($this->tableStyle != null ? "style=\"$this->tableStyle\"" : "").">
+		<div ".($this->maxHeight != null ? "style=\"max-height:{$this->maxHeight}px;overflow:auto;\"" : "").">
+		<table ".($this->tableStyle != null ? "style=\"$this->tableStyle\"" : "")." ".($this->tableID != null ? "id=\"$this->tableID\"" : "")." ".($this->tableClass != "" ? "class=\"$this->tableClass\"" : "").">
 			<colgroup>$cols
 			</colgroup>";
 		
 		$R .= "
 			$rows
-		</table>";
+		</table>
+		</div>";
 		if($this->tab > 1) $R .= "
 		</form>
 		</div>";

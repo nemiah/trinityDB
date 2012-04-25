@@ -18,5 +18,21 @@
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Datei extends PersistentObject {
+	public static function updatePath($oldPath, $newPath){
+		$AC = anyC::get("Datei", "DateiPath", $oldPath);
+
+		while($D = $AC->getNextEntry()){
+			$D->changeA("DateiPath", $newPath);
+			$D->changeA("DateiName", basename($newPath));
+
+			$D->saveMe();
+		}
+	}
+	
+	public function newMe($checkUserData = true, $output = false) {
+		$this->changeA("DateiAddedDate", time());
+		
+		return parent::newMe($checkUserData, $output);
+	}
 }
 ?>

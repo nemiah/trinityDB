@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Applications {
 	private $apps = array();
@@ -24,6 +24,14 @@ class Applications {
 	private $versions = array();
 
 	private static $sessionVariable = "applications";
+
+	public static function init(){
+		$_SESSION[self::$sessionVariable] = new Applications();
+	}
+	
+	public function __construct() {
+		$this->scanApplications();
+	}
 
 	public function scanApplications(){
 		$_SESSION["messages"]->startMessage("checking for directory ./applications/: ");
@@ -39,6 +47,8 @@ class Applications {
 			}
 			sort($apps);
 				
+			$allowedApplications = Environment::getS("allowedApplications", null);
+
 			foreach($apps as $key => $file){
 				
 				require Util::getRootPath()."applications/$file";
@@ -49,6 +59,9 @@ class Applications {
 				$_SESSION["messages"]->startMessage("trying to register application $f[0]: ");
 				$f = $f[0];
 				$c = new $f;
+				if($allowedApplications != null AND !in_array($c->registerName(), $allowedApplications))
+					continue;
+				
 				$this->apps[$c->registerName()] = $c->registerFolder();
 				
 				if(method_exists($c,"registerIcon"))
@@ -65,7 +78,6 @@ class Applications {
 		
 		foreach($this->apps AS $name => $folder){
 			$newName = Environment::getS("renameApplication:$name", $name);
-			
 			if($name != $newName){
 				$this->apps[$newName] = $folder;
 				unset($this->apps[$name]);
@@ -85,6 +97,10 @@ class Applications {
 
 	public static function getList(){
 		return $_SESSION[self::$sessionVariable]->getApplicationsList();
+	}
+
+	public static function activeApplication(){
+		return $_SESSION[self::$sessionVariable]->getActiveApplication();
 	}
 
 	public function getApplicationsList(){

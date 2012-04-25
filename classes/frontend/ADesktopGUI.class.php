@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class ADesktopGUI extends UnpersistentClass implements iGUIHTML2 {
 	function  __construct() {
@@ -29,9 +29,15 @@ class ADesktopGUI extends UnpersistentClass implements iGUIHTML2 {
 				<script type=\"text/javascript\">
 					if($('mInstallationMenuEntry')){
 						$('contentLeft').update('');
-						$('windows').update('');
+						Popup.closeNonPersistent();
 						contentManager.loadFrame('contentRight', 'mInstallation', -1, 0, 'mInstallationGUI;-');
 						setHighLight($('mInstallationMenuEntry'));
+					}
+					else if($('mCloudMenuEntry')){
+						$('contentLeft').update('');
+						Popup.closeNonPersistent();
+						contentManager.loadFrame('contentRight', 'mCloud', -1, 0, 'mCloudGUI;-');
+						setHighLight($('mCloudMenuEntry'));
 					}
 				</script>";
 			break;

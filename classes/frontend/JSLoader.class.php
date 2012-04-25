@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class JSLoader {
 
@@ -24,12 +24,23 @@ class JSLoader {
 	private $blacklist = array();
 	private $plugins = array();
 	private $apps = array();
+
+	private static $sessionVariable = "JS";
+	
+	public static function init(){
+		$_SESSION[self::$sessionVariable] = new JSLoader();
+	}
 	
 	function __construct(){ 
 		$_SESSION["messages"]->addMessage(__CLASS__."-Singleton loaded");
 	}
 		
-	public function addScript($name,$folder,$plugin,$app){
+	public static function addScriptS($name, $folder, $plugin, $app){
+		if(isset($_SESSION[self::$sessionVariable]))
+			$_SESSION[self::$sessionVariable]->addScript($name, $folder, $plugin, $app);
+	}
+	
+	public function addScript($name, $folder, $plugin, $app){
 		if(in_array($name, $this->scripts) AND in_array($folder, $this->folders)) return;
 		$this->scripts[] = $name;
 		$this->folders[] = $folder;

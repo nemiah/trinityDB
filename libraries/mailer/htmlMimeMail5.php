@@ -69,7 +69,7 @@ class htmlMimeMail5
     * The main message headers
     * @private array
     */
-    private $headers;
+   private $headers;
 
     /**
     * Whether the message has been built or not
@@ -619,7 +619,7 @@ class htmlMimeMail5
             $message->addSubpart($value->data, $params);
         }
     }
-
+	
     /**
     * Builds the multipart message.
     */

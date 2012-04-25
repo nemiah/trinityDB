@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class UnifiedTable implements iUnifiedTable {
 	protected $content = array();
@@ -30,13 +30,15 @@ class UnifiedTable implements iUnifiedTable {
 	
 	protected $cellEvents = array();
 	protected $cellStyles = array();
+	protected $cellClasses = array();
 	
 	protected $rowStyles = array();
 	protected $rowClasses = array();
 	protected $rowColspan = array();
 
 	protected $tableStyle;
-
+	protected $tableID;
+	
 	function __construct($numCols = 0, $caption = null){
 		$this->caption = $caption;
 		$this->numCols = $numCols;
@@ -61,10 +63,21 @@ class UnifiedTable implements iUnifiedTable {
 			$this->cellStyles[count($this->content) - 1] = array();
 
 		if(!isset($this->cellStyles[count($this->content) - 1][$colNumber]))
-			$this->cellStyles[count($this->content) - 1][$colNumber] = array();
+			$this->cellStyles[count($this->content) - 1][$colNumber] = "";
 
 
-		$this->cellStyles[count($this->content) - 1][$colNumber] = $style;
+		$this->cellStyles[count($this->content) - 1][$colNumber] .= $style;
+	}
+
+	function addCellClass($colNumber, $class){
+		if(!isset($this->cellClasses[count($this->content) - 1]))
+			$this->cellClasses[count($this->content) - 1] = array();
+
+		if(!isset($this->cellClasses[count($this->content) - 1][$colNumber]))
+			$this->cellClasses[count($this->content) - 1][$colNumber] = array();
+
+
+		$this->cellClasses[count($this->content) - 1][$colNumber] = $class;
 	}
 
 	function addRowStyle($style){
@@ -91,6 +104,10 @@ class UnifiedTable implements iUnifiedTable {
 
 	function setTableStyle($style){
 		$this->tableStyle = $style;
+	}
+
+	function setTableID($id){
+		$this->tableID = $id;
 	}
 
 	public function setColWidth($colNumber, $width){
@@ -122,6 +139,12 @@ class UnifiedTable implements iUnifiedTable {
 		$this->content[] = $content;
 	}
 
+	function addRowTop($content){
+		if(!is_array($content)) $content = array($content);
+
+		$this->content = array_merge(array($content), $this->content);
+	}
+
 	function addHeaderRow($content){
 		if(!is_array($content)) $content = array($content);
 		$this->header = $content;
@@ -149,6 +172,7 @@ class UnifiedTable implements iUnifiedTable {
 		if($E instanceof HTMLTable){
 			$E->setCellEvents($this->cellEvents);
 			$E->setCellStyles($this->cellStyles);
+			$E->setCellClasses($this->cellClasses);
 			$E->setRowStyles($this->rowStyles);
 			$E->setRowClasses($this->rowClasses);
 			$E->setTableStyle($this->tableStyle);

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class CookieCart {
@@ -720,7 +720,7 @@ class CookieCart {
 				$this->sum += $brutto;
 				$this->count += $t[1];
 				$text .= "
-".str_pad($t[1], 5, " ", STR_PAD_LEFT)." x ".$tName."|".str_pad(Util::formatNumber("de_DE", $A->getA()->$mwst * 1, 2, true, false), 7, " ", STR_PAD_LEFT)."% |".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$A->getA()->$preis * 1 * (($A->getA()->$mwst / 100) + 1),true)), 15, " ", STR_PAD_LEFT)." |".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$brutto,true)), 15, " ", STR_PAD_LEFT)."";
+".str_pad($t[1], 5, " ", STR_PAD_LEFT)." x ".$tName."|".str_pad(Util::formatNumber("de_DE", $A->getA()->$mwst * 1, 2, true, false), 7, " ", STR_PAD_LEFT)."% |".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$A->getA()->$preis * 1 * (($A->getA()->$mwst / 100) + 1),true)), 15, " ", STR_PAD_LEFT)." |".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$brutto,true)), 15, " ", STR_PAD_LEFT)."";
 
 				/**
 				 * Artikelnummer in neuer Zeile
@@ -749,7 +749,7 @@ class CookieCart {
 				$tName .= str_pad("",Util::countUmlaute($tName)," ");
 				
 				$text .= "
-".str_pad("1", 5, " ", STR_PAD_LEFT)." x ".$tName."|".str_pad(Util::formatNumber("de_DE",$this->versandkostenBrutto[2], 2,true, false), 7, " ", STR_PAD_LEFT)."% |".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$this->versandkostenBrutto[1],true)), 15, " ", STR_PAD_LEFT)." |".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$this->versandkostenBrutto[1],true)), 15, " ", STR_PAD_LEFT)."";
+".str_pad("1", 5, " ", STR_PAD_LEFT)." x ".$tName."|".str_pad(Util::formatNumber("de_DE",$this->versandkostenBrutto[2], 2,true, false), 7, " ", STR_PAD_LEFT)."% |".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$this->versandkostenBrutto[1],true)), 15, " ", STR_PAD_LEFT)." |".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$this->versandkostenBrutto[1],true)), 15, " ", STR_PAD_LEFT)."";
 				
 				$gesamt += $this->versandkostenBrutto[1];
 				$netto += Util::kRound($this->versandkostenBrutto[1] / ($this->versandkostenBrutto[2] + 100) * 100, 2);
@@ -758,14 +758,14 @@ class CookieCart {
 			
 			$s = "";
 			foreach($steuern AS $key => $value)
-				$s .= ($s != "" ? "\n" : "")."".str_pad(Util::conv_euro("Gesamt MwSt".str_pad(Util::formatNumber("de_DE", $key*1, 2, true, false),7," ",STR_PAD_LEFT)."%: ".str_pad(Util::formatCurrency("de_DE",$value,true),15," ",STR_PAD_LEFT)),91," ",STR_PAD_LEFT);
+				$s .= ($s != "" ? "\n" : "")."".str_pad(Util::conv_euro8("Gesamt MwSt".str_pad(Util::formatNumber("de_DE", $key*1, 2, true, false),7," ",STR_PAD_LEFT)."%: ".str_pad(Util::formatCurrency("de_DE",$value,true),15," ",STR_PAD_LEFT)),91," ",STR_PAD_LEFT);
 		
 			$text .= "
 -------------------------------------------------------------------------------------------
-                                                        Gesamt Netto        ".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$netto,true)),15," ",STR_PAD_LEFT)."
+                                                        Gesamt Netto        ".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$netto,true)),15," ",STR_PAD_LEFT)."
 $s
                                                       -------------------------------------
-                                                              Gesamt        ".str_pad(Util::conv_euro(Util::formatCurrency("de_DE",$gesamt,true)),15," ",STR_PAD_LEFT);
+                                                              Gesamt        ".str_pad(Util::conv_euro8(Util::formatCurrency("de_DE",$gesamt,true)),15," ",STR_PAD_LEFT);
 		
 		
 		} else $text = "Ihr Warenkorb enthält keine Artikel.";
@@ -774,7 +774,7 @@ $s
 		
 		$paypalHTML .= '
 	<p>
-	<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-butcc.gif" style="border:0px;" name="submit" />
+	<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-butcc.gif" style="width:auto;border:0px;" name="submit" />
 	</p>
 </form>';
 		

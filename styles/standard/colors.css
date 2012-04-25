@@ -27,6 +27,9 @@
 	background-color:#E6E6FF;
 }
 
+.FormSeparatorWithLabel {
+	background-color:white;
+}
 /**
   * ELEMENTS
   **/
@@ -81,8 +84,36 @@ input, select, textarea, .AJAXUpload {
 	border-color:#B8B8F0;
 }
 
+#contentRight tr {
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
+}
+
 #contentRight tr:hover {
 	background-color:white;
+	
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
+}
+
+#contentScreen tr {
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
+}
+
+#contentScreen tr:hover {
+	background-color:white;
+	
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
 }
 
 #footer {
@@ -94,7 +125,7 @@ input, select, textarea, .AJAXUpload {
   **/
 
 .navBackgroundColor {
-	background-color:#6868C9;
+	background-color:#7f7fdf/*#6868C9*/;
 }
 
 .navBorderColor {
@@ -102,7 +133,7 @@ input, select, textarea, .AJAXUpload {
 	border-bottom-color:#444444;
 }
 
-#navTabsWrapper div:hover {
+#navTabsWrapper .navTab:hover {
 	background-color:#9E9EF0;
 }
 
@@ -110,4 +141,13 @@ input, select, textarea, .AJAXUpload {
 	background-color:white;
 	border-color:#444444;
 	border-bottom-color:white;
+}
+
+.selectionBox:hover {
+	background-color:white;
+	
+	-moz-transition: background-color .3s;
+	-webkit-transition: background-color .3s;
+	-o-transition: background-color .3s;
+	transition: background-color .3s;
 }

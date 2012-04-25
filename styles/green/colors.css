@@ -91,7 +91,7 @@ input, select, textarea, .AJAXUpload {
 	border-bottom-color:#444444;
 }
 
-#navTabsWrapper div:hover {
+#navTabsWrapper .navTab:hover {
 	background-color:#d9e800;
 }
 

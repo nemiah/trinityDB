@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 
 class File extends PersistentObject {
@@ -33,13 +33,14 @@ class File extends PersistentObject {
 		$A->FileIsDir = "";
 		$A->FileIsWritable = false;
 		$A->FileIsReadable = false;
+		$A->FileCreationDate = 0;
 		
 		return $A;
 	}
 	
 	function getRelPath(){
 		$Path = $this->A->FileDir."/".$this->A->FileName;
-		$pAF = str_replace("interface","",dirname($_SERVER["PHP_SELF"]));
+		$pAF = Util::getRootPath();#str_replace("interface","",dirname($_SERVER["PHP_SELF"]));
 		return str_replace($pAF,"./",substr($Path, strpos($Path,$pAF)));
 	}
 	
@@ -54,6 +55,34 @@ class File extends PersistentObject {
 		readfile($this->ID);
 	}
 
+	protected function moveToDir($toDir){
+		$newName = str_replace(DIRECTORY_SEPARATOR, "/", realpath($toDir))."/".basename($this->getID());
+
+		if(file_exists($newName))
+			throw new Exception("Eine Datei mit diesem Namen existiert bereits!");
+		
+		if(rename($this->getID(), $newName)){
+			Datei::updatePath($this->getID(), $newName);
+			return $newName;
+		}
+
+		return false;
+	}
+
+	protected function rename($newName){
+		$newName = dirname($this->getID())."/".basename($newName);
+
+		if(file_exists($newName))
+			throw new Exception("Eine Datei mit diesem Namen existiert bereits!");
+		
+		if(rename($this->getID(), $newName)){
+			Datei::updatePath($this->getID(), $newName);
+			return $newName;
+		}
+
+		return false;
+	}
+
 	public function makeUpload($A){
 		if($A->FileIsDir == "1")
 			return;
@@ -66,7 +95,7 @@ class File extends PersistentObject {
 
 			$A->FileContent = addslashes(file_get_contents("php://input"));
 			$A->FileName = $_GET['qqfile'];
-			$A->FileDir = $_GET["path"];
+			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = (int) $_SERVER["CONTENT_LENGTH"];
 		} else { //iframe upload for IE8
 			if($_FILES['qqfile']['size'] > $maxSize)
@@ -75,14 +104,14 @@ class File extends PersistentObject {
 
 			$A->FileContent = addslashes(file_get_contents($_FILES['qqfile']['tmp_name']));
 			$A->FileName = $_FILES['qqfile']['name'];
-			$A->FileDir = $_GET["path"];
+			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = $_FILES['qqfile']['size'];
 		}
 
 		echo "{\"success\":true}";
 	}
 
-	public function  newMe($checkUserData = true, $output = false) {
+	public function newMe($checkUserData = true, $output = false) {
 		parent::newMe($checkUserData, false);
 	}
 }

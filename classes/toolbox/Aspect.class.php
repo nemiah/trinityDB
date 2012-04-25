@@ -15,13 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Aspect {
 
 	public static $onetimePointCuts = array();
 	public static $pointCuts = array();
-
+	
+	private static $sessionVariable = "phynx_Aspects";
+	
 	public static function joinPoint($mode, $class, $method, $args = null, $defaultValue = null){
 		$value = Aspect::findPointCut($mode, $class, $method, $args);
 
@@ -38,7 +40,12 @@ class Aspect {
 		if($mode == "after" AND !isset(self::$pointCuts[$mode][$method]))
 			return $args;
 
-		if(isset(Aspect::$pointCuts[$mode][$method])){
+		if(isset($_SESSION[self::$sessionVariable]) AND count($_SESSION[self::$sessionVariable]) > 0)
+			foreach($_SESSION[self::$sessionVariable] AS $PA)
+				self::registerPointCut($PA[0], $PA[1], $PA[2]);
+			
+			
+		if(isset(Aspect::$pointCuts[$mode][$method]) AND count(Aspect::$pointCuts[$mode][$method]) > 0){
 			$values = array();
 			foreach(Aspect::$pointCuts[$mode][$method] AS $k => $advice) {
 				$values[] = Aspect::invokeParser($advice, $class, $args);
@@ -61,7 +68,7 @@ class Aspect {
 		return $method->invoke(null, $class, $args);
 	}
 
-	public static function registerPointCut($mode, $pointCut, $advice){
+	public static function registerPointCut($mode, $pointCut, $advice, $persistent = false){
 		if(!isset(Aspect::$pointCuts[$mode]))
 			Aspect::$pointCuts[$mode] = array();
 
@@ -72,6 +79,13 @@ class Aspect {
 
 		Aspect::$pointCuts[$mode][$pointCut][] = $advice;
 
+		if($persistent){
+			if(!isset($_SESSION[self::$sessionVariable]))
+				$_SESSION[self::$sessionVariable] = array();
+
+			$_SESSION[self::$sessionVariable][$mode.$pointCut.$advice] = array($mode, $pointCut, $advice);
+		}
+		
 		#echo "<pre style=\"font-size:8px;\">";
 		#print_r(Aspect::$pointCuts);
 		#echo "</pre>";

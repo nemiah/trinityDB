@@ -26,7 +26,25 @@ var lastLoadedRight		  = -1;
 var lastLoadedRightPlugin = "";
 var lastLoadedRightPage   = 0;
 
+var lastLoadedScreen		  = -1;
+var lastLoadedScreenPlugin = "";
+var lastLoadedScreenPage   = 0;
+
 var contentManager = {
+	init: function(){
+		Interface.init();
+		Overlay.init();
+		loadMenu();
+		$('contentLeft').update();
+		if (document.cookie == "") document.cookie = "CookieTest = Erfolgreich"
+		if (document.cookie == "") alert("In Ihrem Browser sind Cookies deaktiviert.\nBitte aktivieren Sie Cookies, damit diese Anwendung funktioniert.");
+		DesktopLink.init();
+	},
+	
+	newSession: function(physion, plugin){
+		Popup.load("Neue Sitzung", "Util", "-1", "newSession", [physion, plugin]);
+	},
+	
 	/*backupLeftID: null,
 	backupLeftPage: null,
 	backupLeftPlugin:null,
@@ -41,6 +59,84 @@ var contentManager = {
 
 	autoLogoutInhibitor: null,
 
+	switchApplication: function(){
+		Popup.closeNonPersistent();
+		Popup.closePersistent();
+		Menu.refresh();
+		contentManager.emptyFrame("contentScreen");
+		contentManager.loadDesktop();
+		contentManager.loadJS();
+		contentManager.loadTitle();
+	},
+
+	loadDesktop: function(){
+		new Ajax.Request('./interface/loadFrame.php?p=Desktop&id=1', {
+		method: 'get',
+		onSuccess: function(transport) {
+			if(transport.responseText.search(/^error:/) == -1){
+				lastLoadedRightPlugin = "Desktop";
+				lastLoadedRight = 1;
+				$('contentRight').update(transport.responseText);
+
+				if($('DesktopMenuEntry')) setHighLight($('DesktopMenuEntry'));
+
+				if(!$('morePluginsMenuEntry')) {
+					new Ajax.Request('./interface/loadFrame.php?p=Desktop&id=2', {
+						onSuccess: function(transport){
+							$('contentLeft').update(transport.responseText);
+						}
+					});
+					lastLoadedLeftPlugin = "Desktop";
+					lastLoadedLeft = 2;
+				}
+			}
+		}});
+	},
+	
+	loadPlugin: function(targetFrame, targetPlugin, bps, withId){
+		contentManager.emptyFrame('contentLeft');
+		contentManager.emptyFrame('contentRight');
+		contentManager.emptyFrame('contentScreen');
+		
+		contentManager.loadFrame(targetFrame, targetPlugin, -1, 0, bps, function(){if(typeof withId != "undefined") contentManager.loadFrame("contentLeft", targetPlugin.substr(1), withId);});
+		//$('windows').update('');
+		Popup.closeNonPersistent();
+		
+		if($(targetPlugin+'MenuEntry'))
+			setHighLight($(targetPlugin+'MenuEntry'));
+	},
+
+	loadJS: function(){
+		new Ajax.Request("./interface/loadFrame.php?p=JSLoader&id=-1", {
+    		method: "get",
+    		onSuccess: function(transport){
+    			$('DynamicJS').update('');
+    			scripts = transport.responseText.split("\n");
+    			for(i=0;i<scripts.length;i++) {
+    				if(scripts[i] == "") continue;
+    				s = document.createElement('script');
+
+    				src = document.createAttribute("src")
+    				src.nodeValue = scripts[i];
+    				s.setAttributeNode(src);
+
+    				t = document.createAttribute("type")
+    				t.nodeValue = "text/javascript";
+    				s.setAttributeNode(t);
+
+    				$('DynamicJS').appendChild(s);
+    			}
+    		}
+    	});
+	},
+
+	loadTitle: function(){
+    	new Ajax.Request("./interface/rme.php?class=Menu&method=getActiveApplicationName&constructor=&parameters=",{onSuccess: function(transport){
+			if(!Interface.isDesktop) document.title = transport.responseText;
+			else $("wrapperHandler").update(transport.responseText);
+    	}});
+	},
+
 	setRoot: function(path){
 		contentManager.rootPath = path;
 	},
@@ -53,9 +149,16 @@ var contentManager = {
 	},
 
 	updateLine: function(FormID, elementID, CollectorClass){
-
+		
+		var CC = null;
 		if(typeof CollectorClass != "undefined") CC = CollectorClass;
-		else var CC = $(FormID).CollectorClass.value;
+		else
+			if($(FormID))
+				CC = $(FormID).CollectorClass.value;
+		
+
+		if(CC == null)
+			return;
 
 		if(elementID != "-1"){
 			new Ajax.Request('./interface/loadFrame.php?p='+CC+'&id='+elementID+'&type=main', {method:'get', onSuccess: function(transport){
@@ -71,7 +174,7 @@ var contentManager = {
 				}
 			}});
 		} else {
-			reloadRightFrame();
+			contentManager.reloadFrameRight();
 			if(TextEditor.open) TextEditor.hide();
 		}
 	},
@@ -103,18 +206,28 @@ var contentManager = {
 	},
 
 	reloadOnNew: function(transport, plugin){
-		//checkResponse('message:GlobalMessages.M003');
 		contentManager.setLeftFrame(plugin, transport.responseText);
-		contentManager.reloadFrame('contentLeft');//reloadLeftFrame();
-		contentManager.reloadFrame('contentRight');//reloadRightFrame();
+		contentManager.reloadFrame('contentLeft');
+		contentManager.reloadFrame('contentRight');
 	},
 
-	reloadFrame: function(targetFrame){
-		if(targetFrame == "contentLeft")
-			contentManager.loadFrame("contentLeft", lastLoadedLeftPlugin, lastLoadedLeft, lastLoadedLeftPage);
+	reloadFrame: function(targetFrame, bps){
+		if(targetFrame == "contentLeft" && lastLoadedLeftPlugin != "")
+			contentManager.loadFrame("contentLeft", lastLoadedLeftPlugin, lastLoadedLeft, lastLoadedLeftPage, bps);
 
-		if(targetFrame == "contentRight")
-			contentManager.loadFrame("contentRight", lastLoadedRightPlugin, lastLoadedRight, lastLoadedRightPage);
+		if(targetFrame == "contentRight" && lastLoadedRightPlugin != "")
+			contentManager.loadFrame("contentRight", lastLoadedRightPlugin, lastLoadedRight, lastLoadedRightPage, bps);
+
+		if(targetFrame == "contentScreen" && lastLoadedScreenPlugin != "")
+			contentManager.loadFrame("contentScreen", lastLoadedScreenPlugin, lastLoadedScreen, lastLoadedScreenPage, bps);
+	},
+	
+	reloadFrameLeft: function(bps){
+		contentManager.reloadFrame("contentLeft", bps);
+	},
+	
+	reloadFrameRight: function(bps){
+		contentManager.reloadFrame("contentRight", bps);
 	},
 
 	backupFrame: function(targetFrame, backupName, force){
@@ -157,6 +270,13 @@ var contentManager = {
 			lastLoadedRightPlugin = "";
 			lastLoadedRightPage   = 0;
 		}
+		if(targetFrame == "contentScreen"){
+			lastLoadedScreen      = -1;
+			lastLoadedScreenPlugin = "";
+			lastLoadedScreenPage   = 0;
+		}
+		
+		
 		$(targetFrame).update("");
 	},
 
@@ -166,6 +286,9 @@ var contentManager = {
 
 		if(targetFrame == "contentRight")
 			contentManager.loadFrame(targetFrame, lastLoadedRightPlugin, lastLoadedRight, (lastLoadedRightPage * 1) + 1);
+
+		if(targetFrame == "contentScreen")
+			contentManager.loadFrame(targetFrame, lastLoadedScreenPlugin, lastLoadedScreen, (lastLoadedScreenPage * 1) + 1);
 	},
 
 	backwardOnePage: function(targetFrame){
@@ -174,6 +297,9 @@ var contentManager = {
 
 		if(targetFrame == "contentRight")
 			contentManager.loadFrame(targetFrame, lastLoadedRightPlugin, lastLoadedRight, lastLoadedRightPage - 1);
+
+		if(targetFrame == "contentScreen")
+			contentManager.loadFrame(targetFrame, lastLoadedScreenPlugin, lastLoadedScreen, lastLoadedScreenPage - 1);
 	},
 
 	loadPage: function(targetFrame, page){
@@ -182,25 +308,17 @@ var contentManager = {
 
 		if(targetFrame == "contentRight")
 			contentManager.loadFrame(targetFrame, lastLoadedRightPlugin, lastLoadedRight, page);
+
+		if(targetFrame == "contentScreen")
+			contentManager.loadFrame(targetFrame, lastLoadedScreenPlugin, lastLoadedScreen, page);
 	},
 
-	saveSelection: function(classe, classId, saveFunction, idToSave, targetFrame){
-		rmeP(classe, classId, saveFunction, idToSave, "if(checkResponse(transport)) contentManager.reloadFrame('"+targetFrame+"');");
-
-		/*new Ajax.Request("./interface/rme.php", {
-		method: 'post',
-		parameters: "class="+classe+"&construct="+classId+"&method="+saveFunction+"&parameters='"+idToSave+"'",
-		onSuccess: function(transport) {
-			if(checkResponse(transport)){
-				if(transport.responseText.search(/^message:/) == -1)showMessage(transport.responseText);
-
-				if(targetId != -1) new Ajax.Updater(targetFrame,'./interface/loadFrame.php?p='+targetClass+'&id='+targetId);
-			}
-		}});*/
+	saveSelection: function(classe, classId, saveFunction, idToSave, targetFrame, bps){
+		contentManager.rmePCR(classe, classId, saveFunction, idToSave, function() {contentManager.reloadFrame(targetFrame);}, bps)
 	},
 
-	editInPopup: function(plugin, withId, title, bps){
-		contentManager.loadContent(plugin, withId, 0, bps, function(transport) {Popup.create(plugin, 'edit', title);Popup.update(transport, plugin, 'edit');});
+	editInPopup: function(plugin, withId, title, bps, options){
+		contentManager.loadContent(plugin, withId, 0, bps, function(transport) {Popup.create(plugin, 'edit', title, options);Popup.update(transport, plugin, 'edit');});
 	},
 
 	loadInPopup: function(title, plugin, withId, page, bps){
@@ -231,6 +349,12 @@ var contentManager = {
 			lastLoadedLeft = withId;
 		}
 
+		if(target == "contentScreen"){
+			lastLoadedScreenPlugin = plugin;
+			lastLoadedScreenPage = page;
+			lastLoadedScreen = withId;
+		}
+
 		new Ajax.Request('./interface/loadFrame.php?p='+plugin+(typeof withId != "undefined" ? '&id='+withId : "")+((typeof bps != "undefined" && bps != "") ? '&bps='+bps : "")+((typeof page != "undefined" && page != "") ? '&page='+page : "")+"&r="+Math.random(), {onSuccess: function(transport){
 			if(checkResponse(transport, hideError)) {
 				$(target).update(transport.responseText);
@@ -243,22 +367,25 @@ var contentManager = {
 
 	},
 
-	rmePCR: function(targetClass, targetClassId, targetMethod, targetMethodParameters, onSuccessFunction, bps){
+	rmePCR: function(targetClass, targetClassId, targetMethod, targetMethodParameters, onSuccessFunction, bps, responseCheck, onFailureFunction){
 		var arg = arguments;
+		if(typeof responseCheck == "undefined")
+			responseCheck = true;
 
 		if(typeof targetMethodParameters != "string"){
 			for(var i = 0; i < targetMethodParameters.length; i++)
-				targetMethodParameters[i] = "'"+encodeURIComponent(targetMethodParameters[i])+"'";
+				targetMethodParameters[i] = "'"+encodeURIComponent(targetMethodParameters[i]).replace(/\'/g,'\\\'')+"'";
 
 			targetMethodParameters = targetMethodParameters.join(",");
 		}
-		else targetMethodParameters = "'"+targetMethodParameters+"'";
+		else targetMethodParameters = "'"+targetMethodParameters.replace(/\'/g,'\\\'')+"'";
 
-		new Ajax.Request("./interface/rme.php?rand="+Math.random(), {
+		new Ajax.Request(contentManager.getRoot()+"interface/rme.php?rand="+Math.random(), {
 		method: 'post',
 		parameters: "class="+targetClass+"&construct="+targetClassId+"&method="+targetMethod+"&parameters="+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : ""),
 		onSuccess: function(transport) {
-			if(checkResponse(transport)) {
+			var check = checkResponse(transport);
+			if(!responseCheck || check) {
 				
 				if(typeof onSuccessFunction == "string")
 					eval(onSuccessFunction);
@@ -268,6 +395,8 @@ var contentManager = {
 
 				Aspect.joinPoint("loaded", "contentManager.rmePCR", arg, transport.responseText);
 			}
+			if(!check && typeof onFailureFunction == "function")
+				onFailureFunction();
 		}});
 	},
 
@@ -328,5 +457,53 @@ var contentManager = {
 				else alert(fields[f]+" does not exist!");
 			}
 		}
-	}
+	},
+
+	toggleFormFieldsTest: function(test, showOnTrue, showOnFalse, formID, showOnly){
+		if(typeof showOnly == "undefined")
+			showOnly = false;
+		
+		if(test){
+			contentManager.toggleFormFields("show", showOnTrue, formID);
+			if(!(showOnly))
+				contentManager.toggleFormFields("hide", showOnFalse, formID);
+		} else {
+			if(!(showOnly))
+				contentManager.toggleFormFields("hide", showOnTrue, formID);
+			contentManager.toggleFormFields("show", showOnFalse, formID);
+		}
+	},
+	
+	formContent: function(formID){
+		var fields = $j('#'+formID).serializeArray();
+		
+		$j.each(fields, function(key, value){ 
+			if($j('#'+formID+' input[name='+value.name+']:checked').length > 0) value.value = '1'; 
+		}); 
+		
+		$j.each($j('#'+formID+' input[type=checkbox]:not(:checked)'), function(key, value){ 
+			fields.push({name: value.name, value: '0'}); 
+		});
+		
+		return fields;
+	}/*,
+	
+	tinyMCEFileBrowser: function(field_name, url, type, win) {
+		
+		//alert("Field_Name: " + field_name + "nURL: " + url + "nType: " + type + "nWin: " + win); // debug/testing
+		
+		tinyMCE.activeEditor.windowManager.open({
+			file : "./interface/rme.php?rand="+Math.random()+"&class=FileManager&construct=&method=getTinyMCEManager&parameters='"+field_name+"','"+type+"'",
+			title : 'Dateimanager',
+			width : 800,  // Your dimensions may differ - toy around with them!
+			height : 450,
+			resizable : "yes",
+			inline : "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
+			close_previous : "no"
+		}, {
+			window : win,
+			input : field_name
+		});
+		return false;
+	}*/
 }

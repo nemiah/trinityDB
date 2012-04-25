@@ -15,9 +15,140 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Util {
+	public static function getCloudHost(){
+		if($_SERVER["HTTP_HOST"] == "*")
+			return null;
+		
+		$h = "CloudHost".str_replace(array(":", "-"), "_", implode("", array_map("ucfirst", explode(".", $_SERVER["HTTP_HOST"]))));
+		try {
+			$c = new $h();
+			return $c;
+		} catch (ClassNotFoundException $e){
+			return null;
+		}
+	}
+	
+	/**
+	 * Created fixed-size string
+	 * 
+	 * @param string $string
+	 * @param int $width
+	 * @param int $pad_type STR_PAD_RIGHT OR STR_PAD_LEFT
+	 */
+	public static function utf8_str_col($string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT){
+		preg_match_all("/./su", $string, $ar);
+		
+		$ar = array_slice($ar[0], 0, $width);
+		
+		switch($pad_type){
+			case STR_PAD_RIGHT:
+				while(count($ar) < $width)
+					$ar[] = $pad_string[0];
+			break;
+				
+			case STR_PAD_LEFT:
+				while(count($ar) < $width)
+					array_unshift($ar, $pad_string[0]);
+			break;
+		}
+		
+		return implode("", $ar);
+	}
+	
+	public static function getAppServerClient($auth = true){
+		try {
+			$AppServer = mUserdata::getGlobalSettingValue("AppServer", "");
+			if($AppServer != ""){
+				$CU = Session::currentUser();
+				$uri = $AppServer."/plugins/AppServer/AppServer.php";
+				
+				if($CU != null AND $auth){
+					$c = Session::currentUser()->getA();
+
+					return new SoapClient(null, array(
+						"location" => $uri,
+						"uri" => $uri,
+						#"trace" => 1,
+						"login" => $c->username,
+						"password" => $c->SHApassword));
+				} else {
+					return new SoapClient(null, array(
+						"location" => $uri,
+						"uri" => $uri/*,
+						"trace" => 1*/));
+				}
+
+				#$user = $S->getUser($username, $password);
+			}
+		} catch (Exception $e){}
+
+		return null;
+	}
+
+	public static function getAppClient($App, $local = false, $username = null, $password = null){
+		$host = "";
+		if(!$local){
+			$S = self::getAppServerClient($username != null);
+
+			if($S == null)
+				throw new Exception("Es steht kein AppServer zur Verfügung!");
+
+			$Apps = $S->getApplications();
+
+			$host = $Apps[$App][0];
+		} else
+			$host = AppProvider::getAppHost($App);
+		
+		if($host == "" OR $host == null)
+			throw new Exception("Es steht keine Installation von $App zur Verfügung!");
+
+		$uri = $host."/$App/ExtConn/ExtConn.php";
+		if($username != null)
+			$S2 = new SoapClient(null, array(
+				"location" => $uri,
+				"uri" => $uri,
+				"login" => $username,
+				"password" => $password/*,
+				"trace" => 1*/));
+		else
+			$S2 = new SoapClient(null, array(
+				"location" => $uri,
+				"uri" => $uri/*,
+				"trace" => 1*/));
+
+		return $S2;
+	}
+
+	public static function getCountryAddressFormat($ISOCountry){
+		$r = "";
+
+		switch($ISOCountry){
+			case "GB":
+				$r .= "{firma}\n";
+				$r .= "{position}{vorname}{nachname}\n";
+				$r .= "{zusatz1}\n";
+				$r .= "{nr}{strasse}\n";
+				$r .= "{ort}\n";
+				$r .= "{plz}\n";
+				$r .= "{land}";
+			break;
+
+			default:
+				$r .= "{firma}\n";
+				$r .= "{vorname}{nachname}\n";
+				$r .= "{strasse}{nr}\n";
+				$r .= "{plz}{ort}\n";
+				$r .= "{land}";
+			break;
+		}
+
+		// <editor-fold defaultstate="collapsed" desc="Aspect:jP">
+		return Aspect::joinPoint("after", null, __METHOD__, $r);
+		// </editor-fold>
+	}
 
 	public static function getMaxUpload(){
 		$badFormat = ini_get("upload_max_filesize");
@@ -39,6 +170,32 @@ class Util {
 		return str_replace("classes".DIRECTORY_SEPARATOR."toolbox".DIRECTORY_SEPARATOR."Util.class.php","",__FILE__);
 	}
 
+	public static function PostToHostCustom($host, $port = 80, $path = "/", $data = "", array $headers = null){
+		$fp = fsockopen($host, $port);
+		fputs($fp, "POST $path HTTP/1.1\r\n");
+		fputs($fp, "Host: $host:$port\r\n");
+		
+		foreach($headers AS $k => $v)
+			fputs($fp, "$k:$v\r\n");
+		
+		if(!isset($headers["Content-type"]))
+			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+		
+		fputs($fp, "Content-length: ". strlen($data) ."\r\n");
+		fputs($fp, "Connection: close\r\n\r\n");
+		fputs($fp, $data);
+
+		$res = "";
+
+		while(!feof($fp))
+			$res .= fgets($fp, 128);
+
+		#printf("Done!\n");
+		fclose($fp);
+
+		return $res;
+	}
+	
 	/**
 	 * Setzt einen Post-Request auf Port 80 ab
 	 *
@@ -50,7 +207,7 @@ class Util {
 	 * @param string $data_to_send z.B. "pid=14&poll_vote_number=2"
 	 * @return string
 	 */
-	public static function PostToHost($host, $port = 80, $path = "", $referer = "", $data_to_send = "", $user = null, $pass = null) {
+	public static function PostToHost($host, $port = 80, $path = "", $referer = "", $data_to_send = "", $user = null, $pass = null, $contentType = "application/x-www-form-urlencoded") {
 		$fp = fsockopen($host, $port);
 		#printf("Open!\n");
 		fputs($fp, "POST $path HTTP/1.1\r\n");
@@ -60,7 +217,7 @@ class Util {
 			$string = base64_encode("$user:$pass");
 			fputs($fp, "Authorization: Basic ".$string."\r\n");
 		}
-		fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+		fputs($fp, "Content-type: $contentType\r\n");
 		fputs($fp, "Content-length: ". strlen($data_to_send) ."\r\n");
 		fputs($fp, "Connection: close\r\n\r\n");
 		fputs($fp, $data_to_send);
@@ -88,7 +245,7 @@ class Util {
 	 * $digits kann auch das Format "max2" haben. In diesem Fall werden Nullen am Ende
 	 * abgeschnitten bei maximal 2 Nachkommastellen
 	 */
-	public static function formatNumber($language, $number, $digits = "default", $showZero = true, $endingZeroes = true){
+	public static function formatNumber($language, $number, $digits = "default", $showZero = true, $endingZeroes = true, $thousandSeparator = true){
 		$format = Util::getLangNumbersFormat($language);
 		$ren = false;
 		
@@ -99,7 +256,7 @@ class Util {
 		
 		$float = Util::parseFloat($language, $number);
 
-		$stringNumber = number_format($float, ($digits === "default" ? $format[1] : $digits), $format[0], $format[2])."";
+		$stringNumber = number_format($float, ($digits === "default" ? $format[1] : $digits), $format[0], $thousandSeparator ? $format[2] : "")."";
 
 		if($ren){
 			for($i = 0; $i < $digits; $i++){
@@ -122,8 +279,8 @@ class Util {
 		return $stringNumber;
 	}
 	
-	public static function CLFormatNumber($number, $digits = "default", $showZero = true, $endingZeroes = true){
-		return Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number, $digits, $showZero, $endingZeroes);
+	public static function CLFormatNumber($number, $digits = "default", $showZero = true, $endingZeroes = true, $thousandSeparator = true){
+		return Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number, $digits, $showZero, $endingZeroes, $thousandSeparator);
 	}
 	
 	/**
@@ -135,6 +292,8 @@ class Util {
 		$format = Util::getLangCurrencyFormat($language);
 		
 		$float = Util::parseFloat($language, $number);
+		
+		$float *= Util::getLangCurrencyFactor($language);
 		
 		$negative = false;
 		if($float < 0) $negative = true;
@@ -150,11 +309,22 @@ class Util {
 		return $stringCurrency;
 	}
 	
+	public static function getLangCurrencyFactor($language){
+		if(!Session::isPluginLoaded("mSprache")) return 1;
+		
+		$Sprache = anyC::getFirst("Sprache", "SpracheIdentifier", $language);
+		
+		if($Sprache == null)
+			return 1;
+		
+		return $Sprache->A("SpracheWaehrungFaktor") * 1;
+	}
+	
 	public static function CLFormatCurrency($number, $withSymbol = false){
 		return Util::formatCurrency($_SESSION["S"]->getUserLanguage(), $number, $withSymbol);
 	}
 	
-	public static function CLNumberParser($number, $l){
+	public static function CLNumberParser($number, $l = "load"){
 		if($l == "load") return Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number * 1, 0, true, false);
 		if($l == "store") return Util::parseFloat($_SESSION["S"]->getUserLanguage(), $number);
 	}
@@ -171,7 +341,7 @@ class Util {
 		return self::CLTimeParser($time, $l);
 	}
 	
-	public static function CLNumberParserZ($number, $l){
+	public static function CLNumberParserZ($number, $l = "load"){
 		if($l == "load") {
 			$n = Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number * 1, 3, true, true);
 			$l = strlen($n) - 1;
@@ -209,6 +379,10 @@ class Util {
 		return Aspect::joinPoint("alterAnrede", null, __METHOD__, $args, $A);
 	}
 	
+	public static function CLFormatDate($timeStamp = -1, $long = false){
+		return self::formatDate($_SESSION["S"]->getUserLanguage(), $timeStamp, $long);
+	}
+	
 	public static function formatDate($language, $timeStamp = -1, $long = false){
 		if($timeStamp == -1) $timeStamp = time();
 		$format = Util::getLangDateFormat($language);
@@ -241,6 +415,17 @@ class Util {
 		if($l == "store") return Util::parseDate($_SESSION["S"]->getUserLanguage(), $date);
 	}
 
+	public static function CLDateTimeParser($dateTime, $l = "load"){
+		if($dateTime == "0" AND $l == "load") return "";
+		if($dateTime == "" AND $l == "store") return "0";
+		
+		if($l == "load") return Util::CLDateParser($dateTime)." ".Util::CLTimeParser($dateTime);
+		if($l == "store") {
+			$ex = explode(" ", $dateTime);
+			return Util::CLDateParser($ex[0], "store")-60+Util::CLTimeParser($ex[1], "store");
+		}
+	}
+
 	public static function CLDateParserE($date, $l = "load"){
 		if($date == "0" AND $l == "load") return "";
 		if($date == "" AND $l == "store") return "0";
@@ -268,7 +453,14 @@ class Util {
 		$s = explode($format[2], $time);
 		$r = explode($format[2], $format[0]);
 		
-		return mktime($s[array_search("H", $r)], $s[array_search("i", $r)], (isset($s[array_search("s", $r)]) ? $s[array_search("s", $r)] : 0), 1, 1, 1970) + 3600;
+		return mktime(
+			$s[array_search("H", $r)] * 1, 
+			$s[array_search("i", $r)] * 1, 
+			(isset($s[array_search("s", $r)]) ? 
+				$s[array_search("s", $r)] * 1 : 
+				0), 
+			1, 1, 1970)
+			+ 3600;
 	}
 	
 	/**
@@ -335,8 +527,8 @@ class Util {
 		if(is_float($stringNumber) OR is_int($stringNumber)) return $stringNumber;
 		
 		$format = Util::getLangNumbersFormat($language);
-		
-		$stringNumber = str_replace($format[2], "", $stringNumber);
+
+		$stringNumber = str_replace($format[2], "", stripslashes($stringNumber));
 		$stringNumber = str_replace($format[0], ".", $stringNumber);
 		$number = $stringNumber * 1;
 
@@ -359,7 +551,7 @@ class Util {
 	public static function kRound($nummer, $stellen = 2){
 		$negative = false;
 		if($nummer < 0) $negative = true;
-		return round(abs($nummer) + 0.0000000000001, $stellen) * ($negative ? -1 : 1);
+		return round(abs($nummer) + 0.0000000001, $stellen) * ($negative ? -1 : 1);
 	}
 	
 	public static function getLangNumbersFormat($languageTag){
@@ -411,6 +603,9 @@ class Util {
 			break;
 			case "en_GB":
 				return array("£", "£n", "-£n", ".", 2, ",");
+			break;
+			case "en_NO":
+				return array(" NOK", "n NOK", "-n NOK", ".", 2, ",");
 			break;
 			default:
 				return array("€", "n€", "-n€", ",", 2, ".");
@@ -521,7 +716,7 @@ class Util {
 	}
 
 	public static function checkIsEmail($email){
-		if(eregi("^[a-z0-9]+([-_\.]?[a-z0-9])+@[a-z0-9]+([-_\.]?[a-z0-9])+\.[a-z]{2,4}$", $email))
+		if(preg_match("/^[a-z0-9]+[a-z0-9_\.-]+@[a-z0-9]+([-_\.]?[a-z0-9])+\.[a-z]{2,12}$/", strtolower(trim($email))))
 			return true;
 		else
 			return false;
@@ -537,6 +732,12 @@ class Util {
 	public static function conv_euro($text){
 		$text = str_replace("€", chr(128), $text);
 		$text = str_replace("£", chr(163), $text);
+		return $text;
+	}
+
+	public static function conv_euro8($text){
+		$text = str_replace("€", utf8_encode(chr(128)), $text);
+		$text = str_replace("£", utf8_encode(chr(163)), $text);
 		return $text;
 	}
 	
@@ -645,10 +846,10 @@ class Util {
 	public static function makeFilename($string){
 		$filename = Util::replaceNonURLChars($string);
 		$filename = str_replace(array("Á","À","Â","Ã","á","à","â","ã"), array("A","A","A","A","a","a","a","a"), $filename);
-		$filename = str_replace(array("Ç","ç","É","È","Ê","é","è","ê"), array("C","c","E","E","E","e","e","e"), $filename);
+		$filename = str_replace(array("Ç","ç","É","È","Ê","é","è","ê", "ë", "Č"), array("C","c","E","E","E","e","e","e", "e", "C"), $filename);
 		$filename = str_replace(array("Í","Ì","í","ì","Õ","Ô","Ó"), array("I","I","i","i","O","O","O"), $filename);
 		$filename = str_replace(array("õ","ô","ó","Ú","ú"), array("o","o","o","U","u"), $filename);
-    	$filename = str_replace(array(":", "–", "\n"), array("_", "-", ""), $filename);
+    	$filename = str_replace(array(":", "–", "\n", "'", "?", "(", ")"), array("_", "-", "", "", "", "", ""), $filename);
 
 		return $filename;
 	}
@@ -722,10 +923,10 @@ class Util {
 	}
 	
 	public static function PDFCurrencyParser($w, $l = "load"){
-		return Util::conv_euro(Util::formatCurrency("de_DE", $w * 1, true));
+		return Util::conv_euro(Util::CLFormatCurrency($w * 1, true));
 	}
 	
-	public static function getTempFilename($filename = null, $suffix = "pdf"){
+	public static function getTempDir(){
 		$dirtouse = Util::getRootPath()."system/IECache/";
 		
 		if(!is_writable($dirtouse)) {
@@ -742,7 +943,13 @@ class Util {
 			mkdir($dirtouse, 0777);
 			chmod($dirtouse, 0777);
 		}
-
+		
+		return $dirtouse;
+	}
+	
+	public static function getTempFilename($filename = null, $suffix = "pdf"){
+		$dirtouse = self::getTempDir();
+		
 		if($filename == null) $filename = "TempFile";
 		$filename = $dirtouse.$filename.".$suffix";
 		
@@ -783,7 +990,10 @@ class Util {
 	}
 	
 	public static function catchParser($w, $l = "load", $p = ""){
-		$p = HTMLGUI::getArrayFromParametersString($p);
+		if(!is_array($p))
+			$p = HTMLGUI::getArrayFromParametersString($p);
+		else
+			unset($p[0]);
 		return $w == 1 ? "<img ".(isset($p[0]) ? "title=\"$p[0]\"" : "")." src=\"./images/i2/ok.gif\" />" : "<img ".(isset($p[1]) ? "title=\"$p[1]\"" : "")." src=\"./images/i2/notok.gif\" />";
 	}
 	
@@ -988,8 +1198,8 @@ class Util {
 		if($ob != "")
 			$out[0] .= "<script type=\"text/javascript\">Interface.translateStatusMessage(\"$ob\",\"replacementMessage".count($this->statusMessagesLog)."\");</script><span id=\"replacementMessage".count($this->statusMessagesLog)."\"></span>";
 		elseif($message != ""){
-			$out[0] .= $message;
-		} else $out[0] .= "kein Fehler aufgetreten";
+			$out[0] .= "<span style=\"color:red;\">$message</span>";
+		} else $out[0] .= "<span style=\"color:green;\">OK</span>";
 
 		$this->statusMessagesLog[] = array_merge($columns, $out);
 	}
@@ -1045,11 +1255,13 @@ class Util {
 	<head>
 		<title>'.$title.'</title>
 		'.($js ? '
-		<script type="text/javascript" src="../libraries/scriptaculous/prototype.js"></script>
-		<script type="text/javascript" src="../libraries/scriptaculous/effects.js"></script>
+		<script type="text/javascript" src="../libraries/jquery/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="../libraries/jquery/jquery-ui-1.8.17.custom.min.js"></script>
+		<script type="text/javascript" src="../javascript/P2J.js"></script>
 		<script type="text/javascript" src="../javascript/handler.js"></script>
 		<script type="text/javascript" src="../javascript/contentManager.js"></script>
-		<script type="text/javascript" src="../javascript/interface.js"></script>
+		<script type="text/javascript" src="../javascript/Interface.js"></script>
+		<script type="text/javascript" src="../javascript/Overlay.js"></script>
 		<script type="text/javascript" src="../libraries/webtoolkit.base64.js"></script>' : "").'
 		
 		<link rel="stylesheet" type="text/css" href="../styles/'.(isset($_COOKIE["phynx_color"])? $_COOKIE["phynx_color"] : "standard").'/colors.css"></link>

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class SysMessages {
 	private $messages = array();
@@ -27,17 +27,55 @@ class SysMessages {
 	private $messageLimit = 30;
 	private $starter = 0;
 	private $lastMessage = 0;
+	public static $variable = "messages";
+	
+	/**
+	 * @return SysMessages 
+	 */
+	public static function i(){
+		return $_SESSION[self::$variable];
+	}
+	
+	public static function init(){
+		$_SESSION[self::$variable] = new SysMessages();
+	}
 	
 	public function __construct(){	
 		$this->addMessage("--- System Messages initialized ---");
 		if(!$this->logging) $this->messages[] = "--- Logging has been disabled ---";
 	}
-	
+
+	public static function log($m, $category = "all", $level = 10){
+		if(!isset($_SESSION[self::$variable]))
+			$_SESSION[self::$variable] = new SysMessages ();
+		
+		$_SESSION[self::$variable]->addMessage($m, $category, $level);
+	}
+
 	public function startLogging(){
 		$this->logging = true;
 		$this->addMessage("--- Logging enabled ---");
 	}
 	
+	public function stopLogging(){
+		$this->logging = false;
+		$this->addMessage("--- Logging disabled ---");
+	}
+
+	public static function countCategoryS($category){
+		return $_SESSION[self::$variable]->countCategory($category);
+	}
+
+	public function countCategory($category){
+		$c = 0;
+		foreach($this->categories AS $k => $v){
+			if($v == $category)
+				$c++;
+		}
+
+		return $c;
+	}
+
 	public function clearMessages(){
 		$this->lastMessage = 0;
 		$this->starter = 0;
@@ -143,6 +181,7 @@ class SysMessages {
 			echo (($j<10 ? "0" : "").$j++)." ".(strstr($messages[$key],"Exception") ? "<span style=\"color:white;background-color:red;\">" : "").$messages[$key].(strstr($messages[$key],"Exception") ? "</span>" : "")."<br />";
 
 			$oldTime = $e[0];
+			echo "\n";
 		}
 	}
 

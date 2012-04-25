@@ -15,14 +15,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Red {
 
-	public static function alertD($message){
-		die("alert:'".addslashes($message)."'");
+	public static function alertD($message, $die = true){
+		if($die)
+			die("alert:'".addslashes($message)."'");
+		else
+			throw new Exception($message);
 	}
 
+	public static function redirect($JSFunction){
+		die("redirect:$JSFunction");
+	}
+	
 	public static function errorD($message){
 		die("error:'".addslashes($message)."'");
 	}
@@ -47,6 +54,34 @@ class Red {
 		$Lang = $ac->loadLanguageClass($class)->getText();
 
 		die("message:'".addslashes($Lang[$message])."'");
+	}
+
+	public static function messageD($message){
+		die("message:'".addslashes($message)."'");
+	}
+	
+	public static function messageSaved(){
+		die("message:'Daten gespeichert'");
+	}
+	
+	public static function messageCreated(){
+		die("message:'Datensatz erstellt'");
+	}
+	
+	public static function errorUpdate($e = null){
+		self::errorD("Bitte aktualisieren Sie über das Installations-Plugin im Administrationsbereich die Tabelle des Plugins".($e != null ? " (die Spalte ".$e->getField()." fehlt in der Datenbank)" : "").".");
+	}
+	
+	public static function errorClass($n){
+		self::errorD("Die Klasse $n konnte nicht gefunden werden. Die Anfrage wird abgebrochen.");
+	}
+	
+	public static function errorDuplicate($value){
+		self::errorD("Der Wert $value wurde bereits vergeben");
+	}
+	
+	public static function errorExtension($ext){
+		self::errorD("Die PHP-Erweiterung '$ext' wurde nicht geladen. Anfrage wird abgebrochen.");
 	}
 }
 ?>

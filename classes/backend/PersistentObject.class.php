@@ -15,11 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class PersistentObject {
 	protected $ID;
 	protected $A = null;
+	protected $AA = null;
 	protected $Adapter = null;
 	protected $storage = PHYNX_MAIN_STORAGE;#"MySQL";
 	protected $noDeleteHideOnly = false;
@@ -30,42 +31,17 @@ class PersistentObject {
 	protected $myAdapterClass;
 	protected $echoIDOnNew = false;
 	protected $customizer;
-
+	
+	public $hasParsers = false;
+	/*protected function usedParsers(){
+		if($this->Adapter == null)
+			return false;
+		
+		return true;
+	}*/
+	
 	protected function getMyBPSData(){
-		$_SESSION["BPS"]->setActualClass(get_class($this));
-		return $_SESSION["BPS"]->getAllProperties();
-	}
-
-	public function getNextID($getFirstID = "false"){
-		$aC = new anyC();
-		$aC->setCollectionOf($this->getClearClass());
-		$aC->addOrderV3($this->getClearClass()."ID");
-		if($getFirstID == "false") $aC->addAssocV3($this->getClearClass()."ID",">",$this->ID);
-		$aC->setLimitV3("1");
-
-		$t = $aC->getNextEntry();
-		if($t == null) die("alert:GlobalMessages.A002");
-		die($t->getID());
-	}
-
-	public function getPreviousID($getLastID = "false"){
-		$aC = new anyC();
-		$aC->setCollectionOf($this->getClearClass());
-		$aC->addOrderV3($this->getClearClass()."ID","DESC");
-		if($getLastID == "false") $aC->addAssocV3($this->getClearClass()."ID","<",$this->ID);
-		$aC->setLimitV3("1");
-
-		$t = $aC->getNextEntry();
-		if($t == null) die("alert:GlobalMessages.A003");
-		die($t->getID());
-	}
-
-	public function checkInputID($inputID){
-		$n = $this->getClearClass();
-		$A = new $n($inputID);
-		$A->loadMe();
-		if($A->getA() == null) die("alert:GlobalMessages.A004");
-		else die($inputID);
+		return BPS::getAllProperties(get_class($this));
 	}
 
 	public function isNoDelete(){
@@ -75,19 +51,7 @@ class PersistentObject {
 	function __construct($ID){
 		$this->ID = $ID;
 	}
-/*
-	function newAttributes(){
-		$n = $this->getClearClass()."Attributes";
-		return new $n();
-	}
 
-	function setA(Attributes $A){
-		if($this->A == null) {
-			$this->A = $A;
-			return true;
-		} else return false;
-	}
-	*/
 	function getA(){
 		return $this->A;
 	}
@@ -118,11 +82,13 @@ class PersistentObject {
 	function setParser($a,$f){
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->addParser($a,$f);
+		$this->hasParsers = true;
 	}
 
 	function resetParsers(){
 		if($this->Adapter == null) $this->loadAdapter();
 		$this->Adapter->resetParsers();
+		$this->hasParsers = false;
 	}
 
 	function getClearClass(){
@@ -137,7 +103,7 @@ class PersistentObject {
 	/*function loadMe(){
 	    $this->loadAdapter();
 		if($this->A == null) $this->A = $this->Adapter->loadSingle($this->getClearClass(get_class($this)));
-	}*/
+	}
 
 	public function loadMeT(){
 	    $this->loadAdapter();
@@ -147,40 +113,6 @@ class PersistentObject {
 			if(isset($this->A->$n)) $this->ID = $this->A->$n;
 			unset($this->A->$n);
 		}
-	}
-
-	/*function loadMeOrEmpty(){
-		$this->loadMe();
-
-		if($this->A == null) $this->A = $this->newAttributes();
-
-	}
-
-	function forceReload(){
-	    $this->loadAdapter();
-		$this->A = $this->Adapter->loadSingle($this->getClearClass(get_class($this)));
-	}
-
-	function newMe($checkUserData = true, $output = false){
-		if($checkUserData) mUserdata::checkRestrictionOrDie("cantCreate".str_replace("GUI","",get_class($this)));
-
-	    $this->loadAdapter();
-	    if($this->A == null) $this->loadMe();
-
-        if($output)
-	        if($this->echoIDOnNew) echo $this->ID;
-	        else echo "message:GlobalMessages.M003";
-
-        return $this->ID = $this->Adapter->makeNewLine($this->getClearClass(get_class($this)),$this->A);
-	}
-
-	function saveMe($checkUserData = true, $output = false){
-		if($checkUserData) mUserdata::checkRestrictionOrDie("cantEdit".str_replace("GUI","",get_class($this)));
-		$this->loadAdapter();
-		#$this->loadMe();
-		$this->Adapter->saveSingle($this->getClearClass(get_class($this)),$this->A);
-
-	    if($output) echo "message:GlobalMessages.M002";
 	}*/
 
 	function deleteMe() {
@@ -194,15 +126,6 @@ class PersistentObject {
 			$this->saveMe();
 		}
 	}
-
-	/**
-	 * @deprecated This method is deprecated and should not be used. Use loadTranslation instead
-	 * @param HTMLGUI $gui
-	 */
-	/*function loadGUITranslation(HTMLGUI $gui){
-		throw new FunctionDeprecatedException("PersistentClass", "loadGUITranslation");
-
-	}*/
 
 	function loadTranslation($forClass = null){
 		if($forClass == null) $forClass = $this->getClearClass();
@@ -248,11 +171,26 @@ class PersistentObject {
 		return $this->A->$attributeName;
 	}
 
+	public function AA($attributeName, $value = null){
+		if($value != null){
+			if($this->AA == null)
+				$this->AA = new Attributes();
+			
+			$this->AA->$attributeName = $value;
+		}
+		
+		if(!isset($this->AA->$attributeName)) return null;
+		return $this->AA->$attributeName;
+	}
+
 	public function setEchoIDOnNew($bool){
 		$this->echoIDOnNew = $bool;
 	}
 	
 	public function customize(){
+		if(defined("PHYNX_FORBID_CUSTOMIZERS"))
+			return;
+		
 		try {
 			$active = mUserdata::getGlobalSettingValue("activeCustomizer");
 
@@ -278,6 +216,8 @@ class PersistentObject {
 			unset($this->A->$n);
 		}
 
+		Aspect::joinPoint("after", $this, get_class($this)."::loadMe", $this->A);
+		
 		return $this->A != null;
 	}
 	
@@ -326,30 +266,39 @@ class PersistentObject {
 	
 	function newMe($checkUserData = true, $output = false){
 		if($checkUserData) mUserdata::checkRestrictionOrDie("cantCreate".str_replace("GUI","",get_class($this)));
-		
+
 	    $this->loadAdapter();
 	    if($this->A == null) $this->loadMe();
 
         $this->ID = $this->Adapter->makeNewLine2($this->getClearClass(get_class($this)), $this->A);
-        
-        if($output OR $this->echoIDOnNew)
-	        if($this->echoIDOnNew) echo $this->ID;
-	        else echo "message:GlobalMessages.M003";
-        
+
+        if($output OR $this->echoIDOnNew){
+	        if($this->echoIDOnNew) {
+				echo $this->ID;
+			} else
+				Red::messageCreated();
+		}
+		
+		Aspect::joinPoint("after", $this, get_class($this)."::newMe", $this->A);
+		
         return $this->ID;
 	}
 	
 	function forceReload(){
-	    $this->loadAdapter();
-		$this->A = $this->Adapter->loadSingle2($this->getClearClass(get_class($this)));
+		$this->A = null;
+		$this->loadMe();
+	    #$this->loadAdapter();
+		#$this->A = $this->Adapter->loadSingle2($this->getClearClass(get_class($this)));
 	}
 	
 	function saveMe($checkUserData = true, $output = false){
+		Aspect::joinPoint("before", $this, get_class($this)."::saveMe", $this->A);
+		
 		if($checkUserData) mUserdata::checkRestrictionOrDie("cantEdit".str_replace("GUI","",get_class($this)));
 
 		$this->loadAdapter();
 		$this->Adapter->saveSingle2($this->getClearClass(get_class($this)), clone $this->A);
-	    if($output) echo "message:GlobalMessages.M002";
+	    if($output) Red::messageSaved();
 	}
 
 	protected function getJSON(){

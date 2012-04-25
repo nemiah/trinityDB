@@ -28,6 +28,9 @@
 	background-color:#d0d0d0;
 }
 
+.FormSeparatorWithLabel {
+	background-color:white;
+}
 /**
   * ELEMENTS
   **/
@@ -98,7 +101,7 @@ input, select, textarea, .AJAXUpload {
 	border-color:#1155aa;
 }
 
-#navTabsWrapper div:hover {
+#navTabsWrapper .navTab:hover {
 	background-color:white;
 	border-bottom-color:white;
 	color:black;

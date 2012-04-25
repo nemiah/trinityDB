@@ -24,13 +24,9 @@ var TextEditor = {
 	isBase64: false,
 	open: false,
 	forForm: null,
+	changed: false,
 	
 	init: function(){
-		if(typeof Prototype != "object") {
-			alert("Sie benötigen Prototype (http://www.prototypejs.org) zum betreiben dieses Text-Editors");
-			return;
-		}
-		
 		var editorContainer = document.createElement("div");
 		editorContainer.id = "TextEditor";
 		editorContainer.style.display = "none";
@@ -51,16 +47,20 @@ var TextEditor = {
 		saveButton.type = "button";
 		saveButton.id = "editorSaveButton";
 		saveButton.className = "backgroundColor2";
-		saveButton.value = "Änderungen übernehmen und schließen";
+		saveButton.value = "Editor schließen";
 		
 		var saveButton2 = document.createElement("input");
 		saveButton2.type = "button";
 		saveButton2.id = "editorSaveButton2";
 		saveButton2.className = "backgroundColor2";
-		saveButton2.value = "Änderungen übernehmen und speichern";
+		saveButton2.value = "Änderungen speichern";
 		
-		Event.observe(saveButton, "click", TextEditor.save);
-		Event.observe(saveButton2, "click", TextEditor.backgroundSave);
+		$j(saveButton).click(TextEditor.close);
+		$j(saveButton2).click(TextEditor.backgroundSave);
+		$j(editorTextarea).keydown(function(){ TextEditor.changed = true; });
+		
+		//Event.observe(saveButton, "click", TextEditor.close);
+		//Event.observe(saveButton2, "click", TextEditor.backgroundSave);
 		
 		editorTAContainer.appendChild(editorTextarea);
 		editorTAContainer.appendChild(saveButton2);
@@ -84,6 +84,7 @@ var TextEditor = {
 		TextEditor.forField = field;
 		TextEditor.isBase64 = true;
 		TextEditor.forForm = form;
+		TextEditor.changed = false;
 		
 		TextEditor.textarea.value = Base64.decode($(field).value);
 		TextEditor.open = true;
@@ -102,7 +103,7 @@ var TextEditor = {
 		TextEditor.forField = field;
 		TextEditor.isBase64 = false;
 		TextEditor.forForm = form;
-		
+		TextEditor.changed = false;
 		
 		TextEditor.textarea.value = $(field).value;
 		TextEditor.open = true;
@@ -119,14 +120,14 @@ var TextEditor = {
 	save: function(){
 		if(TextEditor.isBase64) $(TextEditor.forField).value = Base64.encode(TextEditor.textarea.value);
 		else $(TextEditor.forField).value = TextEditor.textarea.value;
-		
+		TextEditor.changed = false;
 		TextEditor.hide();
 	},
 
 	backgroundSave: function(){
 		if(TextEditor.isBase64) $(TextEditor.forField).value = Base64.encode(TextEditor.textarea.value);
 		else $(TextEditor.forField).value = TextEditor.textarea.value;
-		
+		TextEditor.changed = false;
 		$(TextEditor.forForm).currentSaveButton.click();
 	},
 
@@ -142,8 +143,10 @@ var TextEditor = {
 	},
 
 	close: function(){
-		c = confirm("Wirklich schließen? Änderungen werden nicht übernommen.");
-		if(!c) return;
+		if(TextEditor.changed){
+			c = confirm("Wirklich schließen? Ungespeicherte Änderungen werden nicht übernommen.");
+			if(!c) return;
+		}
 		
 		TextEditor.hide();
 	}

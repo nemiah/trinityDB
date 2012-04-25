@@ -15,19 +15,32 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class Session {
 	static $instance;
 	private $currentUser = null;
 	private $afterLoginFunctions = array();
 	//public $menu;
+	private static $sessionVariable = "S";
 	
-	function __construct(){	
-		$this->currentUser = null;
-		//$_SESSION["menu"] = MenuGUI::getSI();
-		$_SESSION["messages"] = new SysMessages();
-		$_SESSION["messages"]->addMessage(__CLASS__."-Singleton loaded");
+	public static function init(){
+		$_SESSION[self::$sessionVariable] = new Session();
+		
+		SysMessages::init();
+		
+		if(!isset($_SESSION["DBData"])) 
+			self::reloadDBData();
+
+		Applications::init();
+		JSLoader::init();
+
+		if(!defined("PHYNX_VIA_INTERFACE"))
+			AppPlugins::init();
+	}
+	
+	public static function reloadDBData() {
+		$_SESSION["DBData"] = $_SESSION[self::$sessionVariable]->getDBData();
 	}
 	
 	public function getDBData($newFolder = null){
@@ -43,6 +56,8 @@ class Session {
 		if($n == null) {
 			#$data = new mInstallation();
 			#if($newFolder != "") $data->changeFolder($newFolder);
+			$data = new mInstallation();
+			if($newFolder != "") $data->changeFolder($newFolder);
 			$data->setAssocV3("httpHost","=","*");
 			$n = $data->getNextEntry();
 		}
@@ -63,8 +78,9 @@ class Session {
 		foreach($s as $key => $value)
 			$t[$value] = $d->$value;
 			
-			
-		return $t;
+		$rt = Environment::getS("databaseData", $t);
+		
+		return $rt;
 	}
 	
 	public static function getSI() {
@@ -91,13 +107,29 @@ class Session {
 		if($plugin == "DesktopLink") return true;
 		if($plugin == "Userdata" AND $this->isUserAdmin()) return true;
 		if($plugin == "BackupManager" AND $this->isUserAdmin()) return true;
+		if($plugin == "LoginData" AND $this->isUserAdmin()) return true;
+		if($plugin == "LoginDataGUI" AND $this->isUserAdmin()) return true;
+		if($plugin == "TempFile" AND $this->isUserAdmin()) return true;
 
+		#if(!SpeedCache::inCache("allowedPlugins"))
+		#	SpeedCache::setCache("allowedPlugins", Environment::getS("allowedPlugins", array()));
+		#echo "test";
+		#print_r(Environment::getS("allowedPlugins", array()));
+		#$allowed = SpeedCache::getCache("allowedPlugins", array());
+
+		#if(count($allowed) > 0 AND !in_array($plugin, $allowed))
+		#	return false;
+		
 		return ($this->isUserAdmin() == $_SESSION["CurrentAppPlugins"]->getIsAdminOnly($plugin));
 	}
-	
+
 	public function isUserAdmin(){
 		$UA = $this->currentUser->getA();
 		return $UA->isAdmin;
+	}
+
+	public static function isUserAdminS(){
+		return Session::currentUser()->A("isAdmin") == "1";
 	}
 
 	public function isAltUser(){
@@ -116,11 +148,11 @@ class Session {
 			try {
 				$c = new $key;
 				if(!method_exists($c, $value)) continue;
+				$f = "@".$key."::".$value."();";
+				eval($f);
 			} catch(Exception $e){
 				continue;
 			}
-			$f = "@".$key."::".$value."();";
-			eval($f);
 		}
 		ob_end_clean();
 	}
@@ -176,7 +208,7 @@ class Session {
 		return $l == "" ? "de_DE" : $l;
 	}
 	
-	public function init($application){
+	public function initApp($application){
 		$_SESSION[$application] = array();
 		$_SESSION["BPS"] = new BackgroundPluginState();
 		$_SESSION["JS"] = new JSLoader();
@@ -189,6 +221,10 @@ class Session {
 	}
 	
 	public function switchApplication($application){
+		$allowedApplications = Environment::getS("allowedApplications", null);
+		if($allowedApplications != null AND !in_array($application, $allowedApplications))
+			Red::errorD("Bitte wenden Sie sich an den Support, wenn Sie $application verwenden möchten");
+		
 		ob_start();
 		$U = new UsersGUI();
 		

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class CreditsGUI implements iGUIHTML2{
 	public function getHTML($id){
@@ -42,11 +42,10 @@ class CreditsGUI implements iGUIHTML2{
 				<td colspan=\"2\"><a href=\"http://www.kde-look.org/content/show.php/Crystal+Clear?content=25668\">Crystal Clear by Everaldo Coelho</a></td>
 			</tr>
 			<tr>
-				<td style=\"font-weight:bold;\" colspan=\"2\" class=\"backgroundColor0\">Javascripts</td>
+				<td colspan=\"2\"><a href=\"http://pc.de/icons/\">PC.de icons</a></td>
 			</tr>
 			<tr>
-				<td style=\"text-align:right;\">Kalender:</td>
-				<td><a href=\"http://www.goweb.de/javascriptkalender.htm\">KjM</a></td>
+				<td style=\"font-weight:bold;\" colspan=\"2\" class=\"backgroundColor0\">Javascripts</td>
 			</tr>
 			<tr>
 				<td style=\"text-align:right;\">Base64-Klasse:</td>
@@ -61,23 +60,30 @@ class CreditsGUI implements iGUIHTML2{
 				<td><a href=\"http://www.webtoolkit.info/\">WebToolkit</a></td>
 			</tr>
 			<tr>
-				<td style=\"text-align:right;\">Effekte:</td>
-				<td><a href=\"http://script.aculo.us/\">Script.aculo.us</a></td>
+				<td style=\"text-align:right;\">AJAX-Framework:</td>
+				<td><a href=\"http://www.jquery.com/\">jQuery</a></td>
 			</tr>
 			<tr>
-				<td style=\"text-align:right;\">AJAX-Framework:</td>
-				<td><a href=\"http://www.prototypejs.org/\">Prototype</a></td>
+				<td style=\"text-align:right;\">Tooltips:</td>
+				<td><a href=\"http://craigsworks.com/projects/qtip2\">qTip2</a></td>
 			</tr>
-			<!--<tr>
-				<td style=\"text-align:right;\">Farbwähler:</td>
-				<td><a href=\"mailto:bob@redivi.com\">Bob Ippolito</a></td>
-			</tr>-->
+			<tr>
+				<td style=\"text-align:right;\">FlashReplace:</td>
+				<td><a href=\"http://www.robertnyman.com\">Robert Nyman</a></td>
+			</tr>
+			<tr>
+				<td style=\"text-align:right;\">jStorage:</td>
+				<td><a href=\"http://www.jstorage.info/\">Andris Reinman</a></td>
 			<tr>
 				<td style=\"font-weight:bold;\" colspan=\"2\" class=\"backgroundColor0\">PHP</td>
 			</tr>
 			<tr>
 				<td style=\"text-align:right;\">MySQL-Backup:</td>
 				<td><a href=\"http://www.phpmybackuppro.net\">phpMyBackupPro</a></td>
+			</tr>
+			<tr>
+				<td style=\"text-align:right;\">JSMin:</td>
+				<td><a href=\"http://code.google.com/p/jsmin-php/\">JSMin</a></td>
 			</tr>
 			<tr>
 				<td style=\"text-align:right;\">PDF-Klasse:</td>

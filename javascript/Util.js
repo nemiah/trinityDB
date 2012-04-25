@@ -133,5 +133,36 @@ var Util = {
 		}
 
 		return rc;
+	},
+	
+	Button: function(label, image, options){
+		if(typeof options == "undefined")
+			options = {};
+		
+		if(typeof options.type == "undefined")
+			options.type = "bigButton";
+	
+		var id = "";
+		if(options.id)
+			id = "id=\""+options.id+"\"";
+	
+		var style = "";
+		if(options.style)
+			style = "style=\""+options.style+"\"";
+	
+		var onclick = "";
+		if(options.onclick)
+			onclick = "onclick=\""+options.onclick+"\"";
+	
+		var classes = "";
+		if(options["class"])
+			classes = "class=\""+options["class"]+"\"";
+	
+		var html = "";
+		
+		if(options.type == "icon")
+			html = "<img "+id+" "+style+" "+onclick+" "+classes+" src=\""+image+"\" title=\""+label+"\" />";
+		
+		return html;
 	}
 }

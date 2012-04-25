@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007, 2008, 2009, 2010, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 $par = "";
 
@@ -34,7 +34,7 @@ if(isset($_POST["method"])) 		$met = $_POST["method"];
 if(isset($_POST["bps"]))			$bps = $_POST["bps"];
 
 if(isset($_GET["target"])){
-	$e = split(";", $_GET["target"]);
+	$e = explode(";", $_GET["target"]);
 	$cla = $e[0];
 	$met = $e[1];
 	$con = "";
@@ -50,7 +50,7 @@ if($met == "getHTML") exit;
 	
 require "../system/connect.php";
 if($cla != "Users" AND $met != "doLogin" AND $_SESSION["S"]->checkIfUserLoggedIn() == true) die("-1");
-if($cla != "Users" AND $cla != "Util" AND $cla != "mUserdata" AND $cla != "HTML" AND $met != "doLogin" AND $met != "createMyTable" AND $met != "checkMyTables" AND !$_SESSION["S"]->checkIfUserIsAllowed($cla)) die("You are not allowed to see this Page!");
+if($cla != "Users" AND $cla != "Util" AND $cla != "mUserdata" AND $cla != "mWebsocket" AND $cla != "HTML" AND $met != "doLogin" AND $met != "createMyTable" AND $met != "checkMyTables" AND !$_SESSION["S"]->checkIfUserIsAllowed($cla)) die("You are not allowed to see this Page!");
 
 if(isset($bps))
 	$_SESSION["BPS"]->setByString($bps);
@@ -67,7 +67,7 @@ $d = new $c($con);
 
 $par = (get_magic_quotes_gpc() ? stripslashes($par) : $par);
 
-$phpversion = str_replace(".","",phpversion())*1;
+#$phpversion = str_replace(".","",phpversion())*1;
 if(Util::phpVersionGEThen("5.1.0")){
 	$pars = explode("','",$par);
 	$pars[0] = substr($pars[0],1);
@@ -75,7 +75,7 @@ if(Util::phpVersionGEThen("5.1.0")){
 
 	if(!method_exists($d, $met)){
 		if(!method_exists($d, "__call")) 
-			die("error:GlobalMessages.E040('$c::$met')");
+			Red::errorD("Die Methode $c::$met existiert nicht");
 		else {
 			array_unshift($pars, $met);
 			$met = "__call";
@@ -83,9 +83,9 @@ if(Util::phpVersionGEThen("5.1.0")){
 	}
 	$method = new ReflectionMethod($c, $met);
 	try {
-	$method->invokeArgs($d, $pars);
+		$method->invokeArgs($d, $pars);
 	} catch (FieldDoesNotExistException $e) {
-		die("error:GlobalMessages.E004");
+		Red::errorUpdate($e);
 	}
 } else
 	eval("\$d->".$met."($par);");

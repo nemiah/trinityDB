@@ -20,16 +20,20 @@
  
  
 var userControl = {
+	certAutoLoginInterval: null,
+	certAutoLoginCounter: 0,
+	
 	doLogin: function(){
+		userControl.abortAutoCertificateLogin();
 		//"+$('loginUsername').value+","+$('loginPassword').value+","+$('anwendung').value+"
-		if($('loginPassword').value != ";;cookieData;;") $('loginSHAPassword').value = SHA1($('loginPassword').value);
+		if($('loginPassword').value != ";;cookieData;;") $('loginSHAPassword').value = SHA1($('loginPassword').value.replace(/ $/, ""));
 		$('loginPassword').value = "";
-		new Ajax.Request("./interface/rme.php", {
-		method: 'post',
-		parameters: "class=Users&construct=&method=doLogin&parameters='"+joinFormFieldsToString('loginForm')+"'",
-		onSuccess: function(transport) {
+		contentManager.rmePCR("Users", "", "doLogin", joinFormFieldsToString('loginForm'), function(transport) {
+			if(!checkResponse(transport))
+				return;
+			
 			if(transport.responseText == "") {
-				alert("Fehler: Server antwortet nicht!");
+				alert("Fehler: Der Server antwortet nicht!");
 				return;
 			}
 	    	if(transport.responseText == 0) {
@@ -38,6 +42,8 @@ var userControl = {
 	    		if(transport.responseText != 1 && transport.responseText != -2)
 	    			alert(transport.responseText.replace(/<br \/>/ig,"\n").replace(/<b>/ig,"").replace(/<\/b>/ig,"").replace(/&gt;/ig,">"));
 	    		
+				contentManager.emptyFrame("contentScreen");
+				
 				var a = new Date();
 				a = new Date(a.getTime() +1000*60*60*24*365);
 				if($('saveLoginData').checked)
@@ -49,10 +55,107 @@ var userControl = {
 	    		DesktopLink.loadContent();
 	    		//$('loginPassword').value = "";
 	    	}
-		}});
+		});
+		/*new Ajax.Request("./interface/rme.php", {
+		method: 'post',
+		parameters: "class=Users&construct=&method=doLogin&parameters='"+joinFormFieldsToString('loginForm')+"'",
+		onSuccess: function(transport) {
+			if(!checkResponse(transport))
+				return;
+			
+			if(transport.responseText == "") {
+				alert("Fehler: Der Server antwortet nicht!");
+				return;
+			}
+	    	if(transport.responseText == 0) {
+	    		alert("Benutzername/Passwort falsch!\nBitte beachten Sie beim Passwort Groß-/Kleinschreibung.");
+	    	} else {
+	    		if(transport.responseText != 1 && transport.responseText != -2)
+	    			alert(transport.responseText.replace(/<br \/>/ig,"\n").replace(/<b>/ig,"").replace(/<\/b>/ig,"").replace(/&gt;/ig,">"));
+	    		
+				contentManager.emptyFrame("contentScreen");
+				
+				var a = new Date();
+				a = new Date(a.getTime() +1000*60*60*24*365);
+				if($('saveLoginData').checked)
+					document.cookie = 'userLoginData='+$('loginUsername').value+':'+$('loginSHAPassword').value+'; expires='+a.toGMTString()+';';
+				else 
+					document.cookie = 'userLoginData=--; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+	
+	    		loadMenu();
+	    		DesktopLink.loadContent();
+	    		//$('loginPassword').value = "";
+	    	}
+		}});*/
+	},
+	
+	saveCertificate: function(){
+		if($('loginNewCertificate').value == ""){
+			alert('Bitte geben Sie ein Zertifikat ein');
+			return;
+		}
+
+		$j.jStorage.set('phynxUserCert', $('loginNewCertificate').value);
+		location.reload();
+	},
+	
+	doCertificateLogin: function(){
+		var cert = $j.jStorage.get('phynxUserCert', null);
+		
+		if(cert == null){
+			$j('#loginCertOptions').toggle();
+			return;
+		}
+		contentManager.rmePCR("Users", "-1", "doCertificateLogin", [$('anwendung').value, $('loginSprache').value, cert], function(transport){
+			if(transport.responseText == 0) {
+	    		alert("Das Zertifikat ist ungültig.");
+				$j('#loginCertOptions').toggle();
+				return;
+			}
+			
+			loadMenu();
+			DesktopLink.loadContent();
+		}, "", true, function(){$j('#loginCertOptions').toggle();});
+	},
+	
+	abortAutoCertificateLogin: function(){
+		if(userControl.certAutoLoginInterval != null)
+			window.clearInterval(userControl.certAutoLoginInterval);
+		
+		userControl.certAutoLoginInterval = null;
+		if($('countdownCertificateLogin'))
+			$('countdownCertificateLogin').update("");
+	},
+	
+	autoCertificateLogin: function(){
+		userControl.certAutoLoginCounter = 3;
+		return; //disabled 11.1.2012 because it will re-login the current user
+		
+		userControl.certAutoLoginInterval = window.setInterval(function(){
+			if(userControl.certAutoLoginCounter == 0){
+				window.clearInterval(userControl.certAutoLoginInterval);
+				userControl.certAutoLoginInterval = null;
+				
+				userControl.doCertificateLogin();
+				$('countdownCertificateLogin').update("");
+				
+				return;
+			}
+			
+			$('countdownCertificateLogin').update(userControl.certAutoLoginCounter);
+			userControl.certAutoLoginCounter--;
+		}, 1000);
 	},
 	
 	doTestLogin: function(){
+		contentManager.rmePCR("Users", "", "doLogin", "%3B-%3B%3Bund%3B%3B-%3BloginUsername%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3BloginSHAPassword%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3Banwendung%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3BsaveLoginData%3B-%3B%3Bistgleich%3B%3B-%3B0", function(transport) {
+			if(transport.responseText == "") {
+				alert("Fehler: Server antwortet nicht!");
+				return;
+			}
+	    	if(transport.responseText == -2) alert("Bitte verwenden Sie 'Admin' als Benutzer und Passwort!\nDie Benutzer-Datenbank existiert noch nicht.");
+		});
+		/*
 		new Ajax.Request("./interface/rme.php", {
 		method: 'post',
 		parameters: "class=Users&construct=&method=doLogin&parameters='%3B-%3B%3Bund%3B%3B-%3BloginUsername%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3BloginSHAPassword%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3Banwendung%3B-%3B%3Bistgleich%3B%3B-%3B0%3B-%3B%3Bund%3B%3B-%3BsaveLoginData%3B-%3B%3Bistgleich%3B%3B-%3B0'",
@@ -62,15 +165,24 @@ var userControl = {
 				return;
 			}
 	    	if(transport.responseText == -2) alert("Bitte verwenden Sie 'Admin' als Benutzer und Passwort!\nDie Benutzer-Datenbank existiert noch nicht.");
-		}});
+		}});*/
 	},
 	
 	doLogout: function(redirect){
+		contentManager.rmePCR("Users", "", "doLogout", "", function() {
+			Popup.closeNonPersistent();
+			Popup.closePersistent();
+			loadMenu();
+			if(typeof redirect != "undefined" && redirect != "") document.location.href= redirect;
+		});
+		/*
 		new Ajax.Request("./interface/rme.php?class=Users&constructor=&method=doLogout&parameters=''", {
 		method: 'get',
 		onSuccess: function(transport) {
+			Popup.closeNonPersistent();
+			Popup.closePersistent();
 			loadMenu();
 			if(typeof redirect != "undefined" && redirect != "") document.location.href= redirect;
-		}});
+		}});*/
 	}
 }

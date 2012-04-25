@@ -43,7 +43,7 @@ var Interface = {
 	},
 	
 	resizeWrapper: function() {
-		size = overlayBox.getPageSize(true);
+		size = Overlay.getPageSize(true);
 		$('wrapper').style.height = (size[1] - 150)+'px';
 	},
 	
@@ -76,10 +76,13 @@ var Interface = {
 		Interface.TabBarLast = boxID;
 		Interface.TabBarLastTab = tab;
 
-		rmeP('mUserdata', '', 'setUserdata', ['TabBarLastTab'+targetClass,boxID]);
+	  //contentManager.rmePCR(targetClass, targetClassId, targetMethod, targetMethodParameters, onSuccessFunction, bps)
+		contentManager.rmePCR('mUserdata', '', 'setUserdata', ['TabBarLastTab'+targetClass,boxID]);
 	},
 
 	startLoading: function(){
+		if(Overlay.dark) return;
+		
 		if(Interface.isLoading) return;
 
 		Interface.isLoading = true;
@@ -93,9 +96,13 @@ var Interface = {
 	showLoading: function(){
 		if(!$('busyBox') || !Interface.isLoading) return;
 
-		Effect.Fade('busyBox', {duration: 0.3, from: 1, to: 0.3, queue: {position: 'end', scope: 'loading'}});
-		Effect.Fade('busyBox', {duration: 0.3, from: 0.3, to: 1, queue: {position: 'end', scope: 'loading'}});
-
+		//if(P2J)
+		//	$j('busyBox').fadeTo(300, 0.3);//.delay(100).fadeTo(300, 1);
+		else {
+			Effect.Fade('busyBox', {duration: 0.3, from: 1, to: 0.3});
+			Effect.Fade('busyBox', {duration: 0.3, from: 0.3, to: 1, delay: 0.1});
+		}
+		
 		window.setTimeout("Interface.showLoading()", 800);
 	}
 
@@ -138,6 +145,7 @@ function showMessage(message){
 		alert(message);
 		return;
 	}
+	//createGrowl(message);
 	$('messenger').update(message);
 
 	new Effect.Move("messenger",{x:0, y:0, mode: 'absolute', duration: 0.2});
