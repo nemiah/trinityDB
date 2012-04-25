@@ -17,7 +17,7 @@
  *
  *  2010, trinityDB - https://sourceforge.net/p/opentrinitydb/
  */
-class tDBEnvironment extends Environment {
+class EnvironmentCurrent extends Environment {
 	public $showHelpButton = 0;
 }
 ?>
