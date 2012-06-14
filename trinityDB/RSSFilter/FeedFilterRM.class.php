@@ -109,7 +109,7 @@ class FeedFilterRM implements iFeedFilter {
 			if(stripos($link, "rapidshare") === false)
 				continue;
 			
-			$RSLink = $link;
+			$RSLink = explode("';txt += \"\\n\";", $link);
 		}
 		
 		
@@ -125,7 +125,8 @@ class FeedFilterRM implements iFeedFilter {
 		$JD = new JD($RSF->A("RSSFilterJDID"));
 		
 		if($RSLink != null AND isset($usableHosts["Rapidshare.com"]))
-			$JD->download($RSLink, $filename);
+			foreach($RSLink AS $l)
+			$JD->download($l, $filename);
 		
 		return true;
 	}
