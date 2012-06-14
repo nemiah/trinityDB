@@ -50,6 +50,7 @@ require_once $absolutePathToPhynx."trinityDB/RSSFilter/iFeedFilter.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedEntry.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilterSJorg.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilter1DDL.class.php";
+require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilterRM.class.php";
 require_once $absolutePathToPhynx."trinityDB/JD/JD.class.php";
 require_once $absolutePathToPhynx."trinityDB/JD/JDownload.class.php";
 
@@ -187,7 +188,8 @@ $series = "";
 
 while($S = $ac->getNextEntry()){
 	try {
-		foreach($S->checkRSS($newFiles) AS $En){
+		$C = $S->checkRSS($newFiles);
+		foreach($C AS $En){
 			if($series != $S->A("name") AND $series != ""){
 				echo "
 			<item>

@@ -86,7 +86,7 @@ class SerieGUI extends Serie implements iGUIHTML2, icontextMenu {
 	}
 
 	public static function getQualities($nr = null){
-		$qs = array(0 => "any", 1 => "360p", 2 => "720p", 3 => "1080i", 4 => "1080p", 5 => "iTunes");
+		$qs = array(0 => "any", 1 => "360p", 6 => "480p", 2 => "720p", 3 => "1080i", 4 => "1080p", 5 => "iTunes");
 
 		if($nr != null) return $qs[$nr];
 		return $qs;
