@@ -83,9 +83,13 @@ class FeedFilterRM implements iFeedFilter {
 		
 		$content = file_get_contents($page);
 		
-		preg_match("/\<script type\=\"text\/javascript\" src\=\"http:\/\/rapidmoviez.com\/j\/([0-9]*)\/script-58.js\"\>\<\/script\>/", $content, $matches);
+		preg_match("/\<script type\=\"text\/javascript\" src\=\"http:\/\/rapidmoviez.com\/j\/([0-9]*)\/script-[0-9]*.js\"\>\<\/script\>/", $content, $matches);
+		if(count($matches) == 0)
+			preg_match("/\<script type\=\"text\/javascript\" src\=\"\/j\/([0-9]*)\/script-[0-9]*.js\"\>\<\/script\>/", $content, $matches);
+		
 		
 		$script = file_get_contents("http://rapidmoviez.com/j/$matches[1]/script-58.js");
+		
 		$script = str_replace("eval(String.fromCharCode(", "", $script);
 		$script = preg_replace("/\)\)$/", "", $script);
 		
@@ -111,7 +115,6 @@ class FeedFilterRM implements iFeedFilter {
 			
 			$RSLink = explode("';txt += \"\\n\";", $link);
 		}
-		
 		
 
 		#if(count($matches) != 3 OR !isset($matches[1][0]))
