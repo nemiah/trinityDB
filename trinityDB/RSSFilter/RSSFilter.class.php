@@ -91,7 +91,7 @@ class RSSFilter extends PersistentObject {
 		if($xml === "null") return $filtered;
 
 		foreach($xml->channel->item AS $v){
-
+			#print_r($v);
 			foreach($Episodes AS $E){
 				$title = $v->title."";
 
@@ -99,9 +99,13 @@ class RSSFilter extends PersistentObject {
 					if($Series->A("sprache") == "en" AND strpos($title, "[ENGLISCH]") === false) continue;
 					if($Series->A("sprache") == "de" AND strpos($title, "[DEUTSCH]") === false) continue;
 				}
-				if(strpos($title, "S".($E->A("season") < 10 ? "0" : "").$E->A("season")."E".($E->A("episode") < 10 ? "0" : "").$E->A("episode")) === false) continue;
+				
+				if(stripos($title, "S".($E->A("season") < 10 ? "0" : "").$E->A("season")."E".($E->A("episode") < 10 ? "0" : "").$E->A("episode")) === false) continue;
 
-				if(strpos(strtolower($title), strtolower(str_replace(" ", ".", $Series->A("name")))) === false AND ($Series->A("altFeedName1") == "" OR strpos(strtolower($title), strtolower(str_replace(" ", ".", $Series->A("altFeedName1")))) === false )) continue;
+				if(
+					strpos(strtolower($title), strtolower(str_replace(" ", ".", $Series->A("name")))) === false 
+					AND strpos(strtolower($title), strtolower($Series->A("name"))) === false 
+					AND ($Series->A("altFeedName1") == "" OR strpos(strtolower($title), strtolower(str_replace(" ", ".", $Series->A("altFeedName1")))) === false )) continue;
 
 				if($Series->A("quality") > 1 AND strpos(strtolower($title), strtolower(SerieGUI::getQualities($Series->A("quality")))) === false) continue;
 
@@ -120,7 +124,7 @@ class RSSFilter extends PersistentObject {
 				$foundEpisodes[$E->getID()] = true;
 				
 				$filtered[] = array("title" => $title, "link" => $v->link."", "pubDate" => $v->pubDate."", "description" => $v->description."", "fileName" => $Adapter->filterFilename($Series, $v), "season" => ($E->A("season") < 10 ? "0" : "").$E->A("season"), "episode" => ($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
-
+				#print_r($filtered);
 				#echo $title."<br />";
 			}
 		}
