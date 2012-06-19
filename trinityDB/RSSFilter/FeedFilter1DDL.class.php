@@ -32,6 +32,7 @@ class FeedFilter1DDL implements iFeedFilter {
 
 
 	public function parseItem(SimpleXMLElement $item) {
+		#print_r($item);
 		$FE = new FeedEntry();
 		$title = $item->title."";
 
@@ -82,11 +83,11 @@ class FeedFilter1DDL implements iFeedFilter {
 
 		#$content = file_get_contents($page);
 		#die($content);
-		$namepos = strpos($content, "<p><oneclick /></p>");
+		$namepos = strpos($content, "<p><onelink /></p>");
 		$lastpos = strpos($content, "<p><download /></p>", $namepos);
 
 		if($namepos === false){
-			$namepos = strpos($content, "<p><oneclick/></p>");
+			$namepos = strpos($content, "<p><onelink/></p>");
 			$lastpos = strpos($content, "<p><download/></p>", $namepos);
 		}
 		
@@ -107,10 +108,10 @@ class FeedFilter1DDL implements iFeedFilter {
 			$middle = strpos($subcontent, $filename);
 			$subcontent = substr($content, $namepos + $middle, $lastpos2 - ($namepos + $middle));
 		}
-		#echo $subcontent;
 		
-		preg_match_all("/<strong>([a-zA-Z0-9 ]*)<\/strong><br \/>\n<a href=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
+		preg_match_all("/<strong>([a-zA-Z0-9 \(\)]*)<\/strong><br \/>\s*\<a href\=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
 
+		
 		if(count($matches) != 3 OR !isset($matches[1][0]))
 			return array("I could not find any suitable links, please try again", "");
 
