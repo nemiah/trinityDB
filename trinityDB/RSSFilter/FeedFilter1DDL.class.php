@@ -21,7 +21,7 @@
 class FeedFilter1DDL implements iFeedFilter {
 
 	public function getLabel() {
-		return "oneddl.com";
+		return "wrzko.com";
 	}
 
 	public function filterFilename(Serie $Series, SimpleXMLElement $item) {
@@ -82,12 +82,12 @@ class FeedFilter1DDL implements iFeedFilter {
 
 		#$content = file_get_contents($page);
 		#die($content);
-		$namepos = strpos($content, "<p><oneclickimg /></p>");
-		$lastpos = strpos($content, "<p><downloadimg /></p>", $namepos);
+		$namepos = strpos($content, "<p><oneclick /></p>");
+		$lastpos = strpos($content, "<p><download /></p>", $namepos);
 
 		if($namepos === false){
-			$namepos = strpos($content, "<p><oneclickimg/></p>");
-			$lastpos = strpos($content, "<p><downloadimg/></p>", $namepos);
+			$namepos = strpos($content, "<p><oneclick/></p>");
+			$lastpos = strpos($content, "<p><download/></p>", $namepos);
 		}
 		
 		if($namepos === false)
@@ -99,7 +99,7 @@ class FeedFilter1DDL implements iFeedFilter {
 		if($middle !== false)
 			$subcontent = substr($content, $namepos + $middle, $lastpos - ($namepos + $middle));
 		else {
-			$lastpos2 = strpos($content, "<p><downloadimg /></p>", $lastpos + 20);
+			$lastpos2 = strpos($content, "<p><download /></p>", $lastpos + 20);
 			if($lastpos2 === false)
 				$lastpos2 = $lastpos;
 			
