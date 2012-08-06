@@ -109,12 +109,8 @@ class FeedFilter1DDL implements iFeedFilter {
 			$subcontent = substr($content, $namepos + $middle, $lastpos2 - ($namepos + $middle));
 		}
 		
-		print_r(htmlentities($subcontent));
-		
 		preg_match_all("/<strong>([a-zA-Z0-9 \(\)]*)<\/strong><br\s*\/>\s*\<a\s*href\=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
 
-		print_r($matches);
-		
 		if(count($matches) != 3 OR !isset($matches[1][0]))
 			return array("I could not find any suitable links, please try again", "");
 
