@@ -20,10 +20,14 @@
 session_name("ExtConnFF");
 error_reporting(E_ALL);
 
-if(function_exists('date_default_timezone_set'))
-	date_default_timezone_set('Europe/Berlin');
-
 $absolutePathToPhynx = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..").DIRECTORY_SEPARATOR;
+
+require_once $absolutePathToPhynx."system/connect.php";
+
+#if(function_exists('date_default_timezone_set'))
+#	date_default_timezone_set('Europe/Berlin');
+
+
 
 require_once $absolutePathToPhynx."classes".DIRECTORY_SEPARATOR."frontend".DIRECTORY_SEPARATOR."ExtConn.class.php";
 
@@ -31,31 +35,34 @@ $e = new ExtConn($absolutePathToPhynx);
 $e->useDefaultMySQLData();
 $e->useUser();
 
-require_once $absolutePathToPhynx."trinityDB/Serien/Serie.class.php";
+/*require_once $absolutePathToPhynx."trinityDB/Serien/Serie.class.php";
 require_once $absolutePathToPhynx."trinityDB/Serien/SerieGUI.class.php";
 require_once $absolutePathToPhynx."trinityDB/Serien/Folge.class.php";
 require_once $absolutePathToPhynx."trinityDB/Serien/iEpguideAdapter.class.php";
 require_once $absolutePathToPhynx."trinityDB/Serien/EpguideAdapter.class.php";
 require_once $absolutePathToPhynx."trinityDB/Serien/thetvdbcomAdapter.class.php";
 require_once $absolutePathToPhynx."trinityDB/Incoming/Incoming.class.php";
-require_once $absolutePathToPhynx."trinityDB/Incoming/mIncoming.class.php";
+require_once $absolutePathToPhynx."trinityDB/Incoming/mIncoming.class.php";*/
 require_once $absolutePathToPhynx."classes/backend/File.class.php";
 require_once $absolutePathToPhynx."plugins/Files/mFile.class.php";
 require_once $absolutePathToPhynx."classes/backend/FileStorage.class.php";
 
 require_once $absolutePathToPhynx."classes/frontend/HTMLInput.class.php";
 
-require_once $absolutePathToPhynx."trinityDB/RSSFilter/RSSFilter.class.php";
+/*require_once $absolutePathToPhynx."trinityDB/RSSFilter/RSSFilter.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/iFeedFilter.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedEntry.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilterSJorg.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilter1DDL.class.php";
 require_once $absolutePathToPhynx."trinityDB/RSSFilter/FeedFilterRM.class.php";
 require_once $absolutePathToPhynx."trinityDB/JD/JD.class.php";
-require_once $absolutePathToPhynx."trinityDB/JD/JDownload.class.php";
+require_once $absolutePathToPhynx."trinityDB/JD/JDownload.class.php";*/
 
-require_once $absolutePathToPhynx."system/basics.php";
 
+addClassPath($absolutePathToPhynx."trinityDB/Serien/");
+addClassPath($absolutePathToPhynx."trinityDB/RSSFilter/");
+addClassPath($absolutePathToPhynx."trinityDB/Incoming/");
+addClassPath($absolutePathToPhynx."trinityDB/JD/");
 
 $RSF = new RSSFilter($_GET["RSSFilterID"]);
 $Adapter = $RSF->A("RSSFilterAdapter");
@@ -184,6 +191,7 @@ $newFiles = $Incoming->getNewFiles();
 $ac = new anyC();
 $ac->setCollectionOf("Serie");
 $ac->addAssocV3("RSSFilterID", "=", $_GET["RSSFilterID"]);
+$ac->addAssocV3("status", "=", "Continuing");
 $series = "";
 
 while($S = $ac->getNextEntry()){

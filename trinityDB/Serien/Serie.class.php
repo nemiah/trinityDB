@@ -28,9 +28,9 @@ class Serie extends PersistentObject {
 
 		if(!$returnValues) $T = new HTMLTable(5);
 		$R = array();
-
+		
 		if($newFiles != null) $newFound = $this->findNewEpisodes($newFiles);
-
+		
 		while($E = $ac->getNextEntry()){
 			$c = $E->check($this);
 

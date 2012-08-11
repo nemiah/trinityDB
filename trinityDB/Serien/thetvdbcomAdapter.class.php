@@ -196,8 +196,8 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		$oldest->setCollectionOf("Serie");
 		$oldest->addOrderV3("lastupdate", "ASC");
 		$oldest->addAssocV3("status", "=", "Ended");
-		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 14);
-		$oldest->setLimitV3("2");
+		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 21);
+		$oldest->setLimitV3("1");
 
 		while($S = $oldest->getNextEntry())
 			$this->download($S, $echo);
@@ -209,7 +209,7 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 3, "AND", "1");
 		$oldest->addAssocV3("status", "=", "Continuing", "AND", "1");
 
-		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 14, "OR", "2");
+		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 21, "OR", "2");
 		$oldest->addAssocV3("status", "=", "Ended", "AND", "2");
 		$oldest->lCV3();
 		
