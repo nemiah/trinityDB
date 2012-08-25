@@ -35,6 +35,22 @@ class JD extends PersistentObject {
 				$link = $links;
 		}
 		
+		if(strpos($link, "safeurl.")){
+			#$newLocation = get_headers($link, 1);
+			#$link = $newLocation["Location"];
+
+			$contentWithLink = file_get_contents($link);
+
+			preg_match_all("/(https:\/\/rapidshare[a-zA-Z0-9\.\-\/_#+\|!]*)/", $contentWithLink, $links);
+
+			$links = array_unique($links[1]);
+			$link = $links[0];
+			$ex = explode("|", $link);
+			
+			$ex[0] = str_replace("/#!download", "/files/", $ex[0]);
+			$link = $ex[0].$ex[2]."/".$ex[3];
+		}
+		
 		if(strpos($link, "canhaz.")){
 			$newLocation = get_headers($link, 1);
 			$link = $newLocation["Location"];
@@ -46,7 +62,7 @@ class JD extends PersistentObject {
 			$links = array_unique($links[1]);
 			$link = $links[0];
 		}
-
+		
 		if($this->A("JDDLType") == "0")
 			Util::PostToHost($this->A("JDHost"), $this->A("JDPort"), "/link_adder.tmpl", "none", "do=Add&addlinks=".urlencode($link), $this->A("JDUser"), $this->A("JDPassword"));
 
@@ -63,8 +79,9 @@ class JD extends PersistentObject {
 		}
 
 		if($this->A("JDDLType") == "2"){
+			
 			$content = file_get_contents("http://".$this->A("JDHost").":".$this->A("JDPort")."/action/add/links/grabber0/start1/$link");
-
+			
 			if(strpos($content, "Link(s) added. (\"$link\"") !== false AND $logLink != null)
 				$this->logDownload($logLink);
 			

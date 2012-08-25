@@ -68,14 +68,16 @@ class mIncomingPrettifyGUI extends anyC implements iGUIHTMLMP2, icontextMenu {
 
 		foreach ($files AS $path){
 			$newName = basename($path);
-			if(strpos($newName, ".part") == strlen($newName) - 5) continue;
-			if(strpos($newName, ".mkv") != strlen($newName) - 4) continue;
+			if(strpos(strtolower($newName), ".part") == strlen($newName) - 5) continue;
+			if(strpos(strtolower($newName), ".mkv") != strlen($newName) - 4 AND strpos(strtolower($newName), ".mp4") != strlen($newName) - 4) continue;
 			
 			while($P = $AC->getNextEntry()){
 				$newName = preg_replace("/".str_replace(".", "\.", $P->A("IncomingPrettifyFind"))."/e".($P->A("IncomingPrettifyCaseSensitive") == "1" ? "" : "i"), str_replace(array("//", "."), array("\\", "\."), $P->A("IncomingPrettifyReplace")), $newName);
 
 			}
 
+			$newName = str_replace("\\", "", $newName);
+			
 			$AC->resetPointer();
 			if($newName != basename($path)){
 				
@@ -109,7 +111,7 @@ class mIncomingPrettifyGUI extends anyC implements iGUIHTMLMP2, icontextMenu {
 		$F->setLabel("execute", "Execute?");
 		$F->setValue("execute", mUserdata::getUDValueS("trinityDBPrettifyExecute", "0"));
 
-		$F->setSaveRMEPCR("save", "./images/i2/save.gif", "mIncomingPrettify", "-1", "saveContextMenu", "function() { contextMenu.stop(); }");
+		$F->setSaveRMEPCR("save", "./images/i2/save.gif", "mIncomingPrettify", "-1", "saveContextMenu", "function() { phynxContextMenu.stop(); }");
 
 		echo $F;
 	}

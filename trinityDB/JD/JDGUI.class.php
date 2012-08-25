@@ -53,17 +53,29 @@ class JDGUI extends JD implements iGUIHTML2 {
 		$gui->setType("JDDLType", "select");
 		$gui->setOptions("JDDLType", array(0, 1, 2, 3), array("JDownloader Web", "QNap Downloader", "JDownloader RC", "pyLoad"));
 
-		$B = $ST->addButton("test\nconnection", "./trinityDB/JD/testLink.png");
+		$B = $ST->addButton("test\ndownload", "./trinityDB/JD/testLink.png");
 
-		$B->popup("testLink", "test link", "JD", $this->getID(), "testLink");
+		$B->popup("testLink", "test link", "JD", $this->getID(), "testDownloadPopup");
 
 		return $ST.$gui->getEditHTML();
 	}
 
-	public function testLink(){
+	/*public function testLink(){
 		Util::PostToHost($this->A("JDHost"), $this->A("JDPort"), "/link_adder.tmpl", "none", "do=Add&addlinks=".urlencode("http://download.serienjunkies.org/f-a5663c31484a040f/rc_aloha113-720p.html"), "JD", "JD");
 	
 		echo "connection successful";
+	}*/
+	
+	public function testDownloadPopup(){
+		$F = new HTMLForm("tdl", array("link"));
+		$F->getTable()->setColWidth(1, 60);
+		$F->setSaveRMEPCR("test download", "", "JD", $this->getID(), "testDownload", OnEvent::closePopup("JD", "testLink"));
+		
+		echo $F;
+	}
+	
+	public function testDownload($link){
+		$this->download($link);
 	}
 }
 ?>

@@ -103,7 +103,7 @@ class SerieGUI extends Serie implements iGUIHTML2, icontextMenu {
 		$F->setLabel("dlCover", "DL Cover?");
 		$F->setValue("dlCover", mUserdata::getGlobalSettingValue("trinityDBdlCover", "0"));
 
-		$F->setSaveRMEPCR("save", "./images/i2/save.gif", "Serie", "-1", "saveContextMenu", "function() { contextMenu.stop(); }");
+		$F->setSaveRMEPCR("save", "./images/i2/save.gif", "Serie", "-1", "saveContextMenu", "function() { phynxContextMenu.stop(); }");
 
 		echo $F;
 	}
