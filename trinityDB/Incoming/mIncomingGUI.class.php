@@ -54,21 +54,26 @@ class mIncomingGUI extends mIncoming implements iGUIHTMLMP2 {
 		$Tab->addRow($B);
 
 		$B = $Tab->addButton("create move-\nscript", "redo");
-		$B->windowRme("mIncoming", "-1", "createMoveScript");
+		$B->windowRme("mIncoming", "-1", "createMoveScript", array("'0'"));
+
+		$B = $Tab->addButton("run move-\nscript", "redo");
+		$B->windowRme("mIncoming", "-1", "createMoveScript", array("'1'"));
 
 		$B = $Tab->addButton("Prettifyer", "./trinityDB/Incoming/prettify.png");
 		$B->loadFrame("contentLeft", "mIncomingPrettify");
 		return ($id == -1 ? $Tab : "").$T;
 	}
 
-	public function createMoveScript(){
+	public function createMoveScript($run = false){
 
-		header("Content-Type: application/x-shellscript; charset=UTF-8");
-		if(!Util::isWindowsHost())
-			header("Content-Disposition: attachment; filename=\"move.sh\"");
-		else
-			header("Content-Disposition: attachment; filename=\"move.bat\"");
-
+		if(!$run){
+			header("Content-Type: application/x-shellscript; charset=UTF-8");
+			if(!Util::isWindowsHost())
+				header("Content-Disposition: attachment; filename=\"move.sh\"");
+			else
+				header("Content-Disposition: attachment; filename=\"move.bat\"");
+		}
+		
 		$new = $this->findNewEpisodes();
 		$maxlength = 0;
 		foreach($new AS $series)
@@ -109,7 +114,14 @@ class mIncomingGUI extends mIncoming implements iGUIHTMLMP2 {
 			}
 			$code .= "\n";
 		}
-		echo $code;
+		
+		if(!$run)
+			echo $code;
+		else {
+			$SC = new SystemCommand();
+			$SC->setCommand($code);
+			$SC->execute();
+		}
 		#print_r();
 		#echo Util::getBasicHTMLText(trim($code)."\n\n", "move script");
 	}
