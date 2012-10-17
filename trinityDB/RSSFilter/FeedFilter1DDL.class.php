@@ -68,7 +68,8 @@ class FeedFilter1DDL implements iFeedFilter {
 
 		$hosts = array();
 		if($RSF->A("RSSFilterProviderRapidshare") == "1" AND in_array("Rapidshare.com", $available)) $hosts["Rapidshare.com"] = "Rapidshare";
-		#if($RSF->A("RSSFilterProviderNetload") == "1" AND in_array("Netload", $available)) $hosts["Netload.com"] = "nl";
+		if($RSF->A("RSSFilterProviderNetload") == "1" AND in_array("Netload", $available)) $hosts["Netload.com"] = "Netload";
+		if($RSF->A("RSSFilterProviderUploaded") == "1" AND in_array("Uploaded", $available)) $hosts["Uploaded.to"] = "Uploaded";
 
 		return $hosts;
 	}
@@ -109,8 +110,10 @@ class FeedFilter1DDL implements iFeedFilter {
 			$subcontent = substr($content, $namepos + $middle, $lastpos2 - ($namepos + $middle));
 		}
 		
-		preg_match_all("/<strong>([a-zA-Z0-9 \(\)]*)<\/strong><br\s*\/>\s*\<a\s*href\=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
+		preg_match_all("/<strong>([a-zA-Z0-9\(\)]*)[a-zA-Z0-9: \(\)]*<\/strong><br\s*\/>\s*\<a\s*href\=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
 
+		#print_r($matches);
+		
 		if(count($matches) != 3 OR !isset($matches[1][0]))
 			return array("I could not find any suitable links, please try again", "");
 

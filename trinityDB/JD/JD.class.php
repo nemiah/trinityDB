@@ -36,19 +36,22 @@ class JD extends PersistentObject {
 		}
 		
 		if(strpos($link, "safeurl.")){
-			#$newLocation = get_headers($link, 1);
-			#$link = $newLocation["Location"];
-
-			$contentWithLink = file_get_contents($link);
-
-			preg_match_all("/(https:\/\/rapidshare[a-zA-Z0-9\.\-\/_#+\|!]*)/", $contentWithLink, $links);
-
-			$links = array_unique($links[1]);
-			$link = $links[0];
-			$ex = explode("|", $link);
 			
-			$ex[0] = str_replace("/#!download", "/files/", $ex[0]);
-			$link = $ex[0].$ex[2]."/".$ex[3];
+			$newLocation = get_headers($link, 1);
+			if(isset($newLocation["Location"])){
+				$link = $newLocation["Location"][0];
+			
+			} else {
+				$contentWithLink = file_get_contents($link);
+				preg_match_all("/(https:\/\/rapidshare[a-zA-Z0-9\.\-\/_#+\|!]*)/", $contentWithLink, $links);
+
+				$links = array_unique($links[1]);
+				$link = $links[0];
+				$ex = explode("|", $link);
+
+				$ex[0] = str_replace("/#!download", "/files/", $ex[0]);
+				$link = $ex[0].$ex[2]."/".$ex[3];
+			}
 		}
 		
 		if(strpos($link, "canhaz.")){

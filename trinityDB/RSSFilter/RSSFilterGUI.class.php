@@ -33,7 +33,8 @@ class RSSFilterGUI extends RSSFilter implements iGUIHTML2 {
 			"RSSFilterJDID",
 			"RSSFilterAutoDL",
 			"RSSFilterProviderRapidshare",
-			"RSSFilterProviderNetload"));
+			"RSSFilterProviderNetload",
+			"RSSFilterProviderUploaded"));
 		
 		$gui->setLabel("RSSFilterName", "Name");
 		$gui->setLabel("RSSFilterFeed", "Feed URL");
@@ -41,11 +42,13 @@ class RSSFilterGUI extends RSSFilter implements iGUIHTML2 {
 		$gui->setLabel("RSSFilterJDID", "DL with");
 		$gui->setLabel("RSSFilterProviderRapidshare", "Rapidshare.com");
 		$gui->setLabel("RSSFilterProviderNetload", "Netload");
+		$gui->setLabel("RSSFilterProviderUploaded", "Uploaded");
 		$gui->setLabel("RSSFilterAutoDL", "Auto-DL?");
 
 		$gui->setType("RSSFilterProviderRapidshare", "checkbox");
 		$gui->setType("RSSFilterProviderNetload", "checkbox");
 		$gui->setType("RSSFilterAutoDL", "checkbox");
+		$gui->setType("RSSFilterProviderUploaded", "checkbox");
 
 		$gui->insertSpaceAbove("RSSFilterJDID");
 

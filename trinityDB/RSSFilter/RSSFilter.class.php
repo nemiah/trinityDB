@@ -133,7 +133,7 @@ class RSSFilter extends PersistentObject {
 	}
 
 	public function getAvailableHosts(){
-		return array("Rapidshare.com", "Netload");
+		return array("Rapidshare.com", "Netload", "Uploaded");
 	}
 
 	public function download($link){
