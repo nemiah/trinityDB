@@ -101,7 +101,8 @@ class mIncomingGUI extends mIncoming implements iGUIHTMLMP2 {
 				if($F == null) continue;
 
 				if(!Util::isWindowsHost())
-					$code .= "mv -n '".str_pad($episode["path"]."\"", $maxlength + 3)." \"".$episode["pointer"]->A("dir")."/".$F->getNewFileName($episode["pointer"], $F->getSuffix(basename($episode["path"])))."';\n";
+					$code .= "mv \"".str_pad($episode["path"]."\"", $maxlength + 3)." \"".$episode["pointer"]->A("dir")."/".$F->getNewFileName($episode["pointer"], $F->getSuffix(basename($episode["path"])))."\";\n";
+					#$code .= "mv -n '".str_pad($episode["path"]."\"", $maxlength + 3)." \"".$episode["pointer"]->A("dir")."/".$F->getNewFileName($episode["pointer"], $F->getSuffix(basename($episode["path"])))."';\n";
 				else
 					$code .= "move /-Y '".str_pad(str_replace ("/", "\\", $episode["path"])."\"", $maxlength + 3)." \"".str_replace("/", "\\", $episode["pointer"]->A("dir"))."\\".$F->getNewFileName($episode["pointer"], $F->getSuffix(basename($episode["path"])))."';\r\n";
 
