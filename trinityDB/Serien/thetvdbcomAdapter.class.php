@@ -82,7 +82,10 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		
 		if($S->A("siteID") == 0){
 			if($echo) $tab->addRow("Retrieving series information...");
-			$data = file_get_contents("$mirrorPath/api/GetSeries.php?seriesname=".$S->A("name")."&language=".$S->A("sprache"));
+			
+			$data = file_get_contents("$mirrorPath/api/GetSeries.php?seriesname=".urlencode($S->A("name"))."&language=".$S->A("sprache"));
+			if($data === false)
+				throw new Exception("No data from $mirrorPath/api/GetSeries.php?seriesname=".urlencode($S->A("name"))."&language=".$S->A("sprache"));
 			#die("DATA: $data");
 			$seriesInfo = new SimpleXMLElement($data, null, false);
 			$seriesID = $seriesInfo->Series->seriesid;
