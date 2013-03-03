@@ -58,7 +58,7 @@ class SerieGUI extends Serie implements iGUIHTML2, icontextMenu {
 		$tab = new HTMLSideTable("right");
 
 		$B = new Button("Download\nepisodes","./trinityDB/Serien/Updates.png");
-		$B->rmePCR("Serie", $this->ID, "downloadEpisodes", array("1"), "Popup.display('Download-Status', transport);");
+		$B->rmePCR("Serie", $this->ID, "downloadEpisodes", array("'1'"), "Popup.display('Download-Status', transport);");
 
 		$S = new Button("Settings", "./images/i2/settings.png");
 		$S->type("icon");
