@@ -228,7 +228,7 @@ while($S = $ac->getNextEntry()){
 	} catch(Exception $ex){
 		echo "
 		<item>
-			<title>The feed ".$ex->getMessage()." could not be loaded</title>
+			<title>Error: ".$ex->getMessage()."</title>
 		</item>";
 	}
 }

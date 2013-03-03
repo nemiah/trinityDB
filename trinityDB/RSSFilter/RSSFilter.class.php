@@ -63,13 +63,47 @@ class RSSFilter extends PersistentObject {
 
 	public function loadFeed(){
 		if(!isset(RSSFilter::$feeds[$this->A("RSSFilterFeed")])){
+			RSSFilter::$feeds[$this->A("RSSFilterFeed")] = "<phynx></phynx>";
 			$content = @file_get_contents($this->A("RSSFilterFeed"));
-			if($content === false) {
-				RSSFilter::$feeds[$this->A("RSSFilterFeed")] = "null";
-				throw new Exception($this->A("RSSFilterFeed"));
+			if($content === false)
+				throw new Exception($this->A("RSSFilterFeed")." could not be loaded!");
+			
+			$content = str_replace("", "", $content);
+			
+			try  {
+				libxml_use_internal_errors(true);
+				RSSFilter::$feeds[$this->A("RSSFilterFeed")] = new SimpleXMLElement($content);
+			} catch (Exception $e){
+				try {
+					$config = array(
+						'indent' => true,
+						'clean' => true,
+						'input-xml'  => true,
+						'output-xml' => true,
+						'wrap'       => false
+						);
+					
+					$tidy = new Tidy();
+					$xml = $tidy->repairString($content, $config);
+					
+					RSSFilter::$feeds[$this->A("RSSFilterFeed")] = new SimpleXMLElement($xml);
+				} catch(ClassNotFoundException $e){
+					throw new Exception($this->A("RSSFilterFeed")." contains errors, but Tidy not found!");
+				} catch(Exception $e){
+					
+					#$errors = "";
+					#foreach(libxml_get_errors() as $error) 
+					#	print_r($error->message);
+					
+					throw new Exception($this->A("RSSFilterFeed")." contained errors even Tidy could not fix!");
+				}
+				#$errors = "";
+				#foreach(libxml_get_errors() as $error) 
+				#	print_r($error->message);
+				
+				#throw new Exception($this->A("RSSFilterFeed"));
 			}
-
-			RSSFilter::$feeds[$this->A("RSSFilterFeed")] = new SimpleXMLElement($content);
+			
 		}
 	}
 
