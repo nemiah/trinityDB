@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class Datum {
 
@@ -25,6 +25,20 @@ class Datum {
 		if($timestamp == null) $timestamp = time();
 		
 		$this->timestamp = $timestamp;
+	}
+	
+	function getNthDayOfMonth(){
+		$endTime = $this->timestamp;
+		$this->setToMonth1st();
+		
+		$c = 0;
+		while($this->timestamp <= $endTime){
+			if(date("w", $this->timestamp) === date("w", $endTime))
+				$c++;
+			$this->addDay();
+		}
+		
+		return $c;
 	}
 	
 	function setToJan1st($jahr){
@@ -51,8 +65,12 @@ class Datum {
 		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)  , date("d", $this->timestamp), date("Y", $this->timestamp)-1);
 	}
 	
-	function addWeek(){
+	function addWeek($fixDST = false){
+		$oldTime = $this->timestamp;
 		$this->timestamp += 7 * 24 * 3600;
+		
+		if($fixDST AND date("I", $oldTime) != date("I", $this->timestamp))
+			$this->timestamp += 3600 * (!date("I", $this->timestamp) ? 1 : -1);
 	}
 	
 	function subWeek(){
@@ -70,7 +88,7 @@ class Datum {
 	}
 
 	function addYear(){
-		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)  , date("d", $this->timestamp), date("Y", $this->timestamp)+1);
+		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp), date("d", $this->timestamp), date("Y", $this->timestamp)+1);
 	}
 	
 	function printer(){

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class propertyC extends anyC {
 	#public $viewOnly = false;
@@ -155,7 +155,7 @@ class propertyC extends anyC {
 			$gui->addTopButton($B);
 
 		if($this->allowEdit)
-			$gui->activateFeature("editInPopup", $this);
+			$gui->activateFeature("editInPopup", $this, "{remember:true}");
 		
 
 		$gui->options($this->allowDelete, $this->allowEdit, false, false);

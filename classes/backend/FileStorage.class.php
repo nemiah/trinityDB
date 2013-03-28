@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class FileStorage {
 	protected $instance;
@@ -72,7 +72,7 @@ class FileStorage {
 		else {
 			$A = $F->newAttributes();
 
-			$A->FileDir = dirname($file);
+			$A->FileDir = dirname(realpath($file));
 			$A->FileName = basename($file);
 			$A->FileIsDir = $isDir;
 			$A->FileSize = filesize($file);
@@ -91,12 +91,12 @@ class FileStorage {
 		$CH = Util::getCloudHost();
 		if($CH != null){
 			Environment::load();
-			
-			$dir = $CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/specifics/";
+			$cloudUser = strtolower(Environment::$currentEnvironment->cloudUser());
+			$dir = $CH->scientiaDir."/".($cloudUser != "" ? "$cloudUser/" : "")."specifics/";
 			
 			if(!file_exists($dir)){
 				#mkdir($CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/");
-				mkdir($CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/specifics/", 0777, true);
+				mkdir($CH->scientiaDir."/".($cloudUser != "" ? "$cloudUser/" : "")."specifics/", 0777, true);
 			}
 			
 			return $dir;
@@ -132,6 +132,18 @@ class FileStorage {
 				continue;
 
 			if(strpos(basename($file), "FITCRMID") === 0)
+				continue;
+
+			if(strpos(basename($file), "GRLBMID") === 0)
+				continue;
+
+			if(strpos(basename($file), "MailArchive") === 0)
+				continue;
+
+			if(strpos(basename($file), "MailTemp") === 0)
+				continue;
+
+			if(strpos(basename($file), "Customizer") === 0 AND strpos(basename($file), ".class.php") !== false)
 				continue;
 
 			if(is_dir($dir.$file)) $dirs[] = $dir.$file;
@@ -172,7 +184,7 @@ class FileStorage {
 	
 
 	function deleteSingle($table, $keyName, $id){
-		if(strpos($id, FileStorage::getFilesDir()) === false)
+		if(strpos(realpath($id), realpath(FileStorage::getFilesDir())) === false)
 			Red::errorD("Die Datei kann wegen fehlender Berechtigung nicht gelöscht werden!");
 		
 		if(is_dir($id)) {

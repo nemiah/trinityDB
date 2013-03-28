@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class mInstallation extends anyC {
 	private $folder = "./system/DBData/";
@@ -31,51 +31,105 @@ class mInstallation extends anyC {
 		#$DB = new DBStorageU();
 	}
 
-	public function updateAllTables(){
-			$p = array_flip($_SESSION["CurrentAppPlugins"]->getAllPlugins());
+	public function setupAllTables($echo = 0){
+		$apps = Applications::getList();
+		$apps["plugins"] = "plugins";
+		#$apps["plugins"] = "ubiquitous";
+
+		$currentPlugins = $_SESSION["CurrentAppPlugins"];
+		
+		$return = array();
+		foreach($apps AS $app){
+			$AP = $_SESSION["CurrentAppPlugins"] = new AppPlugins($app);
+			$AP->scanPlugins("plugins");
+			$p = array_flip($AP->getAllPlugins());
+			Applications::i()->setActiveApplication($app); //or the autoloader won't work
 			
-			echo "
-			<div class=\"backgroundColor1 Tab\"><p>Tabellen-Updates:</p></div>
-			<table>
-				<colgroup>
-					<col style=\"width:120px;\" class=\"backgroundColor2\">
-					<col class=\"backgroundColor3\">
-				</colgroup>";
-				foreach($p as $key => $value){
+			$return[$app] = "<b>Start</b>";
+			
+			#$p = array_flip(AppPlugins::i()->getAllPlugins());
+			foreach($p as $key => $value){
+				if($key == "CIs") continue;
+				
+				$status = "initialized...";
+				
 				try {
-					if(method_exists($_SESSION["CurrentAppPlugins"], "isPluginGeneric") AND $_SESSION["CurrentAppPlugins"]->isPluginGeneric($key)){
-						$c = new mGenericGUI('', $key);
-					} else {
-						$c = new $key();
-						#$className = $key;
-					}
+					$c = new $key();
+					$status = "instantialized $key...";
 				} catch (ClassNotFoundException $e){
 					$key2 = $key."GUI";
-					
+					$status = "instantialized {$key}GUI...";
+
 					try {
 						$c = new $key2();
-						#$className = $key2;
 					} catch (ClassNotFoundException $e2){
-						#echo $key." nicht gefunden";
+						$return[$key] = "<span style=\"color:red;\">Class ".$e2->getClassName()." not found!</span>";
 						continue;
 					}
 				}
 
-				if($key == "CIs") continue;
+				$return[$key] = $status;
 
-				#$c = new $className();
-				if($c->checkIfMyTableExists() AND $c->checkIfMyDBFileExists()){
-				echo "
-				<tr>
-					<td style=\"text-align:right;\">".$value.":</td><td>";
-					$c->checkMyTables();
-				echo "
-					</td>
-				</tr>";
-				} #else echo "keine Tabelle(n) / keine DB-Info-Datei";
+				if($c->checkIfMyDBFileExists()){
+					/*$return[$value] = */$c->createMyTable(true);
+				}
 			}
-			echo "
-			</table>";
+		}
+		
+		mUserdata::setUserdataS("DBVersion", Phynx::build(), "", -1);
+		$_SESSION["CurrentAppPlugins"] = $currentPlugins;
+		
+		return $return;
+	}
+	
+	public function updateAllTables(){
+		$apps = Applications::getList();
+		$apps["plugins"] = "plugins";
+		#$apps["plugins"] = "ubiquitous";
+
+		$currentPlugins = $_SESSION["CurrentAppPlugins"];
+		
+		$return = array();
+		foreach($apps AS $app){
+			$AP = $_SESSION["CurrentAppPlugins"] = new AppPlugins($app);
+			$AP->scanPlugins("plugins");
+			$p = array_flip($AP->getAllPlugins());
+			#Applications::i()->setActiveApplication($app); //or the autoloader won't work; yes, it does because of addClassPath later on
+		
+			foreach($p as $key => $value){
+				if($key == "CIs") continue;
+				
+				$return[$value] = "Keine Collection-Klasse!";
+				
+				addClassPath(Util::getRootPath().$app."/".$AP->getFolderOfPlugin($key)."/");
+				
+				try {
+					$c = new $key();
+				} catch (ClassNotFoundException $e){
+					$key2 = $key."GUI";
+
+					try {
+						$c = new $key2();
+					} catch (ClassNotFoundException $e2){
+						continue;
+					}
+				}
+
+				if(!$c->checkIfMyDBFileExists())
+					$return[$value] = "Keine DB-Datei!";
+				
+				if($c->checkIfMyTableExists() AND $c->checkIfMyDBFileExists())
+					$return[$value] = $c->checkMyTables(true);
+				
+				if(!$c->checkIfMyTableExists() AND $c->checkIfMyDBFileExists())
+					$return[$value] = $c->createMyTable(true);
+				
+			}
+		}
+		
+		mUserdata::setUserdataS("DBVersion", Phynx::build(), "", -1);
+		$_SESSION["CurrentAppPlugins"] = $currentPlugins;
+		return $return;
 	}
 	
 	function changeFolder($newFolder){

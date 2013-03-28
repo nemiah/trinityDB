@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 var Popup = {
 	windowsOpen: 0,
@@ -65,24 +65,28 @@ var Popup = {
 		Popup.update(transport, type, name);
 	},
 
-	sidePanel: function(targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters){
-		targetPluginContainer = "editDetails"+targetPlugin;
+	sidePanel: function(targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters, popupName){
+		if(typeof popupName == "undefined")
+			popupName = "edit";
 		
-		if($j('#'+targetPluginContainer+'SidePanel').length > 0){
-			Popup.sidePanelClose(targetPlugin);
+		targetPluginContainer = popupName+"Details"+targetPlugin;
+		
+		if($j('#'+targetPluginContainer+'SidePanel').length > 0 && Popup.lastSidePanels[targetPlugin][2] == targetPluginMethod){
+			Popup.sidePanelClose(targetPlugin, popupName);
 			return;
 		}
 	
-		$j('#windows').append('<div id="'+targetPluginContainer+'SidePanel" style="display:none;top:'+($j("#"+targetPluginContainer).position().top + 10)+'px;left:'+($j("#"+targetPluginContainer).position().left+  $j("#"+targetPluginContainer).width())+'px;" class="backgroundColor0 borderColor1 popupSidePanel"></div>');
-		
-		$j("#"+targetPluginContainer).bind("dragstart", function(event, ui) {
-			$j('#'+targetPluginContainer+'SidePanel').fadeOut();
-		});
-		
-		$j("#"+targetPluginContainer).bind("dragstop", function(event, ui) {
-			$j('#'+targetPluginContainer+'SidePanel').css({top: $j("#"+targetPluginContainer).position().top + 10, left: $j("#"+targetPluginContainer).position().left + $j("#"+targetPluginContainer).width()}).fadeIn();
-		});
-		
+		if($j('#'+targetPluginContainer+'SidePanel').length == 0){
+			$j('#windows').append('<div id="'+targetPluginContainer+'SidePanel" style="display:none;top:'+($j("#"+targetPluginContainer).css("top").replace("px", "") * 1)+'px;left:'+($j("#"+targetPluginContainer).position().left + $j("#"+targetPluginContainer).width() + 10)+'px;" class="backgroundColor0 popupSidePanel"></div>');
+
+			$j("#"+targetPluginContainer).bind("dragstart", function(event, ui) {
+				$j('#'+targetPluginContainer+'SidePanel').fadeOut();
+			});
+
+			$j("#"+targetPluginContainer).bind("dragstop", function(event, ui) {
+				$j('#'+targetPluginContainer+'SidePanel').css({top: ($j("#"+targetPluginContainer).css("top").replace("px", "") * 1), left: $j("#"+targetPluginContainer).position().left + $j("#"+targetPluginContainer).width() + 10}).fadeIn();
+			});
+		}
 		//$j("#"+targetPluginContainer).bind("DOMNodeRemoved", function(event, ui) {
 			//$j('#'+targetPluginContainer+'SidePanel').remove();
 		//});
@@ -94,17 +98,23 @@ var Popup = {
 		});
 	},
 
-	sidePanelClose: function(parentWindowID){
-		if($j('#editDetails'+parentWindowID+'SidePanel').length == 0)
+	sidePanelClose: function(parentWindowID, popupName){
+		if(typeof popupName == "undefined")
+			popupName = "edit";
+		
+		if($j('#'+popupName+'Details'+parentWindowID+'SidePanel').length == 0)
 			return;
 		
-		$j('#editDetails'+parentWindowID+'SidePanel').fadeOut(300, function(){$j(this).remove();});
+		$j('#'+popupName+'Details'+parentWindowID+'SidePanel').fadeOut(300, function(){$j(this).remove();});
 	},
 	
-	sidePanelRefresh: function(targetPlugin){
+	sidePanelRefresh: function(targetPlugin, popupName){
+		if(typeof popupName == "undefined")
+			popupName = "edit";
+		
 		var values = Popup.lastSidePanels[targetPlugin];
 		
-		contentManager.rmePCR(targetPlugin, values[1], values[2], values[3].slice(0, values[3].length), function(transport){$j('#editDetails'+targetPlugin+'SidePanel').html(transport.responseText)});
+		contentManager.rmePCR(targetPlugin, values[1], values[2], values[3].slice(0, values[3].length), function(transport){$j('#'+popupName+'Details'+targetPlugin+'SidePanel').html(transport.responseText)});
 	},
 
 	create: function(ID, type, name, options){
@@ -117,6 +127,7 @@ var Popup = {
 		
 		var top = null;
 		var right = null;
+		var left = null;
 
 		if(typeof options == "object"){
 			if(options.width)
@@ -136,9 +147,15 @@ var Popup = {
 
 			if(options.top)
 				top = options.top;
+
+			if(options.left)
+				left = options.left;
 			
 			if(options.persistent)
 				persistent = options.persistent;
+			
+			if(options.blackout)
+				Overlay.showDark();
 		}
 		
 		if(persistent)
@@ -148,26 +165,59 @@ var Popup = {
 		if(top == null)
 			top = size[0] <= 1124 ? (66 + $(targetContainer).childNodes.length * 40) : (100 + $(targetContainer).childNodes.length * 40);
 		
-		if(right == null)
+		if(right == null && left == null)
 			right = size[0] <= 1124 ? (0) : (410 + $(targetContainer).childNodes.length * 20);
 		
+		//if(left != null)
+		//	right = size[0] - width - left;
+			
 		//if($(targetContainer).firstChild == null) Popup.windowsOpen = 0;
+		
+		if(typeof options == "object" && options.remember && $j.jStorage.get('phynxPopupPosition'+type+'Details'+ID, null) !== null){
+			var pos = $j.jStorage.get('phynxPopupPosition'+type+'Details'+ID);
+			right = null;
+			left = pos.left;
+			top = pos.top;
+			if(top > $j(window).height() - 40)
+				top = 20;
+		}
+		
 		var element = Builder.node(
 			"div",
 			{
 				id: type+'Details'+ID,
-				style: 'display:none;top:'+top+'px;right:'+right+'px;width:'+width+'px;z-index:'+Popup.zIndex,
-				"class": "borderColor1 popup"
+				style: 'display:none;top:'+top+'px;'+(right != null ? 'right:'+right : 'left:'+left)+'px;width:'+width+'px;z-index:'+Popup.zIndex,
+				"class": "popup"
 			}, [
 				Builder.node("div", {"class": "backgroundColor1 cMHeader", id: type+'DetailsHandler'+ID}, [
 					Builder.node("a", {id: type+"DetailsCloseWindow"+ID, "class": "closeContextMenu backgroundColor0 borderColor0", style:"cursor:pointer;"+(hasX ? "" : "display:none;")}, ["X"])
 					, name]),
-				Builder.node("div", {"class": "backgroundColor0", style: "clear:both;", id: type+'DetailsContent'+ID})
+				Builder.node("div", {"class": "backgroundColor0", style: "clear:both;", id: type+'DetailsContentWrapper'+ID}, [
+					Builder.node("div", {id: type+'DetailsContent'+ID})
+				])
+				
 			]);
 
 		$(targetContainer).appendChild(element);
 		
-		new Draggable($(type+'Details'+ID), {handle: $(type+'DetailsHandler'+ID)});
+		//new Draggable($(type+'Details'+ID), {handle: $(type+'DetailsHandler'+ID)});
+		$j("#"+type+'Details'+ID).draggable({
+			handle: $j('#'+type+'DetailsHandler'+ID),
+			containment: "window",
+			start: function(){
+				$j('#'+type+'DetailsContentWrapper'+ID).css('height', $j('#'+type+'DetailsContent'+ID).height());
+				$j('#'+type+'DetailsContent'+ID).fadeOut("fast");
+			},
+			stop: function(){
+				$j('#'+type+'DetailsContent'+ID).fadeIn("fast", function(){
+					$j('#'+type+'DetailsContentWrapper'+ID).css('height', '');
+				});
+					
+				if(typeof options == "object" && options.remember)
+					$j.jStorage.set('phynxPopupPosition'+type+'Details'+ID, $j("#"+type+'Details'+ID).position());
+				
+			}
+		});
 		Event.observe(type+'DetailsCloseWindow'+ID, 'click', function() {Popup.close(ID, type);});
 		//Event.observe(type+'Details'+ID, 'click', function(event) {Popup.updateZ(event.target);});
 
@@ -181,7 +231,12 @@ var Popup = {
 			tinyMCE.execCommand("mceRemoveControl", false, hasTinyMCE.attr("id"));
 		}
 		
-		Popup.sidePanelClose(ID);
+		var hasNicEdit = $j("#"+type+'Details'+ID+" textarea[name=nicEdit]");
+		if(hasNicEdit.length)
+			new nicEditor().removeInstance("nicEdit");
+		
+		
+		Popup.sidePanelClose(ID, type);
 		
 		//Popup.windowsOpen--;
 		if($j("#"+type+'Details'+ID).length)

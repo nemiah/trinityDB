@@ -15,33 +15,41 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
+function BackupManagerGUIFatalErrorShutdownHandler() {
+	$last_error = error_get_last();
+	if ($last_error['type'] !== E_ERROR) 
+		return;
+
+	if(strpos($last_error['message'], "Allowed memory size of") !== false)
+		echo "<p style=\"color:red;\">Ihrer PHP-Installation steht nicht genügend Speicher zur Verfügung, um die Datensicherung abzuschließen. Bitte erhöhen Sie den Speicher in der PHP-Konfiguration oder führen Sie die Datenbank-Sicherung mit einer externen Anwendung durch.</p>";
+}
 
 class BackupManagerGUI implements iGUIHTML2 {
 	public function getHTML($id){
 		if($_SESSION["S"]->isUserAdmin() == "0")
 			throw new AccessDeniedException();
 
-		$TB = new HTMLTable(4, "Backup wählen");
+		$TB = new HTMLTable(3, "Backup wählen");
 		$TB->addColStyle(2, "text-align:right;");
 		$TB->setColWidth(2, "80px");
 		$TB->setColWidth(3, "20px");
-		$TB->setColWidth(4, "20px");
+		#$TB->setColWidth(4, "20px");
 
 		$gesamt = 0;
 
-		foreach($this->getBackupsList() AS $name => $size){
-			$RB = new Button("Backup wiederherstellen","./images/i2/okCatch.png");
-			$RB->type("icon");
+		$list = $this->getBackupsList();
+		
+		foreach($list AS $name => $size){
+			$RB = new Button("Backup wiederherstellen","./images/i2/okCatch.png", "icon");
 			$RB->onclick("if(confirm('Sind Sie sicher, dass dieses Backup wiederhergestellt werden soll? Es werden dabei alle Daten in der Datenbank überschrieben!')) ");
-			$RB->rmePCR("BackupManager", "", "restoreBackup", "$name", "Popup.displayNamed('BackupManagerGUI','Backup-Manager', transport);");
+			$RB->rmePCR("BackupManager", "", "restoreBackup", $name, OnEvent::rme(new mInstallationGUI(), "getActions", "", "function(transport){ contentManager.contentBelow(transport.responseText); }").OnEvent::closePopup("BackupManager")." Popup.displayNamed('BackupManagerGUI','Backup-Manager', transport);");
 
-			$RD = new Button("Backup anzeigen","./images/i2/search.png");
-			$RD->type("icon");
-			$RD->windowRme("BackupManager", "", "displayBackup", "$name");
+			$RD = new Button("Backup anzeigen","./images/i2/search.png", "icon");
+			$RD->windowRme("BackupManager", "", "displayBackup", $name);
 
-			$TB->addRow(array($name,Util::formatByte($size, 2),$RD,$RB));
+			$TB->addRow(array($name,Util::formatByte($size, 2),$RD/*,$RB*/));
 			$gesamt += $size;
 		}
 
@@ -51,16 +59,32 @@ class BackupManagerGUI implements iGUIHTML2 {
 		$TB->addRow(array("<b>Gesamt:</b>","<b>".Util::formatByte($gesamt,2)."</b>"));
 		$TB->addCellStyle(1, "text-align:right");
 
+		#$ST = new HTMLSideTable("right");
+		
+		$FTPServer = null;
+		try {
+			$FTPServer = LoginData::get("BackupFTPServerUserPass");
+		} catch(TableDoesNotExistException $e){
+			
+		}
 		$ST = new HTMLSideTable("right");
 		
-		$FTPServer = LoginData::get("BackupFTPServerUserPass");
 		$FTPServerID = $FTPServer == null ? -1 : $FTPServer->getID();
 		$BFTP = $ST->addButton("FTP-Server\neintragen", "./plugins/Installation/serverMail.png");
 		$BFTP->popup("edit", "FTP-Server", "LoginData", $FTPServerID, "getPopup", "", "LoginDataGUI;preset:backupFTPServer");
 		
+		
+		
+		if(count($list) == 0)
+			return "$ST<p>Es wurden noch keine Sicherungen angelegt.</p>";
+		
 		return $ST.$TB;
 	}
 
+	public function inPopup(){
+		echo $this->getHTML(-1);
+	}
+	
 	public function displayBackup($name){
 		if($_SESSION["S"]->isUserAdmin() == "0")
 			throw new AccessDeniedException();
@@ -71,8 +95,6 @@ class BackupManagerGUI implements iGUIHTML2 {
 		echo "$html<pre>";
 		readfile(Util::getRootPath()."system/Backup/$name");
 		echo "</pre></body></html>";
-		
-
 	}
 
 	private function noBackupButton(){
@@ -89,9 +111,11 @@ class BackupManagerGUI implements iGUIHTML2 {
 			return $BSave.$GoAway." <label for=\"BackupGoAway\" style=\"float:none;text-align:left;width:auto;\">Diese Meldung nicht mehr anzeigen, ich erstelle meine Backups selbst.</label>";
 	}
 
-	public function getWindow(){
+	public function getWindow($redo = false){
+		register_shutdown_function('BackupManagerGUIFatalErrorShutdownHandler');
+		
 		$F = new File(Util::getRootPath()."system/Backup");
-
+		
 		if(!$F->A("FileIsWritable")){
 			$B = new Button("Achtung","restrictions");
 			$B->type("icon");
@@ -117,9 +141,12 @@ class BackupManagerGUI implements iGUIHTML2 {
 
 		$html = "";
 
-		if(!BackupManagerGUI::checkForTodaysBackup()){
+		if(!BackupManagerGUI::checkForTodaysBackup() OR $redo){
 			$T = new HTMLTable(1);
-
+			
+			if($redo)
+				unlink(BackupManagerGUI::getNewBackupName());
+			
 			$BOK = $this->makeBackupOfToday();
 			$F = new File(BackupManagerGUI::getNewBackupName());
 			$F->loadMe();
@@ -129,7 +156,8 @@ class BackupManagerGUI implements iGUIHTML2 {
 				$B->type("icon");
 				$B->style("float:left;margin-right:10px;");
 
-				$T->addRow($B."Das Backup wurde erfolgreich abgeschlossen!<br />Die Größe des Backups beträgt ".Util::formatByte($F->A("FileSize"), 2));
+				$T->addRow($B."Das Backup wurde erfolgreich abgeschlossen!<br />Die Größe der Sicherungsdatei beträgt <strong>".Util::formatByte($F->A("FileSize"), 2)."</strong>");
+				$T->addRowClass("backgroundColor0");
 				
 				try {
 					$ftpUpload = $this->FTPUpload(Util::getRootPath()."system/Backup/$BOK");
@@ -154,7 +182,7 @@ class BackupManagerGUI implements iGUIHTML2 {
 				$T->addRow($B."Beim Erstellen des Backups ist ein Fehler aufgetreten: $BOK");
 				$html .= $T;
 			}
-			$html .= "<script type=\"text/javascript\">contentManager.reloadFrame('contentLeft');</script>";
+			$html .= OnEvent::script(OnEvent::frame("desktopLeft", "Desktop", "2"));#"<script type=\"text/javascript\">contentManager.reloadFrame('contentLeft');</script>";
 		}
 
 
@@ -193,7 +221,16 @@ class BackupManagerGUI implements iGUIHTML2 {
 		$TF->addRow(array($this->noBackupButton()));
 		$TF->addRowColspan(1, 2);
 
-		echo $html.$TF;
+		$BC = new Button("Fenster\nschließen", "bestaetigung");
+		$BC->onclick(OnEvent::closePopup("", "BackupManagerGUI"));
+		$BC->style("float:right;margin:10px;");
+		
+		$BD = new Button("Details\nanzeigen", "down");
+		$BD->onclick("\$j('#BMMoreDetails').slideToggle();");
+		$BD->style("margin:10px;");
+		$BD->className("backgroundColor0");
+		
+		echo $html.$BC.$BD."<div style=\"clear:both;\"></div><div id=\"BMMoreDetails\" style=\"display:none;\">".$TF."</div>";
 	}
 
 	public function deleteOldBackups(){
@@ -204,16 +241,20 @@ class BackupManagerGUI implements iGUIHTML2 {
 			$i++;
 
 			if($i > 27){
-				$F = new File(Util::getRootPath()."system/Backup/".$fileName);
-				$F->deleteMe();
+				unlink(Util::getRootPath()."system/Backup/".$fileName);
+				#$F->deleteMe();
 			}
 		}
 	}
 
 	public function getBackupsList(){
-		$dir = new DirectoryIterator(dirname(BackupManagerGUI::getNewBackupName()));
-
 		$data = array();
+		$dir = dirname(BackupManagerGUI::getNewBackupName());
+		if(!file_exists($dir))
+			return $data;
+
+		$dir = new DirectoryIterator($dir);
+
 		foreach($dir as $value)
 			if (!$value->isDot() AND strpos($value->getFilename(), ".") !== 0)
 				$data[$value->getFilename()] = $value->getSize();
@@ -229,7 +270,7 @@ class BackupManagerGUI implements iGUIHTML2 {
 
 	public function makeBackupOfToday(){
 		$this->deleteOldBackups();
-
+		
 		$F = new File(Util::getRootPath()."system/Backup/.htaccess");
 		$F->loadMe();
 

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 class OnEvent {
@@ -31,15 +31,28 @@ class OnEvent {
 	 */
 	public static function window($targetObject, $targetMethod, $targetMethodParameters = "", $bps = null, $target = null){
 		
-		return "windowWithRme('".str_replace("GUI", "", get_class($targetObject))."', ".$targetObject->getID().", '$targetMethod', ".(is_array($targetMethodParameters) ? "['".implode("','", $targetMethodParameters)."']" : "'$targetMethodParameters'").($bps != null ? ", '$bps'" : "").($target != null ? ", '$target'" : "")."); ";
+		return "windowWithRme('".str_replace("GUI", "", get_class($targetObject))."', ".($targetObject->getID() == "" ? "-1" : $targetObject->getID()).", '$targetMethod', ".(is_array($targetMethodParameters) ? "['".implode("','", $targetMethodParameters)."']" : "'$targetMethodParameters'").($bps != null ? ", '$bps'" : "").($target != null ? ", '$target'" : "")."); ";
 	}
 	
-	public static function popupSidePanel($targetClass, $targetClassId, $targetMethod, $targetMethodParameters = ""){
-		return "Popup.sidePanel('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."));";
+	public static function selectCustom($targtFrame, $callingPluginID, $selectPlugin, $selectJSFunction, $addBPS = "", $options = ""){
+		return "contentManager.backupFrame('$targtFrame','selectionOverlay'); contentManager.customSelection('$targtFrame', '$callingPluginID', '$selectPlugin', '$selectJSFunction', '$addBPS', ".($options == "" ? "{}" : $options).");";
 	}
 	
-	public static function reloadSidePanel($targetClass){
-		return "Popup.sidePanelRefresh('$targetClass');";
+	public static function context($plugin, $identifier, $title, $leftOrRight = "right", $upOrDown = "down", $options = "{}"){
+		return "phynxContextMenu.start(this, '$plugin','$identifier','$title', '$leftOrRight', '$upOrDown', $options);";
+	}
+	
+	public static function iframe($targetObject, $targetMethod, $targetMethodParameters = "", $targetFrame, $bps = null){
+		
+		return "contentManager.iframeRme('".str_replace("GUI", "", get_class($targetObject))."', ".$targetObject->getID().", '$targetMethod', ".(is_array($targetMethodParameters) ? "['".implode("','", $targetMethodParameters)."']" : "'$targetMethodParameters'").", '$targetFrame'".($bps != null ? ", '$bps'" : "")."); ";
+	}
+	
+	public static function popupSidePanel($targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $popupName = "edit"){
+		return "Popup.sidePanel('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), '$popupName');";
+	}
+	
+	public static function reloadSidePanel($targetClass, $popupName = "edit"){
+		return "Popup.sidePanelRefresh('$targetClass', '$popupName');";
 	}
 	
 	public static function droppable($elementID, $onDropFunction, $hoverClass = null){
@@ -53,21 +66,21 @@ class OnEvent {
 		});";
 	}
 	
-	public static function sortable($selector, $handle, $saveTo = null, $axis = "y", $connectWith = null, $placeholder = null, $onUpdateComplete = ""){
+	public static function sortable($selector, $handle, $saveTo = null, $axis = "y", $connectWith = null, $placeholder = null, $onUpdateComplete = "", $additionalParameters = array()){
 		
 		if($saveTo != null){
 			$ex = explode("::", $saveTo);
-			$saveTo = OnEvent::rme($ex[0], $ex[1], array("Sortable.serialize('$selector')"), $onUpdateComplete);
+			$saveTo = OnEvent::rme($ex[0], $ex[1], array_merge(array("Sortable.serialize('$selector')"), $additionalParameters), $onUpdateComplete);
 		}
 
 		return "
 		\$j('$selector').sortable({
-			axis: '$axis', 
+			".($axis != "" ? "axis: '$axis', " : "")."
 			update: function(){".($saveTo == null ? "" : $saveTo)."},
 			".($connectWith != null ? "connectWith: \$j('$connectWith')," : "")."
 			dropOnEmpty: true,
 			".($placeholder != null ? "placeholder: '$placeholder', " : "")."
-			handle: \$j('$handle')
+			".($handle != null ? "handle: \$j('$handle')" : "")."
 		});";
 	}
 	
@@ -75,7 +88,7 @@ class OnEvent {
 		return "<script type=\"text/javascript\">$action</script>";
 	}
 	
-	public static function rme($targetObject, $targetMethod, $targetMethodParameters = "", $onSuccessFunction = null, $bps = null){
+	public static function rme($targetObject, $targetMethod, $targetMethodParameters = "", $onSuccessFunction = null, $bps = null, $onFailureFunction = null){
 		$id = -1;
 		if($targetObject instanceof PersistentObject)
 			$id = $targetObject->getID();
@@ -93,7 +106,10 @@ class OnEvent {
 		if($onSuccessFunction != null AND strpos(trim($onSuccessFunction), "function") !== 0)
 				$onSuccessFunction = "function(transport){ $onSuccessFunction }";
 		
-		return "contentManager.rmePCR('$targetObject', $id, '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), ".($onSuccessFunction != null ? $onSuccessFunction : "function(){}")."".($bps != null ? ", '$bps'" : "")."); ";
+		if($onFailureFunction != null AND strpos(trim($onFailureFunction), "function") !== 0)
+				$onFailureFunction = "function(transport){ $onFailureFunction }";
+		
+		return "contentManager.rmePCR('$targetObject', $id, '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), ".($onSuccessFunction != null ? $onSuccessFunction : "function(){}")."".($bps != null ? ", '$bps'" : ", ''").", 1, ".($onFailureFunction != null ? $onFailureFunction : "function(){}")."); ";
 	}
 	
 	public static function closePopup($plugin, $id = "edit"){
@@ -145,8 +161,8 @@ class OnEvent {
 		return "contentManager.loadFrame('$target', '$plugin', ".($withId != "transport.responseText" ? "'$withId'" : $withId).", '$page', '$bps', ".($onSuccessFunction != null ? $onSuccessFunction : "function(){}").");";
 	}
 	
-	public static function popup($title, $targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $bps = "", $popupOptions = null){
-		return "Popup.load('$title', '$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), '$bps', 'edit'".($popupOptions != null ? ", '$popupOptions'" : "").");";
+	public static function popup($title, $targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $bps = "", $popupOptions = null, $popupName = "edit"){
+		return "Popup.load('".T::_($title)."', '$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), '$bps', '$popupName'".($popupOptions != null ? ", '".addslashes($popupOptions)."'" : "").");";
 	}
 }
 ?>

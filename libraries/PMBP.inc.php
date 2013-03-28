@@ -485,8 +485,8 @@ function PMBP_exec_sql($file,$con,$linespersession=false,$noFile=false) {
     	if (!$linespersession) $_GET['start']++;
     	  
         // handle DOS and Mac encoded linebreaks
-        $dumpline=ereg_replace("\r\n$","\n",$dumpline);
-        $dumpline=ereg_replace("\r$","\n",$dumpline);
+        $dumpline=preg_replace("/\r\n$/","\n",$dumpline);
+        $dumpline=preg_replace("/\r$/","\n",$dumpline);
 
         // skip comments and blank lines only if NOT in parents    
         if (!$inparents) {
@@ -524,7 +524,7 @@ function PMBP_exec_sql($file,$con,$linespersession=false,$noFile=false) {
         }
 
         // execute query if end of query detected (; as last character) AND NOT in parents
-        if (ereg(";$",trim($dumpline)) && !$inparents) {
+        if (substr(trim($dumpline), -1) == ";" /*ereg(";$",trim($dumpline))*/ && !$inparents) {
             if (!mysql_query(trim($query),$con)) {
                 $error=SQ_ERROR." ".($linenumber+1)."<br>".nl2br(htmlentities(trim($query)))."\n<br>".htmlentities(mysql_error());
                 break;
@@ -798,9 +798,10 @@ function PMBP_save_to_file($backupfile,$zip,&$fileData,$mode) {
 
     // save to a plain text file (uncompressed)
     } else {
-        if ($zp=@fopen($backupfile,$mode)) {
-            @fwrite($zp,$fileData);
-            @fclose($zp);
+        if ($zp=fopen($backupfile,$mode)) {
+			#echo "::Test";
+            fwrite($zp,$fileData);
+            fclose($zp);
             return $backupfile;
         } else {
             return FALSE;
@@ -1132,7 +1133,7 @@ function PMBP_get_db_list($CONF) {
 
 // in dependency on $mode different modes can be selected (see below)
 function PMBP_file_info($mode,$path) {
-    $filename=ereg_replace(".*/","",$path);
+    $filename=preg_replace("#.*/#","",$path);
     $parts=explode(".",$filename);
 
     switch($mode) {

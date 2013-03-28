@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class FileBrowser {
 	private $dirs = array();
@@ -57,6 +57,8 @@ class FileBrowser {
 	
 	private function searchFolder($dir){
 		$fp = opendir($dir);
+		if(!$fp)
+			return;
 		while(($file = readdir($fp)) !== false) {
 			if(is_dir("$dir/$file") AND !$this->isRecursive) continue;
 			elseif($this->isRecursive AND is_dir("$dir/$file") AND $file{0} != ".")
@@ -100,14 +102,22 @@ class FileBrowser {
 		$labeled = array();
 		foreach($this->foundFiles as $key => $value){
 			$class = str_replace($this->onlyExtensions,"",$value);
-			if($this->parameter != "nil") $class = new $class($this->parameter);
-			else $class = new $class();
-			
-			if($class->getLabel() == null) continue;
-			$labeled[$class->getLabel()] = get_class($class);
+			try {
+				if($this->parameter != "nil") $class = new $class($this->parameter);
+				else $class = new $class();
+
+				if($class->getLabel() == null) continue;
+				$labeled[$class->getLabel()] = get_class($class);
+			} catch(ClassNotFoundException $e){
+				continue;
+			}
 		}
 		if($sorted) ksort($labeled);
 		return $labeled;
+	}
+	
+	public function getAsOptionsArray($interface, $extension){
+		return array_flip($this->getAsLabeledArray($interface, $extension, true));
 	}
 }
  ?>

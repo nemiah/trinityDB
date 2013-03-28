@@ -15,13 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 #if(!class_exists("TemporaryPDFClass", false))
 #	eval("class TemporaryPDFClass extends FPDF {}");
 
-class FormattedTextPDF extends FPDF {
+class FormattedTextPDF extends FPDI {
 	function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $copy = false) {
 		if(file_exists(Util::getRootPath()."ubiquitous/Fonts/")){# AND !defined("FPDF_FONTPATH")) {
 			#define('FPDF_FONTPATH', Util::getRootPath()."ubiquitous/Fonts/");
@@ -51,12 +51,20 @@ class FormattedTextPDF extends FPDF {
 	private $FontLnH = array("h1" => 10, "h2" => 8, "h3" => 7, "h4" => 5, "h5" => 5, "h6" => 5);
 
 	private $styleStack = array();
-	private $sizeStack = array(9);
+	private $sizeStack = array();
 	private $colorStack = array("000000");
 	private $alignStack = array("left");
-	private $heightStack = array(5);
-	private $fontStack = array("Helvetica");
+	protected $heightStack = array(3);
+	protected $paragraph = 0;
+	protected $fontStack = array("Helvetica");
 
+	protected function stackFont(array $font){
+		if(count($this->fontStack) > 0)
+			$this->fontStack[count($this->fontStack) - 1] = $font[0];
+		else
+			$this->fontStack[] = $font[0];
+	}
+	
 	private function translateXML($xml){
 		$dom = dom_import_simplexml($xml);
 		
@@ -78,8 +86,12 @@ class FormattedTextPDF extends FPDF {
 
 	private function startTag($xml){
 		if($xml->getName() == "p"){
-			$this->Ln($this->heightStack[count($this->heightStack) - 1] * 2);
+			if($this->paragraph > 0)
+				$this->Ln($this->heightStack[count($this->heightStack) - 1] * 2);
+			
 			array_push($this->heightStack, $this->findMaxStyle("font-size", $xml));
+			
+			$this->paragraph++;
 		}
 
 		if(preg_match_all("/h([0-9])/", $xml->getName(), $m)){
@@ -91,8 +103,17 @@ class FormattedTextPDF extends FPDF {
 		if($xml->getName() == "strong")
 			array_push($this->styleStack, "B");
 
+		if($xml->getName() == "b")
+			array_push($this->styleStack, "B");
+
 		if($xml->getName() == "em")
 			array_push($this->styleStack, "I");
+
+		if($xml->getName() == "i")
+			array_push($this->styleStack, "I");
+
+		if($xml->getName() == "u")
+			array_push($this->styleStack, "U");
 
 		foreach($xml->attributes() AS $k => $a){
 			if($k == "style"){
@@ -125,13 +146,27 @@ class FormattedTextPDF extends FPDF {
 	}
 
 	private function endTag($xml){
+		if($xml->getName() == "br"){
+			$this->ln(5);
+			return;
+		}
+		
 		if($xml->getName() == "p")
 			array_pop($this->heightStack);
 
 		if($xml->getName() == "strong")
 			array_pop($this->styleStack);
 
+		if($xml->getName() == "b")
+			array_pop($this->styleStack);
+
 		if($xml->getName() == "em")
+			array_pop($this->styleStack);
+
+		if($xml->getName() == "i")
+			array_pop($this->styleStack);
+
+		if($xml->getName() == "u")
 			array_pop($this->styleStack);
 
 		if(preg_match_all("/h([0-9])/", $xml->getName(), $m)){
@@ -168,8 +203,12 @@ class FormattedTextPDF extends FPDF {
 	public function WriteHTML($html) {
 		if(trim($html) == "") return;
 
-		$bad = array("&gt;", "&lt;");
-		$good = array("::gt::", "::lt::");
+		$this->sizeStack[] = $this->getFontSize();
+		
+		$html = str_replace("\n", "", $html);
+		
+		$bad = array("&gt;", "&lt;", "&amp;");
+		$good = array("::gt::", "::lt::", "::amp::");
 		$this->translateXML(new SimpleXMLElement(str_replace($good, $bad, "<phynx>".html_entity_decode(str_replace($bad, $good, $html), ENT_NOQUOTES, "UTF-8")."</phynx>")));
 	}
 

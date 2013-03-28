@@ -15,12 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class BPS {
 	public static $variable = "BPS";
 
 	public static function getAllProperties($className){
+		if(is_object($className))
+			$className = get_class($className);
+		
 		$_SESSION[self::$variable]->setActualClass($className);
 		return $_SESSION[self::$variable]->getAllProperties();
 	}

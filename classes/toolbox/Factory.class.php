@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class Factory {
 	private $className;
@@ -79,8 +79,10 @@ class Factory {
 		if($this->newParameter == -1) {
 			$this->object->setA($this->attributes);
 			return $this->lastNewID = $this->object->newMe($checkUserData, $output);
-		} else
+		} else {
 			$this->object->saveMe($checkUserData, $output);
+			return $this->newParameter;
+		}
 	}
 
 	public function verify($resetParsers = false){

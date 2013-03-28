@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class FileManagerGUI extends mFileGUI implements iGUIHTMLMP2 {
 
@@ -163,11 +163,11 @@ class FileManagerGUI extends mFileGUI implements iGUIHTMLMP2 {
 
 		$gui->object($this);
 		$gui->name("Datei");
-		$gui->colWidth("FileIsDir", 20);
+		#$gui->colWidth("FileIsDir", 20);
 
-		$gui->attributes(array("FileIsDir","FileName"));
+		$gui->attributes(array("FileName"));
 
-		$gui->parser("FileIsDir","mFileGUI::popupIsDirParser2");
+		#$gui->parser("FileIsDir","mFileGUI::popupIsDirParser2");
 		$gui->parser("FileName","mFileGUI::nameParser2");
 
 		$gui->addToEvent("onDelete", BPS::getProperty("FileManagerGUI", "reloadFunction", "contentManager.reloadFrame('contentLeft');"));

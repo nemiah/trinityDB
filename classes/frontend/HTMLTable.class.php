@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	private $colStyles = array();
@@ -24,7 +24,8 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 
 	private $rowIDs = array();
 	private $cellIDs = array();
-
+	private $data = array();
+	
 	private $hiddenCols = array();
 	private $colOrder;
 
@@ -38,10 +39,57 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 
 	private $maxHeight;
 	private $tableClass = "";
-
+	private $appendJS = "";
+	private $weight = "heavy";
+	
 	function __construct($numCols = 0, $caption = null){
 		$this->numCols = $numCols;
 		$this->caption = $caption;
+	}
+	
+	function sortable($saveTo, $handleClass){
+		if($this->tableID == null)
+			$this->tableID = "RNDTable".rand (1, 99999999);
+		
+		$this->appendJS = "\$j('#$this->tableID tbody').sortable({
+				helper: function(e, ui) {
+					ui.children().each(function() {
+						\$j(this).width(\$j(this).width());
+					});
+
+					return ui;
+				},
+				update: function(){
+					var newOrder = \$j(this).sortable('serialize', {expression: /([a-zA-Z]+)_([0-9]+)/}).replace(/\[\]=/g, '').replace(/&/g, ';').replace(/[a-zA-Z]*/g, '');
+					contentManager.rmePCR('$saveTo', '-1', 'saveOrder', newOrder);
+				},
+				axis: 'y'".($handleClass != null ? ",
+				handle: \$j('.$handleClass')" : "")."
+			});";
+	}
+	
+	/**
+	 * @param type $weight possible values: heavy, light
+	 */
+	function weight($weight = "heavy"){
+		$this->weight = $weight;
+		$this->addTableClass("tableWeight".ucfirst($weight));
+		
+		for($i = 0; $i < $this->numCols; $i++)
+			$this->setColClass ($i+1, "");
+		
+		#if($weight == "light"){
+		#	$this->appendJS .= "\$j('.tableWeightLight tr').hover(function(){ \$j(this).addClass('backgroundColor2'); }, function(){ \$j(this).removeClass('backgroundColor2'); });";
+		#}
+	}
+	
+	function useForSelection($fixCols = true){
+		if($fixCols){
+			$this->setColWidth(1, 32);
+			$this->setColClass(2, "");
+		}
+		
+		$this->addTableClass("tableForSelection");
 	}
 	
 	function __toString(){
@@ -59,6 +107,13 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	#function setCaption($caption){
 	#	$this->caption = $caption;
 	#}
+	
+	function addRowData($key, $value){
+		if(!isset($this->data[count($this->content) - 1]))
+			$this->data[count($this->content) - 1] = array();
+		
+		$this->data[count($this->content) - 1][$key] = $value;
+	}
 	
 	function insertSpaceAbove($label = "", $tab = false, $formName = ""){
 		if(count($this->insertSpaceBefore) == 0) $this->uID = rand(1000000,9000000);
@@ -146,6 +201,11 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		else $this->colStyles[$colNumber] .= $style;
 	}
 
+	function setColStyle($colNumber, $style){
+		if(!isset($this->colStyles[$colNumber])) $this->colStyles[$colNumber] = $style;
+		else $this->colStyles[$colNumber] = $style;
+	}
+
 	function setRowStyles($styles){
 		$this->rowStyles = $styles;
 	}
@@ -161,7 +221,7 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 	}
 	
 	function addTableClass($class){
-		$this->tableClass = $class;
+		$this->tableClass .= $class." ";
 	}
 
 	function getHTMLForUpdate($addTR = false){
@@ -206,8 +266,14 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 				$this->tab++;
 			}
 
+			$data = "";
+			if(isset($this->data[$K]))
+				foreach($this->data[$K] AS $key => $value)
+					$data .= " data-".strtolower($key)."=\"$value\"";
+			
+			
 			if($addTR) $rows .= "
-			<tr $events ".(isset($this->rowIDs[$K]) ? "id=\"".$this->rowIDs[$K]."\" " : "")."".(isset($this->rowStyles[$K]) ? "style=\"".$this->rowStyles[$K]."\"" : "")." ".(isset($this->rowClasses[$K]) ? "class=\"".$this->rowClasses[$K]."\"" : "").">";
+			<tr $events $data ".(isset($this->rowIDs[$K]) ? "id=\"".$this->rowIDs[$K]."\" " : "")."".(isset($this->rowStyles[$K]) ? "style=\"".$this->rowStyles[$K]."\"" : "")." ".(isset($this->rowClasses[$K]) ? "class=\"".$this->rowClasses[$K]."\"" : "").">";
 
 			for($l = 0; $l < $this->numCols; $l++){
 
@@ -250,6 +316,7 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		
 		if(count($this->header) > 0){
 			$rows .= "
+			<thead>
 			<tr>";
 			
 			foreach($this->header as $K => $V){
@@ -267,7 +334,8 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 				<th $style>".(($this->colOrder != null AND isset($this->colOrder[$K])) ? $this->header[$this->colOrder[$K] - 1] : $V)."</th>";
 			}
 			$rows .= "
-			</tr>";
+			</tr>
+			</thead>";
 		}
 		
 		$this->tab = 1;
@@ -277,12 +345,15 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		if(preg_match("/width:([0-9 ]*)px;/", $this->tableStyle, $regs))
 			$divStyle = "style=\"".$regs[0]."\"";
 		
-
+		$tabClass = "backgroundColor1 Tab";
+		if($this->weight == "light")
+			$tabClass = "lightTab borderColor1";
+		
 		$R = "
 		".($this->caption != null ? "
 			<div>
-			<div class=\"backgroundColor1 Tab\" $divStyle>
-				<p>$this->caption</p>
+			<div class=\"$tabClass\" $divStyle>
+				<p>".T::_($this->caption)."</p>
 			</div></div>" : "");
 		
 		if($this->tab == 1) $R .= "
@@ -298,7 +369,7 @@ class HTMLTable extends UnifiedTable implements iUnifiedTable  {
 		if($this->tab > 1) $R .= "
 		</form>
 		</div>";
-		return $R;
+		return $R.($this->appendJS != "" ? OnEvent::script($this->appendJS) : "");
 	}
 }
 ?>

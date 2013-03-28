@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class AppPlugins {
 	private $folders = array();
@@ -35,6 +35,13 @@ class AppPlugins {
 	
 	private static $sessionVariable = "CurrentAppPlugins";
 
+	/**
+	 * @return AppPlugins 
+	 */
+	public static function i(){
+		return $_SESSION[self::$sessionVariable];
+	}
+	
 	public static function init(){
 		$_SESSION[self::$sessionVariable] = new AppPlugins();
 	}
@@ -75,6 +82,8 @@ class AppPlugins {
 
 		#$allowedPlugins = "noSaaS";
 		$allowedPlugins = Environment::getS("allowedPlugins", array());
+		$extraPlugins = Environment::getS("pluginsExtra", array());
+		$allowedPlugins = array_merge($allowedPlugins, $extraPlugins);
 		#print_r($allowedPlugins);
 		/*if($folder != "plugins" AND $_SERVER["HTTP_HOST"] != "dev.furtmeier.lan"){
 			try {
@@ -212,10 +221,16 @@ class AppPlugins {
 				}
 				
 				if($f[1] == "xml"){
-					$path = "./$folder/".$c->registerFolder()."/".$c->registerClassName().".class.php";
-					if(file_exists($path))
-					require_once $path;
-					elseif(file_exists(".".$path)) require_once ".".$path;
+					$fld = $c->registerFolder();
+					if(!is_array($fld))
+						$fld = array($fld);
+					
+					foreach($fld AS $folderName){
+						$path = "./$folder/$folderName/".$c->registerClassName().".class.php";
+						if(file_exists($path))
+						require_once $path;
+						elseif(file_exists(".".$path)) require_once ".".$path;
+					}
 				}
 				
 				if($appFolder == null) $c->doSomethingElse();
@@ -233,9 +248,15 @@ class AppPlugins {
 	
 	public function getMenuEntries(){
 		$entries = $this->menuEntries;
+		$hidden = Environment::getS("hiddenPlugins", array());
+		
 		foreach($entries as $key => $value){
 			#print_r($this->menuEntries);
-			if(isset($this->blacklist[$value])) unset($entries[$key]);
+			if(in_array($value, $hidden))
+				unset($entries[$key]);
+			
+			if(isset($this->blacklist[$value]))
+				unset($entries[$key]);
 			#$t = ((!isset($this->classes[$key]) OR !isset($this->isAdminOnlyByPlugin[$this->classes[$key]])) ? 
 			#	0 : $this->isAdminOnlyByPlugin[$this->classes[$key]]);
 			$t = 0;
@@ -254,6 +275,10 @@ class AppPlugins {
 
 	public function getMenuTargets(){
 		return $this->targets;
+	}
+	
+	public function addAdminOnly($plugin){
+		$this->isAdminOnlyByPlugin[$plugin] = true;
 	}
 	
 	public function getIsAdminOnly($plugin){
@@ -276,6 +301,13 @@ class AppPlugins {
 	
 	public function getIcons(){
 		return $this->icons;
+	}
+	
+	public function isPluginLoaded($pluginName){
+		if(isset($this->blacklist[$pluginName]))
+			return false;
+		
+		return in_array($pluginName,$_SESSION["CurrentAppPlugins"]->getAllPlugins());
 	}
 	
 	public function getAllPlugins(){
@@ -318,7 +350,7 @@ class AppPlugins {
 	public function getCollectionGUI($pluginClassName){
 		if(isset($this->genericPlugins[$pluginClassName])) 
 			return $this->genericPlugins[$pluginClassName]->getCollectionGUI();
-		print_r($this->genericPlugins);
+		
 		return false;
 	}
 	

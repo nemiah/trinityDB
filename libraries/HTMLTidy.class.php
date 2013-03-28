@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class HTMLTidy {
 	protected $content;
@@ -60,7 +60,7 @@ class HTMLTidy {
 		else
 			$SC->setCommand("c:/tidy.exe -asxhtml -numeric < $temp > $this->cleanedFile");
 		$SC->execute();
-		#echo file_get_contents("php://stderr");
+		#echo htmlentities(file_get_contents($this->errorsFile));
 		$this->done = true;
 	}
 

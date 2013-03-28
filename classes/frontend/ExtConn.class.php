@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class ExtConn {
 	protected $absolutePath;
@@ -28,12 +28,13 @@ class ExtConn {
 	protected $pluginMethods = array();
 	protected $pluginInterfaces = array();
 
-	function __construct($absolutePathToPhynx){
+	function __construct($absolutePathToPhynx, $propagateViaInterface = true){
 		if(!defined("PHYNX_MAIN_STORAGE"))
 			if(function_exists("mysqli_connect")) define("PHYNX_MAIN_STORAGE","MySQL");
 			else define("PHYNX_MAIN_STORAGE","MySQLo");
 
-		define("PHYNX_VIA_INTERFACE", true);
+		if($propagateViaInterface)
+			define("PHYNX_VIA_INTERFACE", true);
 
 		if($absolutePathToPhynx{strlen($absolutePathToPhynx) - 1} != "/") $absolutePathToPhynx .= "/";
 		
@@ -56,11 +57,13 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/backend/UnpersistentClass.class.php";
 		$this->paths[] = $this->absolutePath."classes/backend/PluginV2.class.php";
 		$this->paths[] = $this->absolutePath."classes/backend/XMLPlugin.class.php";
+		$this->paths[] = $this->absolutePath."classes/backend/FileStorage.class.php";
 		
 		$this->paths[] = $this->absolutePath."classes/exceptions/o3AException.class.php";
 		$this->paths[] = $this->absolutePath."classes/exceptions/StorageException.class.php";
 		$this->paths[] = $this->absolutePath."classes/exceptions/NoDBUserDataException.class.php";
 		$this->paths[] = $this->absolutePath."classes/exceptions/AOPNoAdviceException.class.php";
+		$this->paths[] = $this->absolutePath."classes/exceptions/ClassNotFoundException.class.php";
 		
 		$this->paths[] = $this->absolutePath."classes/toolbox/SysMessages.class.php";
 		$this->paths[] = $this->absolutePath."classes/toolbox/SystemCommand.class.php";
@@ -111,9 +114,12 @@ class ExtConn {
 		$this->paths[] = $this->absolutePath."classes/toolbox/LoginData.class.php";//Or else will not find Userdata
 		$this->paths[] = $this->absolutePath."classes/toolbox/Environment.class.php";
 		
+		if(file_exists($this->absolutePath."specifics/EnvironmentCurrent.class.php"))
+			$this->paths[] = $this->absolutePath."specifics/EnvironmentCurrent.class.php";
+		
 		$this->setPaths();
 		
-		if(!isset($_SESSION)) session_start();
+		if(session_id() == "") session_start();
 	
 		if(isset($_SESSION["S"]) AND !is_object($_SESSION["S"]) AND get_class($_SESSION["S"]) != "Session")
 			die($this->getErrorMessage("10"));
@@ -134,6 +140,24 @@ class ExtConn {
 		$_SESSION["viaInterface"] = true;
 	}
 
+	function autofailer(){
+		spl_autoload_register("ExtConn::autofail");
+	}
+	
+	static function autofail($c){
+		if(class_exists($c, false))
+			return;
+		
+		if(strpos($c, "Zend_") === 0)
+			return;
+		
+		eval('class '.$c.' { ' .
+			'    public function __construct() { ' .
+			'        throw new ClassNotFoundException("'.$c.'"); ' .
+			'    } ' .
+			'} ');
+	}
+	
 	function forbidCustomizers(){
 		define("PHYNX_FORBID_CUSTOMIZERS", true);
 	}
@@ -159,16 +183,47 @@ class ExtConn {
 	
 	function useDefaultMySQLData($httpHost = "*"){
 		$PFDB = new PhpFileDB();
-		$PFDB->setFolder($this->absolutePath."system/DBData/");
-		$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '$httpHost'");
-		$Data = $PFDB->pfdbFetchAssoc($q);
-
+		if(file_exists($this->absolutePath."../phynxConfig"))
+			$PFDB->setFolder($this->absolutePath."../phynxConfig/");
+		else
+			$PFDB->setFolder($this->absolutePath."system/DBData/");
+		$Data = false;
+		
+		if($httpHost != "*"){
+			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '$httpHost'");
+			$Data = $PFDB->pfdbFetchAssoc($q);
+		} else {
+			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '".$_SERVER["HTTP_HOST"]."'");
+			$Data = $PFDB->pfdbFetchAssoc($q);
+		}
+		
+		if($Data === false){
+			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '*'");
+			$Data = $PFDB->pfdbFetchAssoc($q);
+		
+		
+		}
+		
 		$this->setMySQLData($Data["host"], $Data["user"], $Data["password"], $Data["datab"]);
 	}
 
+	public function useAdminUser(){
+		$ac = anyC::get("User");
+		$ac->addAssocV3("isAdmin", "=", "1");
+		$ac->setLimitV3("1");
+
+		$u = $ac->getNextEntry();
+
+		if($u == null){
+			$this->errors[] = "100";
+			return false;
+		}
+
+		return $this->login($u->A("username"), $u->A("SHApassword"), true);
+	}
+	
 	public function useUser($username = null){
-		$ac = new anyC();
-		$ac->setCollectionOf("User");
+		$ac = anyC::get("User");
 		if($username != null) $ac->addAssocV3("username", "=", $username);
 		$ac->addAssocV3("isAdmin", "=", "0");
 		$ac->setLimitV3("1");

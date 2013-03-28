@@ -15,12 +15,295 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 class ISO3166 {
 
-	public static function getCountries(){
+	public static function getCountries($lang = "de"){
+		switch($lang){
+			case "de":
+				return self::getCountriesDE();
+			break;
+			
+			case "en":
+				return self::getCountriesEN();
+			break;
+		}
+	}
+	
+	public static function getCountriesEN(){
+		//FROM https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
+		
+		$codes = "Afghanistan,AF,AFG,004,ISO 3166-2:AF,142,034
+Åland Islands,AX,ALA,248,ISO 3166-2:AX,150,154
+Albania,AL,ALB,008,ISO 3166-2:AL,150,039
+Algeria,DZ,DZA,012,ISO 3166-2:DZ,002,015
+American Samoa,AS,ASM,016,ISO 3166-2:AS,009,061
+Andorra,AD,AND,020,ISO 3166-2:AD,150,039
+Angola,AO,AGO,024,ISO 3166-2:AO,002,017
+Anguilla,AI,AIA,660,ISO 3166-2:AI,019,029
+Antarctica,AQ,ATA,010,ISO 3166-2:AQ
+Antigua and Barbuda,AG,ATG,028,ISO 3166-2:AG,019,029
+Argentina,AR,ARG,032,ISO 3166-2:AR,019,005
+Armenia,AM,ARM,051,ISO 3166-2:AM,142,145
+Aruba,AW,ABW,533,ISO 3166-2:AW,019,029
+Australia,AU,AUS,036,ISO 3166-2:AU,009,053
+Austria,AT,AUT,040,ISO 3166-2:AT,150,155
+Azerbaijan,AZ,AZE,031,ISO 3166-2:AZ,142,145
+Bahamas,BS,BHS,044,ISO 3166-2:BS,019,029
+Bahrain,BH,BHR,048,ISO 3166-2:BH,142,145
+Bangladesh,BD,BGD,050,ISO 3166-2:BD,142,034
+Barbados,BB,BRB,052,ISO 3166-2:BB,019,029
+Belarus,BY,BLR,112,ISO 3166-2:BY,150,151
+Belgium,BE,BEL,056,ISO 3166-2:BE,150,155
+Belize,BZ,BLZ,084,ISO 3166-2:BZ,019,013
+Benin,BJ,BEN,204,ISO 3166-2:BJ,002,011
+Bermuda,BM,BMU,060,ISO 3166-2:BM,019,021
+Bhutan,BT,BTN,064,ISO 3166-2:BT,142,034
+Bolivia\, Plurinational State of,BO,BOL,068,ISO 3166-2:BO,019,005
+Bonaire\, Sint Eustatius and Saba,BQ,BES,535,ISO 3166-2:BQ,019,029
+Bosnia and Herzegovina,BA,BIH,070,ISO 3166-2:BA,150,039
+Botswana,BW,BWA,072,ISO 3166-2:BW,002,018
+Bouvet Island,BV,BVT,074,ISO 3166-2:BV
+Brazil,BR,BRA,076,ISO 3166-2:BR,019,005
+British Indian Ocean Territory,IO,IOT,086,ISO 3166-2:IO
+Brunei Darussalam,BN,BRN,096,ISO 3166-2:BN,142,035
+Bulgaria,BG,BGR,100,ISO 3166-2:BG,150,151
+Burkina Faso,BF,BFA,854,ISO 3166-2:BF,002,011
+Burundi,BI,BDI,108,ISO 3166-2:BI,002,014
+Cambodia,KH,KHM,116,ISO 3166-2:KH,142,035
+Cameroon,CM,CMR,120,ISO 3166-2:CM,002,017
+Canada,CA,CAN,124,ISO 3166-2:CA,019,021
+Cape Verde,CV,CPV,132,ISO 3166-2:CV,002,011
+Cayman Islands,KY,CYM,136,ISO 3166-2:KY,019,029
+Central African Republic,CF,CAF,140,ISO 3166-2:CF,002,017
+Chad,TD,TCD,148,ISO 3166-2:TD,002,017
+Chile,CL,CHL,152,ISO 3166-2:CL,019,005
+China,CN,CHN,156,ISO 3166-2:CN,142,030
+Christmas Island,CX,CXR,162,ISO 3166-2:CX
+Cocos (Keeling) Islands,CC,CCK,166,ISO 3166-2:CC
+Colombia,CO,COL,170,ISO 3166-2:CO,019,005
+Comoros,KM,COM,174,ISO 3166-2:KM,002,014
+Congo,CG,COG,178,ISO 3166-2:CG,002,017
+Congo\, the Democratic Republic of the,CD,COD,180,ISO 3166-2:CD,002,017
+Cook Islands,CK,COK,184,ISO 3166-2:CK,009,061
+Costa Rica,CR,CRI,188,ISO 3166-2:CR,019,013
+Côte d'Ivoire,CI,CIV,384,ISO 3166-2:CI,002,011
+Croatia,HR,HRV,191,ISO 3166-2:HR,150,039
+Cuba,CU,CUB,192,ISO 3166-2:CU,019,029
+Curaçao,CW,CUW,531,ISO 3166-2:CW,019,029
+Cyprus,CY,CYP,196,ISO 3166-2:CY,142,145
+Czech Republic,CZ,CZE,203,ISO 3166-2:CZ,150,151
+Denmark,DK,DNK,208,ISO 3166-2:DK,150,154
+Djibouti,DJ,DJI,262,ISO 3166-2:DJ,002,014
+Dominica,DM,DMA,212,ISO 3166-2:DM,019,029
+Dominican Republic,DO,DOM,214,ISO 3166-2:DO,019,029
+Ecuador,EC,ECU,218,ISO 3166-2:EC,019,005
+Egypt,EG,EGY,818,ISO 3166-2:EG,002,015
+El Salvador,SV,SLV,222,ISO 3166-2:SV,019,013
+Equatorial Guinea,GQ,GNQ,226,ISO 3166-2:GQ,002,017
+Eritrea,ER,ERI,232,ISO 3166-2:ER,002,014
+Estonia,EE,EST,233,ISO 3166-2:EE,150,154
+Ethiopia,ET,ETH,231,ISO 3166-2:ET,002,014
+Falkland Islands (Malvinas),FK,FLK,238,ISO 3166-2:FK,019,005
+Faroe Islands,FO,FRO,234,ISO 3166-2:FO,150,154
+Fiji,FJ,FJI,242,ISO 3166-2:FJ,009,054
+Finland,FI,FIN,246,ISO 3166-2:FI,150,154
+France,FR,FRA,250,ISO 3166-2:FR,150,155
+French Guiana,GF,GUF,254,ISO 3166-2:GF,019,005
+French Polynesia,PF,PYF,258,ISO 3166-2:PF,009,061
+French Southern Territories,TF,ATF,260,ISO 3166-2:TF
+Gabon,GA,GAB,266,ISO 3166-2:GA,002,017
+Gambia,GM,GMB,270,ISO 3166-2:GM,002,011
+Georgia,GE,GEO,268,ISO 3166-2:GE,142,145
+Germany,DE,DEU,276,ISO 3166-2:DE,150,155
+Ghana,GH,GHA,288,ISO 3166-2:GH,002,011
+Gibraltar,GI,GIB,292,ISO 3166-2:GI,150,039
+Greece,GR,GRC,300,ISO 3166-2:GR,150,039
+Greenland,GL,GRL,304,ISO 3166-2:GL,019,021
+Grenada,GD,GRD,308,ISO 3166-2:GD,019,029
+Guadeloupe,GP,GLP,312,ISO 3166-2:GP,019,029
+Guam,GU,GUM,316,ISO 3166-2:GU,009,057
+Guatemala,GT,GTM,320,ISO 3166-2:GT,019,013
+Guernsey,GG,GGY,831,ISO 3166-2:GG,150,154
+Guinea,GN,GIN,324,ISO 3166-2:GN,002,011
+Guinea-Bissau,GW,GNB,624,ISO 3166-2:GW,002,011
+Guyana,GY,GUY,328,ISO 3166-2:GY,019,005
+Haiti,HT,HTI,332,ISO 3166-2:HT,019,029
+Heard Island and McDonald Islands,HM,HMD,334,ISO 3166-2:HM
+Holy See (Vatican City State),VA,VAT,336,ISO 3166-2:VA,150,039
+Honduras,HN,HND,340,ISO 3166-2:HN,019,013
+Hong Kong,HK,HKG,344,ISO 3166-2:HK,142,030
+Hungary,HU,HUN,348,ISO 3166-2:HU,150,151
+Iceland,IS,ISL,352,ISO 3166-2:IS,150,154
+India,IN,IND,356,ISO 3166-2:IN,142,034
+Indonesia,ID,IDN,360,ISO 3166-2:ID,142,035
+Iran\, Islamic Republic of,IR,IRN,364,ISO 3166-2:IR,142,034
+Iraq,IQ,IRQ,368,ISO 3166-2:IQ,142,145
+Ireland,IE,IRL,372,ISO 3166-2:IE,150,154
+Isle of Man,IM,IMN,833,ISO 3166-2:IM,150,154
+Israel,IL,ISR,376,ISO 3166-2:IL,142,145
+Italy,IT,ITA,380,ISO 3166-2:IT,150,039
+Jamaica,JM,JAM,388,ISO 3166-2:JM,019,029
+Japan,JP,JPN,392,ISO 3166-2:JP,142,030
+Jersey,JE,JEY,832,ISO 3166-2:JE,150,154
+Jordan,JO,JOR,400,ISO 3166-2:JO,142,145
+Kazakhstan,KZ,KAZ,398,ISO 3166-2:KZ,142,143
+Kenya,KE,KEN,404,ISO 3166-2:KE,002,014
+Kiribati,KI,KIR,296,ISO 3166-2:KI,009,057
+Korea\, Democratic People's Republic of,KP,PRK,408,ISO 3166-2:KP,142,030
+Korea\, Republic of,KR,KOR,410,ISO 3166-2:KR,142,030
+Kuwait,KW,KWT,414,ISO 3166-2:KW,142,145
+Kyrgyzstan,KG,KGZ,417,ISO 3166-2:KG,142,143
+Lao People's Democratic Republic,LA,LAO,418,ISO 3166-2:LA,142,035
+Latvia,LV,LVA,428,ISO 3166-2:LV,150,154
+Lebanon,LB,LBN,422,ISO 3166-2:LB,142,145
+Lesotho,LS,LSO,426,ISO 3166-2:LS,002,018
+Liberia,LR,LBR,430,ISO 3166-2:LR,002,011
+Libya,LY,LBY,434,ISO 3166-2:LY,002,015
+Liechtenstein,LI,LIE,438,ISO 3166-2:LI,150,155
+Lithuania,LT,LTU,440,ISO 3166-2:LT,150,154
+Luxembourg,LU,LUX,442,ISO 3166-2:LU,150,155
+Macao,MO,MAC,446,ISO 3166-2:MO,142,030
+Macedonia\, the former Yugoslav Republic of,MK,MKD,807,ISO 3166-2:MK,150,039
+Madagascar,MG,MDG,450,ISO 3166-2:MG,002,014
+Malawi,MW,MWI,454,ISO 3166-2:MW,002,014
+Malaysia,MY,MYS,458,ISO 3166-2:MY,142,035
+Maldives,MV,MDV,462,ISO 3166-2:MV,142,034
+Mali,ML,MLI,466,ISO 3166-2:ML,002,011
+Malta,MT,MLT,470,ISO 3166-2:MT,150,039
+Marshall Islands,MH,MHL,584,ISO 3166-2:MH,009,057
+Martinique,MQ,MTQ,474,ISO 3166-2:MQ,019,029
+Mauritania,MR,MRT,478,ISO 3166-2:MR,002,011
+Mauritius,MU,MUS,480,ISO 3166-2:MU,002,014
+Mayotte,YT,MYT,175,ISO 3166-2:YT,002,014
+Mexico,MX,MEX,484,ISO 3166-2:MX,019,013
+Micronesia\, Federated States of,FM,FSM,583,ISO 3166-2:FM,009,057
+Moldova\, Republic of,MD,MDA,498,ISO 3166-2:MD,150,151
+Monaco,MC,MCO,492,ISO 3166-2:MC,150,155
+Mongolia,MN,MNG,496,ISO 3166-2:MN,142,030
+Montenegro,ME,MNE,499,ISO 3166-2:ME,150,039
+Montserrat,MS,MSR,500,ISO 3166-2:MS,019,029
+Morocco,MA,MAR,504,ISO 3166-2:MA,002,015
+Mozambique,MZ,MOZ,508,ISO 3166-2:MZ,002,014
+Myanmar,MM,MMR,104,ISO 3166-2:MM,142,035
+Namibia,NA,NAM,516,ISO 3166-2:NA,002,018
+Nauru,NR,NRU,520,ISO 3166-2:NR,009,057
+Nepal,NP,NPL,524,ISO 3166-2:NP,142,034
+Netherlands,NL,NLD,528,ISO 3166-2:NL,150,155
+New Caledonia,NC,NCL,540,ISO 3166-2:NC,009,054
+New Zealand,NZ,NZL,554,ISO 3166-2:NZ,009,053
+Nicaragua,NI,NIC,558,ISO 3166-2:NI,019,013
+Niger,NE,NER,562,ISO 3166-2:NE,002,011
+Nigeria,NG,NGA,566,ISO 3166-2:NG,002,011
+Niue,NU,NIU,570,ISO 3166-2:NU,009,061
+Norfolk Island,NF,NFK,574,ISO 3166-2:NF,009,053
+Northern Mariana Islands,MP,MNP,580,ISO 3166-2:MP,009,057
+Norway,NO,NOR,578,ISO 3166-2:NO,150,154
+Oman,OM,OMN,512,ISO 3166-2:OM,142,145
+Pakistan,PK,PAK,586,ISO 3166-2:PK,142,034
+Palau,PW,PLW,585,ISO 3166-2:PW,009,057
+Palestinian Territory\, Occupied,PS,PSE,275,ISO 3166-2:PS,142,145
+Panama,PA,PAN,591,ISO 3166-2:PA,019,013
+Papua New Guinea,PG,PNG,598,ISO 3166-2:PG,009,054
+Paraguay,PY,PRY,600,ISO 3166-2:PY,019,005
+Peru,PE,PER,604,ISO 3166-2:PE,019,005
+Philippines,PH,PHL,608,ISO 3166-2:PH,142,035
+Pitcairn,PN,PCN,612,ISO 3166-2:PN,009,061
+Poland,PL,POL,616,ISO 3166-2:PL,150,151
+Portugal,PT,PRT,620,ISO 3166-2:PT,150,039
+Puerto Rico,PR,PRI,630,ISO 3166-2:PR,019,029
+Qatar,QA,QAT,634,ISO 3166-2:QA,142,145
+Réunion,RE,REU,638,ISO 3166-2:RE,002,014
+Romania,RO,ROU,642,ISO 3166-2:RO,150,151
+Russian Federation,RU,RUS,643,ISO 3166-2:RU,150,151
+Rwanda,RW,RWA,646,ISO 3166-2:RW,002,014
+Saint Barthélemy,BL,BLM,652,ISO 3166-2:BL,019,029
+Saint Helena\, Ascension and Tristan da Cunha,SH,SHN,654,ISO 3166-2:SH,002,011
+Saint Kitts and Nevis,KN,KNA,659,ISO 3166-2:KN,019,029
+Saint Lucia,LC,LCA,662,ISO 3166-2:LC,019,029
+Saint Martin (French part),MF,MAF,663,ISO 3166-2:MF,019,029
+Saint Pierre and Miquelon,PM,SPM,666,ISO 3166-2:PM,019,021
+Saint Vincent and the Grenadines,VC,VCT,670,ISO 3166-2:VC,019,029
+Samoa,WS,WSM,882,ISO 3166-2:WS,009,061
+San Marino,SM,SMR,674,ISO 3166-2:SM,150,039
+Sao Tome and Principe,ST,STP,678,ISO 3166-2:ST,002,017
+Saudi Arabia,SA,SAU,682,ISO 3166-2:SA,142,145
+Senegal,SN,SEN,686,ISO 3166-2:SN,002,011
+Serbia,RS,SRB,688,ISO 3166-2:RS,150,039
+Seychelles,SC,SYC,690,ISO 3166-2:SC,002,014
+Sierra Leone,SL,SLE,694,ISO 3166-2:SL,002,011
+Singapore,SG,SGP,702,ISO 3166-2:SG,142,035
+Sint Maarten (Dutch part),SX,SXM,534,ISO 3166-2:SX,019,029
+Slovakia,SK,SVK,703,ISO 3166-2:SK,150,151
+Slovenia,SI,SVN,705,ISO 3166-2:SI,150,039
+Solomon Islands,SB,SLB,090,ISO 3166-2:SB,009,054
+Somalia,SO,SOM,706,ISO 3166-2:SO,002,014
+South Africa,ZA,ZAF,710,ISO 3166-2:ZA,002,018
+South Georgia and the South Sandwich Islands,GS,SGS,239,ISO 3166-2:GS
+South Sudan,SS,SSD,728,ISO 3166-2:SS,002,015
+Spain,ES,ESP,724,ISO 3166-2:ES,150,039
+Sri Lanka,LK,LKA,144,ISO 3166-2:LK,142,034
+Sudan,SD,SDN,729,ISO 3166-2:SD,002,015
+Suriname,SR,SUR,740,ISO 3166-2:SR,019,005
+Svalbard and Jan Mayen,SJ,SJM,744,ISO 3166-2:SJ,150,154
+Swaziland,SZ,SWZ,748,ISO 3166-2:SZ,002,018
+Sweden,SE,SWE,752,ISO 3166-2:SE,150,154
+Switzerland,CH,CHE,756,ISO 3166-2:CH,150,155
+Syrian Arab Republic,SY,SYR,760,ISO 3166-2:SY,142,145
+Taiwan\, Province of China,TW,TWN,158,ISO 3166-2:TW,142,030
+Tajikistan,TJ,TJK,762,ISO 3166-2:TJ,142,143
+Tanzania\, United Republic of,TZ,TZA,834,ISO 3166-2:TZ,002,014
+Thailand,TH,THA,764,ISO 3166-2:TH,142,035
+Timor-Leste,TL,TLS,626,ISO 3166-2:TL,142,035
+Togo,TG,TGO,768,ISO 3166-2:TG,002,011
+Tokelau,TK,TKL,772,ISO 3166-2:TK,009,061
+Tonga,TO,TON,776,ISO 3166-2:TO,009,061
+Trinidad and Tobago,TT,TTO,780,ISO 3166-2:TT,019,029
+Tunisia,TN,TUN,788,ISO 3166-2:TN,002,015
+Turkey,TR,TUR,792,ISO 3166-2:TR,142,145
+Turkmenistan,TM,TKM,795,ISO 3166-2:TM,142,143
+Turks and Caicos Islands,TC,TCA,796,ISO 3166-2:TC,019,029
+Tuvalu,TV,TUV,798,ISO 3166-2:TV,009,061
+Uganda,UG,UGA,800,ISO 3166-2:UG,002,014
+Ukraine,UA,UKR,804,ISO 3166-2:UA,150,151
+United Arab Emirates,AE,ARE,784,ISO 3166-2:AE,142,145
+United Kingdom,GB,GBR,826,ISO 3166-2:GB,150,154
+United States,US,USA,840,ISO 3166-2:US,019,021
+United States Minor Outlying Islands,UM,UMI,581,ISO 3166-2:UM
+Uruguay,UY,URY,858,ISO 3166-2:UY,019,005
+Uzbekistan,UZ,UZB,860,ISO 3166-2:UZ,142,143
+Vanuatu,VU,VUT,548,ISO 3166-2:VU,009,054
+Venezuela\, Bolivarian Republic of,VE,VEN,862,ISO 3166-2:VE,019,005
+Viet Nam,VN,VNM,704,ISO 3166-2:VN,142,035
+Virgin Islands\, British,VG,VGB,092,ISO 3166-2:VG,019,029
+Virgin Islands\, U.S.,VI,VIR,850,ISO 3166-2:VI,019,029
+Wallis and Futuna,WF,WLF,876,ISO 3166-2:WF,009,061
+Western Sahara,EH,ESH,732,ISO 3166-2:EH,002,015
+Yemen,YE,YEM,887,ISO 3166-2:YE,142,145
+Zambia,ZM,ZMB,894,ISO 3166-2:ZM,002,014
+Zimbabwe,ZW,ZWE,716,ISO 3166-2:ZW,002,014";
+		
+		$lines = explode("\n", $codes);
+		$countries = array();
+
+		foreach($lines AS $k => $v){
+			if(strpos($v, "\,") === false){
+				$values = explode(",", $v);
+				$countries[$values[1]] = $values[0];
+			} else {
+				$values = explode(",", $v);
+				$countries[$values[2]] = str_replace("\\", "", $values[0]).",".$values[1];
+			}
+		}
+
+		asort($countries);
+
+		return $countries;
+	}
+	
+	public static function getCountriesDE(){
 		$codes = "ABW    AW    Aruba
 AFG    AF    Afghanistan
 AGO    AO    Angola
@@ -281,20 +564,38 @@ ZWE    ZW    Simbabwe";
 		return $countries;
 	}
 
-	public static function getCountryToCode($code){
-		$countries = self::getCountries();
+	public static function getCountryToCode($code, $lang = "de"){
+		$countries = self::getCountries($lang);
 
 		return $countries[$code];
 	}
 
-	public static function getCodeToCountry($country){
-		$countries = self::getCountries();
+	public static function getCodeToCountry($country, $lang = "de"){
+		$countries = self::getCountries($lang);
 
 		return array_search($country, $countries);
 	}
 
 	public static function getZones($code){
 		$zones = array();
+		$zones["DE"] = array(
+			"1" => "Baden-Württemberg",
+			"2" => "Bayern",
+			"3" => "Berlin",
+			"4" => "Brandenburg",
+			"5" => "Bremen",
+			"6" => "Hamburg",
+			"7" => "Hessen",
+			"8" => "Mecklenburg-Vorpommern",
+			"9" => "Niedersachsen",
+			"10" => "Nordrhein-Westfalen",
+			"11" => "Rheinland-Pfalz",
+			"12" => "Saarland",
+			"13" => "Sachsen",
+			"14" => "Sachsen-Anhalt",
+			"15" => "Schleswig-Holstein",
+			"16" => "Thüringen");
+		
 		$zones["AT"] = array(
 			"1" => "Burgenland",
 			"2" => "Kärnten",
@@ -430,7 +731,306 @@ ZWE    ZW    Simbabwe";
 9;"Wien";920;"Wien 20.,Brigittenau"
 9;"Wien";921;"Wien 21.,Floridsdorf"
 9;"Wien";922;"Wien 22.,Donaustadt"
-9;"Wien";923;"Wien 23.,Liesing"');
+9;"Wien";923;"Wien 23.,Liesing"',
+
+"DE" => "1;;8425;Alb-Donau-Kreis
+1;;8426;Biberach
+1;;8115;Böblingen
+1;;8435;Bodenseekreis
+1;;8315;Breisgau-Hochschwarzwald
+1;;8235;Calw
+1;;8316;Emmendingen
+1;;8236;Enzkreis
+1;;8116;Esslingen
+1;;8237;Freudenstadt
+1;;8117;Göppingen
+1;;8135;Heidenheim
+1;;8125;Heilbronn
+1;;8126;Hohenlohekreis
+1;;8215;Karlsruhe
+1;;8335;Konstanz
+1;;8336;Lörrach
+1;;8118;Ludwigsburg
+1;;8128;Main-Tauber-Kreis
+1;;8225;Neckar-Odenwald-Kreis
+1;;8317;Ortenaukreis
+1;;8136;Ostalbkreis
+1;;8216;Rastatt
+1;;8436;Ravensburg
+1;;8119;Rems-Murr-Kreis
+1;;8415;Reutlingen
+1;;8226;Rhein-Neckar-Kreis
+1;;8325;Rottweil
+1;;8127;Schwäbisch Hall
+1;;8326;Schwarzwald-Baar-Kreis
+1;;8437;Sigmaringen
+1;;8416;Tübingen
+1;;8327;Tuttlingen
+1;;8337;Waldshut
+1;;8417;Zollernalbkreis
+2;;9771;Aichach-Friedberg
+2;;9171;Altötting
+2;;9371;Amberg-Sulzbach
+2;;9571;Ansbach
+2;;9671;Aschaffenburg
+2;;9772;Augsburg
+2;;9672;Bad Kissingen
+2;;9173;Bad Tölz-Wolfratshausen
+2;;9471;Bamberg
+2;;9472;Bayreuth
+2;;9172;Berchtesgadener Land
+2;;9372;Cham
+2;;9473;Coburg
+2;;9174;Dachau
+2;;9271;Deggendorf
+2;;9773;Dillingen an der Donau
+2;;9279;Dingolfing-Landau
+2;;9779;Donau-Ries
+2;;9175;Ebersberg
+2;;9176;Eichstätt
+2;;9177;Erding
+2;;9572;Erlangen-Höchstadt
+2;;9474;Forchheim
+2;;9178;Freising
+2;;9272;Freyung-Grafenau
+2;;9179;Fürstenfeldbruck
+2;;9573;Fürth
+2;;9180;Garmisch-Partenkirchen
+2;;9774;Günzburg
+2;;9674;Haßberge
+2;;9475;Hof
+2;;9273;Kelheim
+2;;9675;Kitzingen
+2;;9476;Kronach
+2;;9477;Kulmbach
+2;;9181;Landsberg am Lech
+2;;9274;Landshut
+2;;9478;Lichtenfels
+2;;9776;Lindau (Bodensee)
+2;;9677;Main-Spessart
+2;;9182;Miesbach
+2;;9676;Miltenberg
+2;;9183;Mühldorf am Inn
+2;;9184;München
+2;;9775;Neu-Ulm
+2;;9185;Neuburg-Schrobenhausen
+2;;9373;Neumarkt in der Oberpfalz
+2;;9575;Neustadt an der Aisch-Bad Windsheim
+2;;9374;Neustadt an der Waldnaab
+2;;9574;Nürnberger Land
+2;;9780;Oberallgäu
+2;;9777;Ostallgäu
+2;;9275;Passau
+2;;9186;Pfaffenhofen an der Ilm
+2;;9276;Regen
+2;;9375;Regensburg
+2;;9673;Rhön-Grabfeld
+2;;9187;Rosenheim
+2;;9576;Roth
+2;;9277;Rottal-Inn
+2;;9376;Schwandorf
+2;;9678;Schweinfurt
+2;;9188;Starnberg
+2;;9278;Straubing-Bogen
+2;;9377;Tirschenreuth
+2;;9189;Traunstein
+2;;9778;Unterallgäu
+2;;9190;Weilheim-Schongau
+2;;9577;Weißenburg-Gunzenhausen
+2;;9479;Wunsiedel im Fichtelgebirge
+2;;9679;Würzburg
+3;;11000;Berlin
+4;;12060;Barnim
+4;;12061;Dahme-Spreewald
+4;;12062;Elbe-Elster
+4;;12063;Havelland
+4;;12064;Märkisch-Oderland
+4;;12065;Oberhavel
+4;;12066;Oberspreewald-Lausitz
+4;;12067;Oder-Spree
+4;;12068;Ostprignitz-Ruppin
+4;;12069;Potsdam-Mittelmark
+4;;12070;Prignitz
+4;;12071;Spree-Neiße
+4;;12072;Teltow-Fläming
+4;;12073;Uckermark
+5;;4011;Bremen
+6;;2000;Hamburg
+7;;6431;Bergstraße
+7;;6432;Darmstadt-Dieburg
+7;;6631;Fulda
+7;;6531;Gießen
+7;;6433;Groß-Gerau
+7;;6632;Hersfeld-Rotenburg
+7;;6434;Hochtaunuskreis
+7;;6633;Kassel
+7;;6532;Lahn-Dill-Kreis
+7;;6533;Limburg-Weilburg
+7;;6435;Main-Kinzig-Kreis
+7;;6436;Main-Taunus-Kreis
+7;;6534;Marburg-Biedenkopf
+7;;6437;Odenwaldkreis
+7;;6438;Offenbach
+7;;6439;Rheingau-Taunus-Kreis
+7;;6634;Schwalm-Eder-Kreis
+7;;6535;Vogelsbergkreis
+7;;6635;Waldeck-Frankenberg
+7;;6636;Werra-Meißner-Kreis
+7;;6440;Wetteraukreis
+8;;13076;Ludwigslust-Parchim
+8;;13071;Mecklenburgische Seenplatte
+8;;13074;Nordwestmecklenburg
+8;;13072;Rostock
+8;;13075;Vorpommern-Greifswald
+8;;13073;Vorpommern-Rügen
+9;;3451;Ammerland
+9;;3452;Aurich
+9;;3351;Celle
+9;;3453;Cloppenburg
+9;;3352;Cuxhaven
+9;;3251;Diepholz
+9;;3454;Emsland
+9;;3455;Friesland
+9;;3151;Gifhorn
+9;;3153;Goslar
+9;;3152;Göttingen
+9;;3456;Grafschaft Bentheim
+9;;3252;Hameln-Pyrmont
+9;;3241;Hannover Region
+9;;3353;Harburg
+9;;3358;Heidekreis
+9;;3154;Helmstedt
+9;;3254;Hildesheim
+9;;3255;Holzminden
+9;;3457;Leer
+9;;3354;Lüchow-Dannenberg
+9;;3355;Lüneburg
+9;;3256;Nienburg/Weser
+9;;3155;Northeim
+9;;3458;Oldenburg
+9;;3459;Osnabrück
+9;;3356;Osterholz
+9;;3156;Osterode am Harz
+9;;3157;Peine
+9;;3357;Rotenburg (Wümme)
+9;;3257;Schaumburg
+9;;3359;Stade
+9;;3360;Uelzen
+9;;3460;Vechta
+9;;3361;Verden
+9;;3461;Wesermarsch
+9;;3462;Wittmund
+9;;3158;Wolfenbüttel
+10;;5334;Aachen Städteregion
+10;;5554;Borken
+10;;5558;Coesfeld
+10;;5358;Düren
+10;;5954;Ennepe-Ruhr-Kreis
+10;;5366;Euskirchen
+10;;5754;Gütersloh
+10;;5370;Heinsberg
+10;;5758;Herford
+10;;5958;Hochsauerlandkreis
+10;;5762;Höxter
+10;;5154;Kleve
+10;;5766;Lippe
+10;;5962;Märkischer Kreis
+10;;5158;Mettmann
+10;;5770;Minden-Lübbecke
+10;;5374;Oberbergischer Kreis
+10;;5966;Olpe
+10;;5774;Paderborn
+10;;5562;Recklinghausen
+10;;5362;Rhein-Erft-Kreis
+10;;5162;Rhein-Kreis Neuss
+10;;5382;Rhein-Sieg-Kreis
+10;;5378;Rheinisch-Bergischer Kreis
+10;;5970;Siegen-Wittgenstein
+10;;5974;Soest
+10;;5566;Steinfurt
+10;;5978;Unna
+10;;5166;Viersen
+10;;5570;Warendorf
+10;;5170;Wesel
+11;;7131;Ahrweiler
+11;;7132;Altenkirchen (Westerwald)
+11;;7331;Alzey-Worms
+11;;7332;Bad Dürkheim
+11;;7133;Bad Kreuznach
+11;;7231;Bernkastel-Wittlich
+11;;7134;Birkenfeld
+11;;7135;Cochem-Zell
+11;;7333;Donnersbergkreis
+11;;7232;Eifelkreis Bitburg-Prüm
+11;;7334;Germersheim
+11;;7335;Kaiserslautern
+11;;7336;Kusel
+11;;7339;Mainz-Bingen
+11;;7137;Mayen-Koblenz
+11;;7138;Neuwied
+11;;7140;Rhein-Hunsrück-Kreis
+11;;7141;Rhein-Lahn-Kreis
+11;;7338;Rhein-Pfalz-Kreis
+11;;7337;Südliche Weinstraße
+11;;7340;Südwestpfalz
+11;;7235;Trier-Saarburg
+11;;7233;Vulkaneifel
+11;;7143;Westerwaldkreis
+12;;10042;Merzig-Wadern
+12;;10043;Neunkirchen
+12;;10041;Saarbrücken Regionalverband
+12;;10044;Saarlouis
+12;;10045;Saarpfalz-Kreis
+12;;10046;St. Wendel
+13;;14625;Bautzen
+13;;14521;Erzgebirgskreis
+13;;14626;Görlitz
+13;;14729;Leipzig
+13;;14627;Meißen
+13;;14522;Mittelsachsen
+13;;14730;Nordsachsen
+13;;14628;Sächsische Schweiz-Osterzgebirge
+13;;14523;Vogtlandkreis
+13;;14524;Zwickau
+14;;15081;Altmarkkreis Salzwedel
+14;;15082;Anhalt-Bitterfeld
+14;;15083;Börde
+14;;15084;Burgenlandkreis
+14;;15085;Harz
+14;;15086;Jerichower Land
+14;;15087;Mansfeld-Südharz
+14;;15088;Saalekreis
+14;;15089;Salzlandkreis
+14;;15090;Stendal
+14;;15091;Wittenberg
+15;;1051;Dithmarschen
+15;;1053;Herzogtum Lauenburg
+15;;1054;Nordfriesland
+15;;1055;Ostholstein
+15;;1056;Pinneberg
+15;;1057;Plön
+15;;1058;Rendsburg-Eckernförde
+15;;1059;Schleswig-Flensburg
+15;;1060;Segeberg
+15;;1061;Steinburg
+15;;1062;Stormarn
+16;;16077;Altenburger Land
+16;;16061;Eichsfeld
+16;;16067;Gotha
+16;;16076;Greiz
+16;;16069;Hildburghausen
+16;;16070;Ilm-Kreis
+16;;16065;Kyffhäuserkreis
+16;;16062;Nordhausen
+16;;16074;Saale-Holzland-Kreis
+16;;16075;Saale-Orla-Kreis
+16;;16073;Saalfeld-Rudolstadt
+16;;16066;Schmalkalden-Meiningen
+16;;16068;Sömmerda
+16;;16072;Sonneberg
+16;;16064;Unstrut-Hainich-Kreis
+16;;16063;Wartburgkreis
+16;;16071;Weimarer Land");
 
 		$zones = array();
 		$ex = explode("\n", $csv[$code]);

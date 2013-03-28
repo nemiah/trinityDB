@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 var Interface = {
@@ -124,8 +124,12 @@ function checkVirtualBox(image, targetFieldId, setValue){
 	}
 }
 
+/**
+ * @deprecated since 27.11.2012
+ */
 function showHideTBody(what, image){
-
+	alert("showHideTBody is DEPRECATED");
+	
 	while(what.tagName != "TABLE") what = what.parentNode;
 	what = what.firstChild;
 	while(what.tagName != "TBODY") what = what.nextSibling;
@@ -146,16 +150,17 @@ function showMessage(message){
 		return;
 	}
 	//createGrowl(message);
-	$('messenger').update(message);
-
-	new Effect.Move("messenger",{x:0, y:0, mode: 'absolute', duration: 0.2});
-	new Effect.Move("messenger",{x:-210, y:0, mode: 'absolute', delay:2, duration: 0.2});
+	$j('#messenger').html(message);
+	$j('#messenger').fadeIn(100, function(){ $j(this).delay(1000).fadeOut(300); });
+	/*new Effect.Move("messenger",{x:0, y:0, mode: 'absolute', duration: 0.2});
+	new Effect.Move("messenger",{x:-210, y:0, mode: 'absolute', delay:2, duration: 0.2});*/
+	
 }
 
 function focusMe(elem){
-	elem.className = "hasFocus";
+	$j(elem).addClass("hasFocus");
 }
 
 function blurMe(elem){
-	elem.className = "";
+	$j(elem).removeClass("hasFocus");
 }

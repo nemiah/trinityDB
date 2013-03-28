@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 class CookieCart {
@@ -358,14 +358,14 @@ class CookieCart {
 							orderNow: function(){
 								$('cart').action.value = 'order';
 
-								if(confirm('Jetzt bestellen?'))
-									new Ajax.Request('/index.php', {
-										method:'post',
-										parameters: 'r=".mt_rand(0, 10000)."&formID=nix&HandlerName=CookieCartHandler$payVia'+CookieCart.joinFormFields('cart'),
-										onSuccess: function(transport){
-											if(multiCMS.checkResponse(transport))
-												document.location.reload();
-									}});
+								//if(confirm('Jetzt kaufen?'))
+								new Ajax.Request('/index.php', {
+									method:'post',
+									parameters: 'r=".mt_rand(0, 10000)."&formID=nix&HandlerName=CookieCartHandler$payVia'+CookieCart.joinFormFields('cart'),
+									onSuccess: function(transport){
+										if(multiCMS.checkResponse(transport))
+											document.location.reload();
+								}});
 							},
 										
 							updateAmounts: function(){
@@ -487,7 +487,8 @@ class CookieCart {
 					Util::formatCurrency("de_DE",$A->getA()->$preis * 1 * (($A->getA()->$mwst / 100) + 1),true)."<br /><small>".Util::formatNumber("de_DE", $A->getA()->$mwst * 1, 2, true, false)."%</small>",
 					Util::formatCurrency("de_DE",$A->getA()->$preis * 1 * (($A->getA()->$mwst / 100) + 1) * $t[1],true),
 					!$previewMode ? "<img style=\"cursor:pointer;\" onclick=\"CookieCart.deleteMe('{$t[0]}','$t[2]');\" alt=\"Artikel aus Warenkorb löschen\" title=\"Artikel aus Warenkorb löschen\" src=\"$this->trashImage\" />" : ""));
-
+				
+				$tab->addCellStyle(1, "vertical-align:top;");
 				$i++;
 			}
 		

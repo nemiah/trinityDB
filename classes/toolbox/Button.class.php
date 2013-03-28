@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class Button {
 	
@@ -47,6 +47,17 @@ class Button {
 		$this->type($type);
 	}
 
+	function getAction(){
+		$rme = $this->rme;
+		$this->rme = null;
+		
+		return $rme;
+	}
+	
+	function label($label){
+		$this->label = $label;
+	}
+	
 	function name($name){
 		$this->name = $name;
 	}
@@ -67,9 +78,36 @@ class Button {
 			case "bigButton":
 			case "LPBig":
 				$this->type = $type;
+				$this->class = "backgroundColor3";
 			break;
 			
 			case "icon":
+				$this->type = $type;
+				$this->class = "";
+			break;
+			
+			case "iconic":
+				$this->type = $type;
+				$this->class = "";
+			break;
+			
+			case "iconicG":
+				$this->type = "iconic";
+				$this->class = "iconicG";
+			break;
+			
+			case "iconicR":
+				$this->type = "iconic";
+				$this->class = "iconicR";
+			break;
+			
+			case "iconicL":
+				$this->type = "iconic";
+				$this->class = "iconicG iconicL";
+			break;
+			
+			case "seamless":
+			case "touch":
 				$this->type = $type;
 				$this->class = "";
 			break;
@@ -92,10 +130,18 @@ class Button {
 		$this->style = $style;
 	}
 	
+	function getStyle(){
+		return $this->style;
+	}
+	
 	function className($class){
 		$this->class = $class;
 	}
 
+	function newSession($physionName, $application, $plugin){
+		$this->onclick = "contentManager.newSession('$physionName', '$application', '$plugin'".(isset($_SESSION["phynx_customer"]) ? ", '".$_SESSION["phynx_customer"]."'" : "").");";
+	}
+	
 	function select($isMultiSelection, $selectPlugin, $callingPlugin, $callingPluginID, $callingPluginFunction){
 		#$this->rme = " contentManager.rightSelection(".($isMultiSelection ? "true" : "false").", '$pluginRight','$pluginLeftID','$calledPlugin','$calledPluginID','$calledPluginFunction');";
 		#isMultiSelection, selectPlugin, callingPlugin, callingPluginID, callingPluginFunction
@@ -107,8 +153,8 @@ class Button {
 		$this->rme = " contentManager.backupFrame('contentLeft','selectionOverlay'); contentManager.leftSelection(".($isMultiSelection ? "true" : "false").", '$selectPlugin','$callingPlugin','$callingPluginID','$callingPluginFunction');";
 	}
 
-	function customSelect($targtFrame, $callingPluginID, $selectPlugin, $selectJSFunction, $addBPS = ""){
-		$this->rme = " contentManager.backupFrame('$targtFrame','selectionOverlay'); contentManager.customSelection('$targtFrame', '$callingPluginID', '$selectPlugin', '$selectJSFunction'".($addBPS != "" ? ", '$addBPS'" : "").");";
+	function customSelect($targtFrame, $callingPluginID, $selectPlugin, $selectJSFunction, $addBPS = "", $options = ""){
+		$this->rme = " contentManager.backupFrame('$targtFrame','selectionOverlay'); contentManager.customSelection('$targtFrame', '$callingPluginID', '$selectPlugin', '$selectJSFunction', '$addBPS', ".($options == "" ? "{}" : $options).");";
 	}
 	
 	function rme($targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $onSuccessFunction = "", $bps = ""){
@@ -121,7 +167,7 @@ class Button {
 	}
 
 	function editInPopup($targetClass, $targetClassId, $title = "Eintrag bearbeiten", $bps = ""){
-		$this->rme = "contentManager.editInPopup('$targetClass', '$targetClassId', '$title', '$bps');";
+		$this->rme = "contentManager.editInPopup('$targetClass', '$targetClassId', '".T::_($title)."', '$bps');";
 	}
 	
 	/**
@@ -136,22 +182,24 @@ class Button {
 	 * @param string $onSuccessFunction Some JavaScript that will be executed if the response is fine
 	 * @param string $bps Background Plugin Storage commands that will be executed before the method is called
 	 */
-	function rmePCR($targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $onSuccessFunction = "", $bps = ""){
+	function rmePCR($targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $onSuccessFunction = "", $bps = "", $doResponseCheck = true, $onFailureFunction = ""){
 		if(strpos($onSuccessFunction, "function(") !== 0)
 				$onSuccessFunction = "'".addslashes($onSuccessFunction)."'";
 		
 		#$this->rmeP($targetClass, $targetClassId, $targetMethod, $targetMethodParameters, $onSuccessFunction != "" ? addslashes("if(checkResponse(transport)) { ".$onSuccessFunction."}") : $onSuccessFunction, $bps);
-		$this->rme = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), $onSuccessFunction, '$bps');";
+		$this->rme = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), $onSuccessFunction, '$bps', ".($doResponseCheck ? "true" : "false")." ".($onFailureFunction != "" ? ", $onFailureFunction" : "").");";
 	}
 
 	function settings($plugin, $identifier = ""){
-		$this->settings = $B = new Button("Einstellungen", "./images/i2/settings.png");
-		$B->type("icon");
+		$this->settings = $B = new Button("Einstellungen", "./images/i2/settings.png", "icon");
+
 		if(strpos($this->style, "float:right;") !== false)
 			$B->style("float:right;margin-right:-22px;");
 		else
 			$B->style("margin-left:4px;margin-bottom:15px;");
 		$B->contextMenu($plugin, $identifier, "Einstellungen:");
+		
+		$B->className("buttonSettings");
 		
 		return $B;
 	}
@@ -189,7 +237,7 @@ class Button {
 	
 	function popup($name, $title, $targetClass, $targetClassId, $targetMethod, $targetMethodParameters = "", $bps = "", $popupOptions = null){
 		#$this->rme = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), 'Popup.displayNamed(\'edit\', \'$title\', transport, \'$name\');', '$bps');";
-		$this->rme = "Popup.load('$title', '$targetClass', '$targetClassId', '$targetMethod', [".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."], '$bps'".($name != "" ? ", '$name'" : ", 'edit'")."".($popupOptions != null ? ", '$popupOptions'" : "").")";
+		$this->rme = "Popup.load('".T::_($title)."', '$targetClass', '$targetClassId', '$targetMethod', [".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."], '$bps'".($name != "" ? ", '$name'" : ", 'edit'")."".($popupOptions != null ? ", '".addslashes($popupOptions)."'" : "").")";
 	}
 
 	function hasMouseOverEffect($bool){
@@ -204,19 +252,44 @@ class Button {
 	}
 	
 	function __toString(){
+		if($this->type != "seamless" AND $this->type != "touch")
+			$this->label = T::_($this->label);
+		
 		if($this->before != "")
 			$this->rme = str_replace("%AFTER", $this->rme, $this->before);
 
-		if($this->image != "" AND $this->image[0] != "." AND strpos($this->image, ":") === false AND $this->image[0] != "/") $this->image = "./images/navi/$this->image.png";# : $this->image );
+		if($this->image != "" AND $this->image[0] != "." AND strpos($this->image, ":") === false AND $this->image[0] != "/" AND $this->type != "iconic" AND $this->type != "seamless" AND $this->type != "touch")
+			$this->image = "./images/navi/$this->image.png";# : $this->image );
 
 		$onclick = $this->onclick != null ? $this->onclick : "";
 		#if($this->pluginRight != null) $onclick .= ;
 		if($this->rme != null) $onclick .= " ".$this->rme;
-		if($this->type == "bigButton" OR $this->type == "LPBig") return (strpos($this->style, "float:right;") !== false ? $this->settings : "")."<input".($this->name != null ? " name=\"$this->name\"" : "")." ".($this->disabled ? "disabled=\"disabled\"" : "")." ".($this->id ? "id=\"$this->id\" " : "")."onclick=\"$onclick\" type=\"button\" class=\"$this->class ".($this->type == "bigButton" ? "bigButton" : "LPBigButton")."\" style=\"{$this->style}background-image:url(".$this->image.");\" ".($this->type == "bigButton" ? "value" : "title")."=\"$this->label\" />".(strpos($this->style, "float:right;") === false ? $this->settings : "")."$this->js";
+		if($this->type == "bigButton" OR $this->type == "LPBig") return (strpos($this->style, "float:right;") !== false ? $this->settings : "")."<button".($this->name != null ? " name=\"$this->name\"" : "")." ".($this->disabled ? "disabled=\"disabled\"" : "")." ".($this->id ? "id=\"$this->id\" " : "")."onclick=\"$onclick\" type=\"button\" class=\"$this->class ".($this->type == "bigButton" ? "bigButton" : "LPBigButton")."\" style=\"{$this->style}".($this->image != "" ? "background-image:url(".$this->image.");" : "")."\" ".($this->type == "bigButton" ? "" : "title=\"$this->label\"").">".($this->type == "bigButton" ? nl2br($this->label) : "")."</button>".(strpos($this->style, "float:right;") === false ? $this->settings : "")."$this->js";
 		
 		if($this->type == "icon") return "<img ".($this->id ? "id=\"$this->id\" " : "")." ".($onclick != "" ? "onclick=\"$onclick\"" : "")." class=\"".($this->mouseOverEffect ? "mouseoverFade" : "")." $this->class\" style=\"{$this->style}\" src=\"".$this->image."\" title=\"$this->label\" alt=\"$this->label\" />$this->js";
 		
+		if($this->type == "iconic") return "<span ".($this->id ? "id=\"$this->id\" " : "")." ".($onclick != "" ? "onclick=\"$onclick\"" : "")." class=\"iconic $this->class $this->image\" style=\"{$this->style}\" title=\"$this->label\" alt=\"$this->label\" ></span>$this->js";
+		
 		if($this->type == "save") return "<input ".($this->id ? "id=\"$this->id\" " : "")." onclick=\"$onclick\" type=\"button\" value=\"$this->label\" style=\"{$this->style}background-image:url(".$this->image.");\" />$this->js";
+		
+		if($this->type == "seamless"){
+			$B = new Button($this->label, $this->image, "iconicG");
+			$B->style("float:right;margin-left:10px;margin-top:-1px;");
+			
+			return "<div style=\"$this->style\" onclick=\"$onclick\" class=\"seamlessButton\">$B".T::_($this->label)."</div>";
+		}
+		
+		if($this->type == "touch"){
+			$B = new Button($this->label, $this->image, "iconicL");
+			#$B->style("float:left;margin-left:10px;margin-top:-1px;");
+			
+			return "
+			<div class=\"touchButton\" ".($this->id ? "id=\"$this->id\" " : "")." onclick=\"$onclick\" style=\"$this->style\">
+				".$B."
+				<div class=\"label\">".T::_($this->label)."</div>
+				<div style=\"clear:both;\"></div>
+			</div>";
+		}
 	}
 }
 ?>

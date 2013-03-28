@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class Applications {
 	private $apps = array();
@@ -27,6 +27,13 @@ class Applications {
 
 	public static function init(){
 		$_SESSION[self::$sessionVariable] = new Applications();
+	}
+	
+	/**
+	 * @return Applications 
+	 */
+	public static function i(){
+		return $_SESSION[self::$sessionVariable];
 	}
 	
 	public function __construct() {
@@ -95,12 +102,20 @@ class Applications {
 		}
 	}
 
+	public static function isAppLoaded($App){
+		return in_array($App, self::getList());
+	}
+	
 	public static function getList(){
 		return $_SESSION[self::$sessionVariable]->getApplicationsList();
 	}
 
 	public static function activeApplication(){
 		return $_SESSION[self::$sessionVariable]->getActiveApplication();
+	}
+	
+	public static function activeVersion(){
+		return $_SESSION[self::$sessionVariable]->getRunningVersion();
 	}
 
 	public function getApplicationsList(){
@@ -132,10 +147,10 @@ class Applications {
 		return isset($this->versions[$appCheck]) ? $this->versions[$appCheck] : null;
 	}
 	
-	public function getHTMLOptions(){
+	public function getHTMLOptions($selected = null){
 		$o = "";
 		foreach($this->apps as $key => $value)
-			$o .= "<option value=\"$value\">$key</option>";
+			$o .= "<option ".(($selected != null AND $selected == $value) ? "selected=\"selected\"" : "")." value=\"$value\">$key</option>";
 		return $o;
 	}
 	

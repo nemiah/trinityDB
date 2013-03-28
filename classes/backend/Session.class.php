@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class Session {
 	static $instance;
@@ -23,6 +23,15 @@ class Session {
 	private $afterLoginFunctions = array();
 	//public $menu;
 	private static $sessionVariable = "S";
+	
+	public $physion = null;
+	
+	public static function physion($sessionName = null, $application = null, $plugin = null){
+		if($sessionName != null)
+			$_SESSION[self::$sessionVariable]->physion = array($sessionName, $application, $plugin);
+		
+		return $_SESSION[self::$sessionVariable]->physion;
+	}
 	
 	public static function init(){
 		$_SESSION[self::$sessionVariable] = new Session();
@@ -44,7 +53,15 @@ class Session {
 	}
 	
 	public function getDBData($newFolder = null){
-		if($newFolder == null) $newFolder = Util::getRootPath()."system/DBData/";
+		if(file_exists(Util::getRootPath()."../../phynxConfig"))
+			$newFolder = Util::getRootPath()."../../phynxConfig/";
+		
+		if(file_exists(Util::getRootPath()."../phynxConfig"))
+			$newFolder = Util::getRootPath()."../phynxConfig/";
+		
+		if($newFolder == null)
+			$newFolder = Util::getRootPath()."system/DBData/";
+		
 		if(!isset($_SERVER["HTTP_HOST"])) $_SERVER["HTTP_HOST"] = "*";
 		$data = new mInstallation();
 		if($newFolder != "") $data->changeFolder($newFolder);
@@ -136,6 +153,10 @@ class Session {
 		return get_class($this->currentUser) == "phynxAltLogin";
 	}
 	
+	public static function isAltUserS(){
+		return get_class(Session::currentUser()) == "phynxAltLogin";
+	}
+	
 	public function setLoggedInUser($U){
 		$UA = $U->getA();
 		$_SESSION["messages"]->addMessage("User $UA->name logged in, letting system know...");
@@ -179,7 +200,8 @@ class Session {
 			return class_exists($pluginName, false);
 
 		if(!isset($_SESSION["CurrentAppPlugins"])) return false;
-		return in_array($pluginName,$_SESSION["CurrentAppPlugins"]->getAllPlugins());
+		return $_SESSION["CurrentAppPlugins"]->isPluginLoaded($pluginName);
+		#return in_array($pluginName,$_SESSION["CurrentAppPlugins"]->getAllPlugins());
 	}
 
 	public static function currentUser(){
@@ -188,7 +210,7 @@ class Session {
 
 	public function checkForPlugin($pluginName){
 		if(!isset($_SESSION["CurrentAppPlugins"])) return false;
-		return in_array($pluginName,$_SESSION["CurrentAppPlugins"]->getAllPlugins());
+		return $_SESSION["CurrentAppPlugins"]->isPluginLoaded($pluginName);
 	}
 
 	public function registerOnLoginFunction($class, $function){

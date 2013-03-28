@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 class HTMLList {
@@ -35,8 +35,8 @@ class HTMLList {
 		$this->style .= "min-height:{$height}px;";
 	}
 	
-	public function sortable($handle, $saveTo = null, $connectWith = null, $dropPlaceholder = null){
-		$this->sortable = OnEvent::sortable("%LISTID%", $handle, $saveTo, "y", $connectWith, $dropPlaceholder);
+	public function sortable($handle, $saveTo = null, $connectWith = null, $dropPlaceholder = null, $axis = "y", $additionalParameters = array()){
+		$this->sortable = OnEvent::sortable("%LISTID%", $handle, $saveTo, $axis, $connectWith, $dropPlaceholder, "", $additionalParameters);
 	}
 	
 	public function maxHeight($height){

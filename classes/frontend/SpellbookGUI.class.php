@@ -15,15 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 class SpellbookGUI implements iGUIHTMLMP2 {
 	public static function getSpell($requestPlugins){
 		$connection = true;
 		$options = array(
-			"location" => "https://www.open3a.de/page-SOAP",
-			"uri" => "https://www.open3a.de/page-SOAP");
+			"location" => "http://www.open3a.de/page-SOAP",
+			"uri" => "http://www.open3a.de/page-SOAP");
 		try {
 			$S = new SoapClient(null, $options);
 			$I = $S->getPluginDescription($requestPlugins, false);
@@ -67,6 +67,9 @@ class SpellbookGUI implements iGUIHTMLMP2 {
 		$html .= "<div style=\"float:right;width:160px;padding-top:20px;\" id=\"containerSortTabs\">".$this->getSortable(false)."</div>
 			<div style=\"margin-right:160px;\">";
 		
+		$U = new mUserdata();
+		$U->addAssocV3("typ","=","TTP");
+		$collapsedTabs = Environment::getS("collapsedTabs", "0") == "1";
 		
 		foreach($entries as $key => $value) {
 			$text = "";
@@ -86,16 +89,38 @@ class SpellbookGUI implements iGUIHTMLMP2 {
 			
 			$I = new HTMLInput("usePlugin$value", "checkbox", in_array($value, $appMenuDisplayed) ? "1" : "0");
 			$I->id("usePlugin$value");
-			$I->onchange("this.checked ? Menu.showTab('$value') : Menu.hideTab('$value');");
+			$I->onchange("if(this.checked) { Menu.showTab('$value'); \$j('#minPlugin$value').prop('disabled', ''); } else { Menu.hideTab('$value'); \$j('#minPlugin$value').prop('disabled', 'disabled'); }");
+			
+			
+			$t =  !$_SESSION["S"]->isUserAdmin() ? $U->getUDValueCached("ToggleTab$value") : "big";
+			if($t == null AND $collapsedTabs)
+				$t = "small";
+
+			if($t == null)
+				$t = "big";
+			
+			$IM = new HTMLInput("minPlugin$value", "checkbox", $t == "big" ? "0" : "1");
+			$IM->id("minPlugin$value");
+			$IM->onchange("toggleTab('$value');");
+			
+			if(isset($_COOKIE["phynx_layout"]) AND ($_COOKIE["phynx_layout"] == "vertical" OR $_COOKIE["phynx_layout"] == "desktop"))
+				$IM->isDisabled (true);
+			
+			if(!in_array($value, $appMenuDisplayed))
+				$IM->isDisabled (true);
+			
 			#border-width:1px;border-style:solid;
 			$html .= "
 			<div style=\"width:33%;float:left;\">
-				<div style=\"margin:10px;border-radius:5px;\" class=\"borderColor1 spell\">
-					<div class=\"backgroundColor2\" style=\"padding:10px;padding-bottom:5px;border-top-left-radius:5px;border-top-right-radius:5px;\">
+				<div style=\"margin:10px;\" class=\"borderColor1 spell\">
+					<div class=\"backgroundColor2\" style=\"padding:10px;padding-bottom:5px;\">
 						$BG$B<h2 style=\"margin-bottom:0px;width:150px;\">$key</h2>
 					</div>
 					<div style=\"padding:7px;\">
 						$I<label style=\"float:none;width:200px;text-align:left;display:inline;margin-left:10px;font-wight:normal;\" for=\"usePlugin$value\">Plugin verwenden</label>
+					</div>
+					<div style=\"padding:7px;padding-top:0px;\">
+						$IM<label style=\"float:none;width:200px;text-align:left;display:inline;margin-left:10px;font-wight:normal;\" for=\"minPlugin$value\">Reiter minimiert</label>
 					</div>
 					".($xml !== false ? "<div style=\"padding:7px;height:115px;overflow:auto;\">$text</div>" : "")."
 				</div>

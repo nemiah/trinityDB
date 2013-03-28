@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class HTMLSlicer {
 	private $url;
@@ -44,6 +44,7 @@ class HTMLSlicer {
 
 		if($this->content instanceof HTMLTidy){
 			$this->page = $this->content->getCleaned();
+			#print_r($this->page);
 			return;
 		}
 
@@ -65,16 +66,17 @@ class HTMLSlicer {
 		try {
 			$this->xml = new SimpleXMLElement($this->page);
 		} catch(Exception $e){
-			echo "<pre>";
-
-			foreach(libxml_get_errors() as $error){
+			#echo "<pre>";
+			echo "Exception: ".$e->getMessage()."\n";
+			
+			/*foreach(libxml_get_errors() as $error){
 				if($error->level == LIBXML_ERR_WARNING) echo "Warning: ".$error->message;
 				if($error->level == LIBXML_ERR_ERROR) echo "Error: ".$error->message;
 				if($error->level == LIBXML_ERR_FATAL) echo "Fatal error: ".$error->message;
 			}
-			echo "</pre>";
+			echo "</pre>";*/
 
-			echo $this->page;
+			#echo $this->page;
 
 			return;
 		}

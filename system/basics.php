@@ -15,12 +15,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
 function addClassPath($path){
 	if(!isset($_SESSION["phynx_addClassPaths"]))
 		$_SESSION["phynx_addClassPaths"] = array();
+	
+	if($path{strlen($path) - 1} != "/")
+		$path .= "/";
 	
 	if(!in_array($path, $_SESSION["phynx_addClassPaths"]))
 		$_SESSION["phynx_addClassPaths"][] = $path;
@@ -30,7 +33,25 @@ function registerClassPath($className, $classPath){
 	$_SESSION["classPaths"][$className] = $classPath;
 }
 
+function phynxParseStr($query){ //fools mod_security
+	$return = array();
+
+	$ex = explode("&", $query);
+
+	foreach($ex AS $parameter){
+		$ex2 = explode("=", $parameter);
+		$name = $ex2[0];
+		unset($ex2[0]);
+
+		$return[$name] = implode("=", $ex2);
+	}
+
+	return $return;
+}
+
 function findClass($class_name){
+	if(strpos($class_name, 'PHPExcel') === 0)
+		return false;
 	
 	$root = str_replace("system".DIRECTORY_SEPARATOR."basics.php", "", __FILE__);
 
@@ -50,8 +71,10 @@ function findClass($class_name){
 	$standardPaths[] = $root."classes/toolbox/";
 	$standardPaths[] = $root."classes/interfaces/";
 	$standardPaths[] = $root."libraries/";
+	$standardPaths[] = $root."libraries/fpdf/";
 	$standardPaths[] = $root."specifics/";
 	$standardPaths[] = $root."classes/exceptions/";
+	$standardPaths[] = $root."libraries/geshi/";
 	if(isset($_SESSION["phynx_addClassPaths"]))
 		$standardPaths = array_merge($standardPaths, $_SESSION["phynx_addClassPaths"]);
 
@@ -88,10 +111,16 @@ function findClass($class_name){
 	} else {
 		$fp = opendir($root."plugins/");
 		while(($file = readdir($fp)) !== false) {
+			if($file == "." OR $file == "..")
+				continue;
+			
 			if(is_dir($root."plugins/$file")) {
 
 				$fp2 = opendir($root."plugins/$file/");
 				while(($file2 = readdir($fp2)) !== false) {
+					if(!is_dir($root."plugins/$file/$file2"))
+						continue;
+					
 					$path = $root."plugins/$file/$file2/$class_name.class.php";
 					if(is_file($path)){
 						require_once $path;
@@ -114,6 +143,11 @@ function findClass($class_name){
 		return 1;
 	}
 
+	if($class_name == "PHPMailer"){
+		require_once $root."libraries/mailer/PHPMailer.class.php";
+		return 1;
+	}
+
 	if(preg_match("/^i[A-Z].*/", $class_name)) {
 		$_SESSION["messages"]->addMessage("Warning: Creating interface $class_name");
 		eval('interface '.$class_name.' { } ');
@@ -125,6 +159,10 @@ function findClass($class_name){
 		'} ');
 
 }
+
+function phynx_mb_str_pad($input, $pad_length, $pad_string = " ", $pad_style = STR_PAD_RIGHT, $encoding="UTF-8") {
+   return str_pad($input, strlen($input)-mb_strlen($input, $encoding)+$pad_length, $pad_string, $pad_style);
+} 
 
 function emoFatalError($excuse, $message, $title, $showErrors = true, $mode = "warning") {
 	$errors = "";

@@ -2,14 +2,18 @@
 	position:fixed;
 	top:0px;
 	left:0px;
-	z-index:1000;
+	z-index:98;
 }
 
-#darkOverlay {
+#darkOverlay, .darkOverlay {
 	position:fixed;
 	top:0px;
 	left:0px;
-	z-index:1000;
+	z-index:98;
+    width: 100%;
+    height: 100%;
+	background-color:black;
+	color:#888;
 }
 
 .loginWindow {
@@ -20,9 +24,9 @@
 	position:fixed;
 	margin:auto;
 	top:4px;
-	z-index:1001;
+	z-index:99;
 	width:430px;
-	padding:4px;
+	/*padding:4px;
 	border-style:solid;
 	border-width:1px;
 	
@@ -32,7 +36,22 @@
 	
 	-moz-box-shadow: 0px 0px 4px 1px #999;
 	-webkit-box-shadow: 0px 0px 4px 1px #999;
-	box-shadow: 0px 0px 4px 1px #999;
+	box-shadow: 0px 0px 4px 1px #999;*/
+	box-shadow: 0px 0px 0px 8px rgba(200, 200, 200, .5);
+	/*border-top-left-radius:5px;
+	border-top-right-radius:5px;*/
+	border-color: #777;
+	border-style:solid;
+	border-width:1px;
+}
+
+#overlayText ul { /*PRESENTATION*/
+	margin-top:20px;
+	margin-bottom:20px;
+}
+
+#overlayText ul li { /*PRESENTATION*/
+	padding-left:20px;
 }
 
 /*#boxInOverlay td {

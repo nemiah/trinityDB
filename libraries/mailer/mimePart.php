@@ -135,7 +135,7 @@ class Mail_MIMEPart
         foreach ($params as $key => $value) {
             switch ($key) {
                 case 'content_type':
-                    $headers['Content-Type'] = $value . (isset($charset) ? '; charset="' . $charset . '"' : '');
+                    $headers['Content-Type'] = $value.(isset($params["method"]) ? "; method=".$params["method"] : "").(isset($charset) ? '; charset="' . $charset . '"' : '');
                     break;
 
                 case 'encoding':

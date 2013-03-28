@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class HTMLGUI2 extends HTMLGUI {
 	private $displaySide = "default";
@@ -192,7 +192,7 @@ class HTMLGUI2 extends HTMLGUI {
 		 * DELETE-BUTTON
 		 */
 		if((!$this->onlyDisplayMode OR $this->deleteInDisplayMode) AND $userCanDelete AND !$this->isSelection AND $this->showDeleteButton)  $this->newColsRight["delete"]  = "
-			<img class=\"mouseoverFade\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "contentManager.reloadFrameLeft();" : "contentManager.reloadFrameRight(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".str_replace("%1",$this->singularName, $this->texts["%1 wirklich löschen?"])."');\" src=\"./images/i2/delete.gif\" />";
+			<span class=\"iconic trash_stroke\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "contentManager.reloadFrameLeft();" : "contentManager.reloadFrameRight(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".str_replace("%1",$this->singularName, $this->texts["%1 wirklich löschen?"])."');\"></span>";
 		elseif(!$userCanDelete) $this->newColsRight["delete"] = "<img src=\"./images/i2/empty.png\" />";
 
 
@@ -202,18 +202,19 @@ class HTMLGUI2 extends HTMLGUI {
 		if(!isset($this->newColsLeft["select"]) AND (!$this->onlyDisplayMode OR $this->editInDisplayMode) AND $this->showEditButton) {
 			$EB = new Button("","./images/i2/edit.png");
 			$EB->type("icon");
-			if($this->JSOnEdit == null) $EB->onclick("contentManager.loadFrame('contentLeft','".$this->singularClass."','%%VALUE%%','0');");
+			$EB->className("editButton");
+			if($this->JSOnEdit == null) $EB->onclick("contentManager.selectRow(this); contentManager.loadFrame('contentLeft','".$this->singularClass."','%%VALUE%%','0');");
 			else $EB->onclick($this->JSOnEdit);
 
 			$this->newColsLeft["select"] = $EB;
 		}
 		$cols = count($this->showAttributes) + count($this->newColsLeft) + count($this->newColsRight);
-		$valuesTab = new HTMLTable($cols,($lineWithId == -1 ? (!$this->onlyDisplayMode ? ($singularLanguageClass == null ? "Bitte ".$this->name." auswählen:" : $singularLanguageClass->getBrowserCaption().":") : ($singularLanguageClass == null ? $this->name : $singularLanguageClass->getPlural() ).":") : null));
-
-		if(isset($this->newColsRight["delete"]) AND ($this->displaySide == "default" OR $this->displaySide == "right"))
+		$valuesTab = new HTMLTable($cols,($lineWithId == -1 ? $this->displaySide == "left" ? $this->name : "&nbsp;"/*(!$this->onlyDisplayMode ? ($singularLanguageClass == null ? "Bitte ".$this->name." auswählen:" : $singularLanguageClass->getBrowserCaption().":") : ($singularLanguageClass == null ? $this->name : $singularLanguageClass->getPlural() ).":")*/ : null));
+		$valuesTab->addTableClass("contentBrowser");
+		/*if(isset($this->newColsRight["delete"]) AND ($this->displaySide == "default" OR $this->displaySide == "right"))
 			$valuesTab->setColClass($cols, "backgroundColor0");
 		if(isset($this->newColsRight["delete"]) AND $this->displaySide == "left")
-			$valuesTab->setColClass(1, "backgroundColor0");
+			$valuesTab->setColClass(1, "backgroundColor0");*/
 
 		/**
 		 * QUICKSEARCH
@@ -235,7 +236,7 @@ class HTMLGUI2 extends HTMLGUI {
 				$valuesTab->addRow(array($BSearchInfo, $quickSearchRow));
 				$valuesTab->addRowColspan(2, $cols-1);
 			}
-			$valuesTab->addRowClass("backgroundColor2");
+			$valuesTab->addRowClass("backgroundColorHeader");
 		}
 
 		if($this->headerRow != null)
@@ -305,10 +306,10 @@ class HTMLGUI2 extends HTMLGUI {
 			if($lineWithId == -1) {
 				$BSettings = $this->getPageOptionsButton();
 
-				$IPage = $this->getPageSelectionField();
-				$IPage->style("width:30px;float:right;text-align:right;");
+				#$IPage = $this->getPageSelectionField();
+				#$IPage->style("width:30px;float:right;text-align:right;");
 
-				$pageOptions = $IPage.$this->multiPageMode[0]." ".($this->multiPageMode[0] == 1 ? $this->texts["Eintrag"] : $this->texts["Einträge"])."";
+				$pageOptions = $this->multiPageMode[0]." ".($this->multiPageMode[0] == 1 ? $this->texts["Eintrag"] : $this->texts["Einträge"]).", $pageLinks";
 
 				if(!$userDefinedEntriesPerPage){
 					$valuesTab->addRow(array($pageOptions));
@@ -332,15 +333,20 @@ class HTMLGUI2 extends HTMLGUI {
 						$valuesTab->addRow(array($BSettings,$pageOptions));
 						$valuesTab->addRowColspan(2, $cols-1);
 					}
-				$valuesTab->addRowClass("backgroundColor3");
+				$valuesTab->addRowClass("backgroundColorHeader");
 
-				$valuesTab->addRow(array($pageLinks));
+				#$valuesTab->addRow(array($pageLinks));
+				#$valuesTab->addRowColspan(1, $cols);
+				#$valuesTab->addRowClass("backgroundColorHeader");
+				
+				$valuesTab->addRow("");
 				$valuesTab->addRowColspan(1, $cols);
-				$valuesTab->addRowClass("backgroundColor2");
+				$valuesTab->addRowClass("backgroundColor0 browserSeparatorTop");
 
 			}
 		}
 
+		$filteredCol = null;
 		if($lineWithId == -1 AND $this->showFilteredCategoriesWarning != null AND $this->showFilteredCategoriesWarning[0]) {
 			$dB = new Button($this->texts["Filter löschen"],"./images/i2/delete.gif");
 			$dB->style("float:right;");
@@ -351,7 +357,8 @@ class HTMLGUI2 extends HTMLGUI {
 				<td class=\"backgroundColor0\"".((isset($this->showFilteredCategoriesWarning[0]) AND $this->showFilteredCategoriesWarning[0] == true) ? "<img src=\"./images/i2/note.png\" /></td><td class=\"backgroundColor0\" colspan=\"".($determinedNumberofCols - 2)."\" style=\"color:grey;\" >".$this->texts["Anzeige wurde gefiltert"]."</td><td class=\"backgroundColor0\">$dB</td>" : " >")."</td>
 			</tr>";*/
 
-			$valuesTab->addRow(array("<img src=\"./images/i2/note.png\" />",$dB.$this->texts["Anzeige wurde gefiltert"]));
+			$filteredCol = array("<img src=\"./images/i2/note.png\" />",$dB.$this->texts["Anzeige wurde gefiltert"]);
+			$valuesTab->addRow($filteredCol);
 			$valuesTab->addRowColspan(2, $cols-1);
 			$valuesTab->addRowClass("backgroundColor0");
 			$valuesTab->addRowStyle("color:grey;");
@@ -464,7 +471,18 @@ class HTMLGUI2 extends HTMLGUI {
 			}
 		}
 
+		if($filteredCol !== null){
+			$valuesTab->addRow($filteredCol);
+			$valuesTab->addRowColspan(2, $cols-1);
+			$valuesTab->addRowClass("backgroundColor0");
+			$valuesTab->addRowStyle("color:grey;");
+		}
+		
 		if($lineWithId == -1 AND $isMultiPageMode) {
+			$valuesTab->addRow("");
+			$valuesTab->addRowColspan(1, $cols);
+			$valuesTab->addRowClass("backgroundColor0 browserSeparatorBottom");
+			
 			if(!$userDefinedEntriesPerPage){
 				$valuesTab->addRow(array($pageOptions));
 				$valuesTab->addRowColspan(1, $cols);
@@ -476,11 +494,11 @@ class HTMLGUI2 extends HTMLGUI {
 					$valuesTab->addRow(array($BSettings,$pageOptions));
 					$valuesTab->addRowColspan(2, $cols-1);
 				}
-			$valuesTab->addRowClass("backgroundColor2");
-
-			$valuesTab->addRow(array($pageLinks));
-			$valuesTab->addRowColspan(1, $cols);
-			$valuesTab->addRowClass("backgroundColor3");
+			$valuesTab->addRowClass("backgroundColorHeader");
+				
+			#$valuesTab->addRow(array($pageLinks));
+			#$valuesTab->addRowColspan(1, $cols);
+			#$valuesTab->addRowClass("backgroundColorHeader");
 		}
 
 		if(count($this->attributes) == 0){

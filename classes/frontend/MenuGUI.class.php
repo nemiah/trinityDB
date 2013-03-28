@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 	function  __construct() {
@@ -115,6 +115,8 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 			if($t == null AND $collapsedTabs)
 				$t = "small";
 
+			$key = Aspect::joinPoint("renameTab", $this, __METHOD__, array($key), $key);
+			
 			if(isset($_COOKIE["phynx_layout"]) AND ($_COOKIE["phynx_layout"] == "vertical" OR $_COOKIE["phynx_layout"] == "desktop")) $t = "big";
 
 			#$emptyFrame = "contentLeft";
@@ -162,13 +164,13 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 					class=\"navBackgroundColor navBorderColor ".(($t == null OR $t == "big") ? "" : " smallTab")." navTab\"
 					$style
 					>
-					<img
+					<!--<img
 						style=\"margin-top:-28px;float:left;\"
 						id=\"".$value."TabMinimizer\"
 						class=\"navTabMinimizer\"
 						title=\"Tab $key vergrößern/verkleinern\"
 						onclick=\"toggleTab('$value');\"
-						src=\"./images/i2/tabMinimize.png\" />
+						src=\"./images/i2/tabMinimize.png\" />-->
 					
 					<div onclick=\"$onclick\" style=\"padding:3px;padding-right:7px;padding-top:7px;height:18px;\">
 
@@ -202,8 +204,9 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 		}
 		
 		try {
-			$U = new User(Session::currentUser()->getID());
-			echo "<script type=\"text/javascript\">\$j.datepicker.setDefaults(\$j.datepicker.regional['".$U->A("language")."']);</script>";
+			$c = get_class(Session::currentUser());
+			$U = new $c(Session::currentUser()->getID());
+			echo "<script type=\"text/javascript\">\$j.datepicker.setDefaults(\$j.datepicker.regional['".$U->A("language")."']); ".(Session::physion() ? "\$j('#navigation').hide();" : "")."</script>";
 		} catch (Exception $e){ }
 	}
 
@@ -307,7 +310,7 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 		#self::saveAppMenuOrder("appMenuHidden", implode(";", $appMenuHidden));
 	}
 	
-	public function toggleTab($plugin){
+	public function toggleTab($plugin, $mode = null){
 		$U = new mUserdata();
 		$U->addAssocV3("typ","=","TTP");
 		$t = $U->getUDValueCached("ToggleTab$plugin");
@@ -317,6 +320,9 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 		if($t == null AND $collapsedTabs)
 			$t = "small";
 
+		if($mode != null)
+			$t = $mode;
+		
 		if($t == null or $t == "big")
 			$U->setUserdata("ToggleTab$plugin","small","TTP");
 		else
@@ -346,7 +352,7 @@ class MenuGUI extends UnpersistentClass implements iGUIHTML2, icontextMenu {
 			
 		$gui = new HTMLGUI();
 		echo "<div style=\"max-height:400px;overflow:auto;\">".$gui->getContextMenu($kal, 'Menu','1',$sk,'phynxContextMenu.stop(); contentManager.switchApplication();')."</div>";
-		echo "<div class=\"backgroundColor1\" onclick=\"userControl.doLogout();\" onmouseover=\"this.className='backgroundColor3';\" onmouseout=\"this.className='backgroundColor1';\" style=\"padding:5px;cursor:pointer;\"><img style=\"float:left;\" title=\"Abmelden\" src=\"./images/i2/logout.png\" onclick=\"userControl.doLogout();\" /><p style=\"padding-top:7px;padding-bottom:7px;padding-left:50px;\"><b>Abmelden</b></p></div>";
+		echo "<div class=\"backgroundColor1\" id=\"cMLogout\" onclick=\"userControl.doLogout();\" onmouseover=\"this.className='backgroundColor3';\" onmouseout=\"this.className='backgroundColor1';\" style=\"padding:5px;cursor:pointer;\"><img style=\"float:left;\" title=\"Abmelden\" src=\"./images/i2/logout.png\" onclick=\"userControl.doLogout();\" /><p style=\"padding-top:7px;padding-bottom:7px;padding-left:50px;\"><b>Abmelden</b></p></div>";
 	}
 
 	public function saveContextMenu($identifier, $key){
