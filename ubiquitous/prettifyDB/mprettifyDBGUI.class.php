@@ -1,37 +1,34 @@
 <?php
 /**
- *  This file is part of trinityDB.
+ *  This file is part of ubiquitous.
 
- *  trinityDB is free software; you can redistribute it and/or modify
+ *  ubiquitous is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 3 of the License, or
  *  (at your option) any later version.
 
- *  trinityDB is distributed in the hope that it will be useful,
+ *  ubiquitous is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
 
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <http://www.gnu.org/licenses></http:>.
  * 
- *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
+ *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
  */
 
-class mJDGUI extends anyC implements iGUIHTMLMP2 {
+class mprettifyDBGUI extends anyC implements iGUIHTMLMP2 {
 
 	public function getHTML($id, $page){
 		$this->loadMultiPageMode($id, $page, 0);
 
 		$gui = new HTMLGUIX($this);
-		$gui->version("mJD");
+		$gui->version("mprettifyDB");
 
-		$gui->name("DL");
+		$gui->name("prettifyDB");
 		
-		$gui->attributes(array("JDName"));
-		
-		$B = $gui->addSideButton("Downloads\nRSS feed", "./trinityDB/JD/rss.png");
-		$B->onclick("window.open('./trinityDB/JD/exportRSS.php');");
+		$gui->attributes(array());
 		
 		return $gui->getBrowserHTML($id);
 	}

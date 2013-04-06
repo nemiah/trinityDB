@@ -27,6 +27,7 @@
 		<folder>Serien</folder>
 
 		<adminOnly>false</adminOnly>
+		<registry>Kalender;mSerieGUI::getCalendarData;events</registry>
 		
 		<version>0.4</version>
 		<deploy>

@@ -100,5 +100,44 @@ class mSerieGUI extends anyC implements iGUIHTMLMP2, iCategoryFilter {
 
 		}
 	}
+	
+	public static function getCalendarDetails($className, $classID, $T = null) {
+		$K = new Kalender();
+		if($T == null){
+			$AC = anyC::get("Folge", "FolgeID", $classID);
+			$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
+			$AC->setFieldsV3(array("t1.name", "season", "episode", "t1.description", "airDate"));
+			$T = $AC->getNextEntry();
+		}
+		
+		$ex = explode("-", $T->A("airDate"));
+		$day = mktime(8, 0, 0, $ex[1], $ex[2], $ex[0]);
+
+		$KE = new KalenderEvent($className, $classID, $K->formatDay($day),"1800", $T->A("name")." S".($T->A("season") < 10 ? "0" : "").$T->A("season")."E".($T->A("episode") < 10 ? "0" : "").$T->A("episode"));
+		
+		#$KE->repeat(true, "yearly");
+		$KE->endDay($K->formatDay($day));
+		$KE->endTime("1845");
+		$KE->icon("./fheME/FAdressen/birthday.png");
+		$KE->summary($T->A("description"));
+		return $KE;
+	}
+
+	public static function getCalendarData($firstDay, $lastDay) {
+		$K = new Kalender();
+
+		$AC = anyC::get("Folge");
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", ">=", $firstDay);
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "<=", $lastDay);
+		$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
+		#$AC->addAssocV3("type", "=", "default");
+		#$AC->addAssocV3("AuftragID", "=", "-1");
+		#$AC->addAssocV3("geb", "!=", "0");
+		
+		while($t = $AC->getNextEntry())
+			$K->addEvent(self::getCalendarDetails("mSerieGUI", $t->getID(), $t));
+		
+		return $K;
+	}
 }
 ?>

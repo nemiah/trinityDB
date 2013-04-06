@@ -441,7 +441,8 @@ class HTMLInput {
 					if($this->autocomplete[4] != null){
 						$B2 = $this->autocomplete[4];
 						$B2->style("float:right;margin-left:5px;");
-						$this->style .= "width:80%";
+						if(strpos($this->style, "width") === false)
+							$this->style .= "width:80%";
 					} else {
 						if(strpos($this->style, "width") === false)
 							$this->style .= "width:87%";

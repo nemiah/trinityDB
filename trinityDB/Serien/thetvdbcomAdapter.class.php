@@ -133,9 +133,19 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		$S->saveMe(true, false);
 		
 		foreach($episodesList->Episode AS $k => $v){
+			$AC = anyC::get("Folge", "SerieID", $S->getID());
+			$AC->addAssocV3("season", "=", $v->SeasonNumber);
+			$AC->addAssocV3("episode", "=", $v->EpisodeNumber);
+			$AC->lCV3();
+			if($AC->numLoaded() > 1)
+				while($F = $AC->getNextEntry())
+					$F->deleteMe();
+			
 			$F = new Factory("Folge");
 
-			$F->sA("episodeID", $v->id);
+			$F->sA("SerieID", $S->getID());
+			$F->sA("season", $v->SeasonNumber);
+			$F->sA("episode", $v->EpisodeNumber);
 
 			if(($E = $F->exists(true))) {
 				if($v->lastupdated == $E->A("lastupdate")) continue;
@@ -152,9 +162,7 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 				continue;
 			}
 
-			$F->sA("SerieID", $S->getID());
-			$F->sA("season", $v->SeasonNumber);
-			$F->sA("episode", $v->EpisodeNumber);
+			$F->sA("episodeID", $v->id);
 			$F->sA("name", $v->EpisodeName);
 			$F->sA("airDate", $v->FirstAired);
 			$F->sA("lastupdate", $v->lastupdated);
