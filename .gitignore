@@ -1,3 +1,5 @@
 /system/DBData/
 /system/IECache/
 /updateFramework.php
+/plugins/Merlin/
+/applications/ubiquitousApplication.class.php
