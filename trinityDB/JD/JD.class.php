@@ -18,7 +18,7 @@
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class JD extends PersistentObject {
-	public function download($link, $logLink = null){
+	public function download($link, $logLink = null, $logFilename = ""){
 		if(strpos($link, "linksafe.")){
 			$newLocation = get_headers($link, 1);
 			$links = $newLocation["Location"];
@@ -77,7 +77,7 @@ class JD extends PersistentObject {
 		
 			$xml = new SimpleXMLElement(substr($data, strpos($data, "<?xml ")));
 			if($xml->Result."" == "success")
-				$this->logDownload($logLink);
+				$this->logDownload($logLink, $logFilename);
 
 		}
 
@@ -86,7 +86,7 @@ class JD extends PersistentObject {
 			$content = file_get_contents("http://".$this->A("JDHost").":".$this->A("JDPort")."/action/add/links/grabber0/start1/$link");
 			
 			if(strpos($content, "Link(s) added. (\"$link\"") !== false AND $logLink != null)
-				$this->logDownload($logLink);
+				$this->logDownload($logLink, $logFilename);
 			
 		}
 
@@ -120,9 +120,10 @@ class JD extends PersistentObject {
 		}
 	}
 
-	private function logDownload($logLink){
+	private function logDownload($logLink, $fileName = ""){
 		$F = new Factory("JDownload");
 		$F->sA("JDownloadURL", $logLink);
+		$F->sA("JDownloadFilename", $fileName);
 		if(!$F->exists()){
 			$F->sA("JDownloadDate", time());
 			$F->store();

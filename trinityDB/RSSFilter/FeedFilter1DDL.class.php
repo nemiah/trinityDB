@@ -74,7 +74,7 @@ class FeedFilter1DDL implements iFeedFilter {
 		return $hosts;
 	}
 
-	public function download(RSSFilter $RSF, $filename, $page){
+	public function download(RSSFilter $RSF, $filename, $page, $targetFileName){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $page);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -132,7 +132,7 @@ class FeedFilter1DDL implements iFeedFilter {
 				continue;
 
 			$DLFrom = $matches[2][$k];
-			$JD->download($DLFrom, $filename);
+			$JD->download($DLFrom, $filename, $targetFileName);
 			#echo $matches[2][$k];
 			$dl[$host] = true;
 		}

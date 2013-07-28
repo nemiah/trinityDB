@@ -177,7 +177,7 @@ class RSSFilter extends PersistentObject {
 		return true;
 	}
 
-	public function autoDownload($filename, $page){
+	public function autoDownload($filename, $page, $targetFileName){
 		if($this->A("RSSFilterAutoDL") == "0") return false;
 		$JD = new JD($this->A("RSSFilterJDID"));
 		if(!$JD->supportsAutoDownload())
@@ -186,7 +186,7 @@ class RSSFilter extends PersistentObject {
 		$Adapter = $this->A("RSSFilterAdapter");
 		$Adapter = new $Adapter();
 
-		$Adapter->download($this, $filename, $page);
+		$Adapter->download($this, $filename, $page, $targetFileName);
 
 		return true;
 	}
