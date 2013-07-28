@@ -22,7 +22,7 @@ interface iFeedFilter {
 	public function getLabel();
 	
 	public function parseItem(SimpleXMLElement $item);
-	public function download(RSSFilter $RSF, $filename, $page);
+	public function download(RSSFilter $RSF, $filename, $page, $targetFileName);
 
 	public function filterFilename(Serie $Series, SimpleXMLElement $item);
 }
