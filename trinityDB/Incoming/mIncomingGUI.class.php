@@ -49,19 +49,57 @@ class mIncomingGUI extends mIncoming implements iGUIHTMLMP2 {
 
 		$Tab = new HTMLSideTable("left");
 
-		$B = new Button("change\ndirectories", "./trinityDB/Incoming/SetFolder.png");
+		$B = new Button("Change\ndirectories", "./trinityDB/Incoming/SetFolder.png");
 		$B->onclick("contentManager.loadFrame('contentRight', 'mIncoming', -1, 0, 'mIncomingGUI;edit:true');");
 		$Tab->addRow($B);
 
-		$B = $Tab->addButton("create move-\nscript", "redo");
+		$B = $Tab->addButton("Rename\ndownloaded", "redo");
+		$B->popup("", "Rename downloaded", "mIncoming", "-1", "renameDownloaded", array("'0'"));
+
+		$B = $Tab->addButton("Create move-\nscript", "redo");
 		$B->windowRme("mIncoming", "-1", "createMoveScript", array("'0'"));
 
-		$B = $Tab->addButton("run move-\nscript", "redo");
+		$B = $Tab->addButton("Run move-\nscript", "redo");
 		$B->windowRme("mIncoming", "-1", "createMoveScript", array("'1'"));
 
 		$B = $Tab->addButton("Prettifyer", "./trinityDB/Incoming/prettify.png");
 		$B->loadFrame("contentLeft", "mIncomingPrettify");
 		return ($id == -1 ? $Tab : "").$T;
+	}
+	
+	public function renameDownloaded(){
+		$AC = anyC::get("JDownload");
+		$AC->addAssocV3("JDownloadFilename", "!=", "");
+		$AC->addAssocV3("JDownloadRenamed", "=", "0");
+		
+		$dirs = array();
+		$ACI = anyC::get("Incoming", "IncomingUseForDownloads", "1");
+		while($I = $ACI->getNextEntry())
+			$dirs[] = $I->A("IncomingDir");
+		
+		while($D = $AC->getNextEntry()){
+			$filename = preg_replace("/\.htm$/", "", basename($D->A("JDownloadFilename")));
+			$ext = Util::ext($filename);
+			
+			$found = false;
+			foreach($dirs AS $dir){
+				if(file_exists($dir."/$filename")){
+					$found = true;
+					if(rename($dir."/$filename", $dir."/".Util::makeFilename($D->A("JDownloadRenameto").".$ext"))){
+						echo "<p>renamed $dir/$filename to ".Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")).".$ext")."</p>";
+						$D->changeA("JDownloadRenamed", time());
+						$D->saveMe();
+					} else {
+						echo "<p>$filename: ERROR RENAMING!</p>";
+					}
+				}
+				#	rename($filename, Util::makeFilename($D->A("JDownloadRenameto").".$ext"));
+			}
+			
+			if(!$found)
+				echo "<p>$filename: NOT FOUND!</p>";
+			
+		}
 	}
 
 	public function createMoveScript($run = false){

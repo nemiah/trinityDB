@@ -27,11 +27,14 @@ class IncomingGUI extends Incoming implements iGUIHTML2 {
 		$gui->setName("Incoming");
 
 		$gui->setLabel("IncomingDir", "Dir");
+		$gui->setLabel("IncomingUseForDownloads", "Downloads");
 		$gui->setLabel("IncomingUseForMoving", "Move files");
 
 		$gui->setFieldDescription("IncomingUseForMoving", "Check this, if you want to move the files from this directory with the move scripts.");
+		$gui->setFieldDescription("IncomingUseForDownloads", "This directory is used for downloads.");
 
 		$gui->setType("IncomingUseForMoving", "checkbox");
+		$gui->setType("IncomingUseForDownloads", "checkbox");
 
 		$gui->setStandardSaveButton($this);
 	

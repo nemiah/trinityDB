@@ -77,7 +77,7 @@ class JD extends PersistentObject {
 		
 			$xml = new SimpleXMLElement(substr($data, strpos($data, "<?xml ")));
 			if($xml->Result."" == "success")
-				$this->logDownload($logLink, $logFilename);
+				$this->logDownload($logLink, $link, $logFilename);
 
 		}
 
@@ -86,7 +86,7 @@ class JD extends PersistentObject {
 			$content = file_get_contents("http://".$this->A("JDHost").":".$this->A("JDPort")."/action/add/links/grabber0/start1/$link");
 			
 			if(strpos($content, "Link(s) added. (\"$link\"") !== false AND $logLink != null)
-				$this->logDownload($logLink, $logFilename);
+				$this->logDownload($logLink, $link, $logFilename);
 			
 		}
 
@@ -120,10 +120,11 @@ class JD extends PersistentObject {
 		}
 	}
 
-	private function logDownload($logLink, $fileName = ""){
+	private function logDownload($logLink, $link, $fileName = ""){
 		$F = new Factory("JDownload");
 		$F->sA("JDownloadURL", $logLink);
-		$F->sA("JDownloadFilename", $fileName);
+		$F->sA("JDownloadFilename", $link);
+		$F->sA("JDownloadRenameto", $fileName);
 		if(!$F->exists()){
 			$F->sA("JDownloadDate", time());
 			$F->store();
