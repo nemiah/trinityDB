@@ -30,8 +30,47 @@ class OnEvent {
 	 * @return string
 	 */
 	public static function window($targetObject, $targetMethod, $targetMethodParameters = "", $bps = null, $target = null){
+		$useID = "-1";
+		if(!($targetObject instanceof Collection))
+			$useID = ($targetObject->getID() == "" ? "-1" : $targetObject->getID());
 		
-		return "windowWithRme('".str_replace("GUI", "", get_class($targetObject))."', ".($targetObject->getID() == "" ? "-1" : $targetObject->getID()).", '$targetMethod', ".(is_array($targetMethodParameters) ? "['".implode("','", $targetMethodParameters)."']" : "'$targetMethodParameters'").($bps != null ? ", '$bps'" : "").($target != null ? ", '$target'" : "")."); ";
+		if(!is_numeric($useID))
+			$useID = "'$useID'";
+		
+		return "windowWithRme('".str_replace("GUI", "", get_class($targetObject))."', $useID, '$targetMethod', ".(is_array($targetMethodParameters) ? "['".implode("','", $targetMethodParameters)."']" : "'$targetMethodParameters'").($bps != null ? ", '$bps'" : "").($target != null ? ", '$target'" : "")."); ";
+	}
+	
+	public static function tip($targetElement, $title, $text, $options = "{}"){
+		return "\$j('$targetElement').qtip(\$j.extend({}, {
+		position: {
+			my: 'right top',
+			at: 'center left',
+			viewport: true,
+			adjust: {
+				method: 'flip'
+			}
+		},
+		show: {
+			event: false,
+			ready: true,
+			solo: true
+		},
+		hide: false,
+		style: {
+			classes: 'ui-tooltip-text'
+		},
+		content: {
+			text: '$text', 
+			title: {
+				text: '$title',
+				button: true
+			}
+		}
+	}, $options));";
+	}
+	
+	public static function clear($frame){
+		return "contentManager.emptyFrame('content$frame');";
 	}
 	
 	public static function selectCustom($targtFrame, $callingPluginID, $selectPlugin, $selectJSFunction, $addBPS = "", $options = ""){
@@ -93,6 +132,9 @@ class OnEvent {
 		if($targetObject instanceof PersistentObject)
 			$id = $targetObject->getID();
 		
+		if(!is_numeric($id))
+			$id = "'$id'";
+		
 		/*if($targetObject instanceof Collection)
 			$id = -1;
 		
@@ -109,7 +151,7 @@ class OnEvent {
 		if($onFailureFunction != null AND strpos(trim($onFailureFunction), "function") !== 0)
 				$onFailureFunction = "function(transport){ $onFailureFunction }";
 		
-		return "contentManager.rmePCR('$targetObject', $id, '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), ".($onSuccessFunction != null ? $onSuccessFunction : "function(){}")."".($bps != null ? ", '$bps'" : ", ''").", 1, ".($onFailureFunction != null ? $onFailureFunction : "function(){}")."); ";
+		return "contentManager.rmePCR('$targetObject', $id, '$targetMethod', [".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."], ".($onSuccessFunction != null ? $onSuccessFunction : "function(){}")."".($bps != null ? ", '$bps'" : ", ''").", 1, ".($onFailureFunction != null ? $onFailureFunction : "function(){}")."); ";
 	}
 	
 	public static function closePopup($plugin, $id = "edit"){
@@ -119,11 +161,12 @@ class OnEvent {
 		return "Popup.close('$plugin', '$id');";
 	}
 	
-	public static function reloadPopup($plugin, $bps = ""){
+	public static function reloadPopup($plugin, $bps = "", $firstParameter = null){
 		if($plugin instanceof Collection)
 			$plugin = str_replace("GUI", "", get_class($plugin));
 		
-		return "Popup.refresh('$plugin'".($bps != "" ? ", '$bps'" : "").");";
+		
+		return "Popup.refresh('$plugin'".(($bps != "" OR $firstParameter != null) ? ", '$bps'" : "")." ".($firstParameter != null ? ", '$firstParameter'" : "").");";
 	}
 	
 	public static function reload($frame, $bps = null){

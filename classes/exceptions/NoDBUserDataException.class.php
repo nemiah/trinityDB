@@ -19,8 +19,8 @@
  */
 class NoDBUserDataException extends StorageException {
 
-	function __construct(){
-		parent::__construct();
+	function __construct($message = ""){
+		parent::__construct($message);
 		$_SESSION["messages"]->addMessage("Cannot authenticate with the database. Please use the install-plugin.");
 	}
 

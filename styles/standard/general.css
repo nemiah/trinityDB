@@ -253,20 +253,54 @@ a.hiddenLink:hover {
 	filter:alpha(opacity=50);
 }
 
-input, select, .AJAXUpload, button {
+input[type=text],
+input[type=submit],
+input[type=password],
+input[type=radio],
+input[type=checkbox],
+input[type=button],
+input[type=submit],
+select,
+.AJAXUpload,
+button {
 	border:0;
 	border-bottom-width:1px;
 	border-bottom-style: dotted;
-	width:95%;
 	background:transparent;
-	padding:2px;
+	padding:5px;
 	background-repeat:no-repeat;
 	background-position:right;
 	color:black;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+input[type=text],
+input[type=submit],
+input[type=password],
+input[type=radio],
+input[type=checkbox],
+input[type=button]:not(.bigButton),
+input[type=submit],
+select,
+.AJAXUpload,
+button {
+	width:90%;
+}
+
+button.loading {
+	background-image:url('../../images/loading.png') !important;
+	color:grey;
+}
+
+input[type=checkbox]{
+	margin:5px;
+	padding:0;
 }
 
 textarea {
-	width:95%;
+	width:90%;
 	background-color:transparent;
 	border:0px;
 	border-bottom-width:1px;
@@ -274,6 +308,10 @@ textarea {
 	padding-left:2px;
 	font-size:1.1em;
 	height:60px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	padding:5px;
 }
 
 .hasFocus {
@@ -282,7 +320,7 @@ textarea {
 }
 
 select {
-	background-color:white;
+	/*background-color:white;*/
 }
 
 input[type=submit] {
@@ -297,7 +335,7 @@ input[type=radio] {
 	width:10px;
 }
 
-input[disabled], select[disabled], input[readonly] {
+input[disabled], select[disabled], input[readonly], button[disabled] {
 	color:grey;
 }
 
@@ -396,7 +434,7 @@ img[onclick] {
 label {
 	display:block;
 	float:right;
-	font-weight:bold;
+	font-weight:normal;
 	margin-right:2px;
 	text-align:right;
 	width:120px;
@@ -409,6 +447,7 @@ label {
 	text-align:right;
 	padding-top:5px;
 	clear:both;
+	/*background-image: linear-gradient(#AAAAAA 0%, rgba(170, 170, 170, 0) 4px);*/
 }
 
 #footer p {
@@ -439,7 +478,7 @@ h1 {
 	margin-bottom:5px;
 	padding:5px;
 	padding-bottom:5px;
-	margin-top:20px;
+	padding-top:25px;
 }
 
 h2 {
@@ -487,7 +526,7 @@ pre {
 	width:50px;
 	text-align:right;
 }
-.multiEditInput2 {
+input.multiEditInput2 {
 	width:50px;
 	text-align:right;
 }
@@ -521,11 +560,11 @@ div + .Tab {
 
 .lightTab {
 	color:grey;
-	margin-top:10px;
 	border-bottom-width:1px;
 	border-bottom-style:dashed;
 	margin-bottom:5px;
 	padding:3px;
+	padding-top:13px;
 	padding-bottom:0px;
 	padding-left:5px;
 }
@@ -628,8 +667,9 @@ div + .Tab {
 	padding-top:8px;
 }
 
-input[name=currentSaveButton] {
-	width:100%;
+input[type=button][name=currentSaveButton], input[type=button][name=submitForm] {
+	width:99%;
+	text-transform:uppercase;
 }
 
 .spell {
@@ -672,7 +712,7 @@ input[name=currentSaveButton] {
 	border-top-right-radius:5px;*/
 	border-color: #777;
 	border-style:solid;
-	border-width:1px;
+	border-width:0px;
 }
 
 .popup > div:first-child {
@@ -812,4 +852,8 @@ input[name=currentSaveButton] {
 
 .ui-widget-content .ui-state-active {
 	background-color:#ffb400;
+}
+
+.tableWeightLightColored {
+	border-spacing: 0 0px;
 }

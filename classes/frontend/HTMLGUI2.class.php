@@ -96,19 +96,6 @@ class HTMLGUI2 extends HTMLGUI {
 			break;
 		}
 	}
-
-	public function insertAttribute($where, $fieldName, $insertedFieldName){
-		if($where == "after")
-			$add = 1;
-
-		if($where == "before")
-			$add = 0;
-
-		$first = array_splice($this->showAttributes, 0, array_search($fieldName, $this->showAttributes) + $add);
-		$last = array_splice($this->showAttributes, array_search($fieldName, $this->showAttributes));
-
-		$this->showAttributes = array_merge($first, array($insertedFieldName), $last);
-	}
 	
 	function setMode($mode){
 		if($mode != "") {
@@ -209,7 +196,7 @@ class HTMLGUI2 extends HTMLGUI {
 			$this->newColsLeft["select"] = $EB;
 		}
 		$cols = count($this->showAttributes) + count($this->newColsLeft) + count($this->newColsRight);
-		$valuesTab = new HTMLTable($cols,($lineWithId == -1 ? $this->displaySide == "left" ? $this->name : "&nbsp;"/*(!$this->onlyDisplayMode ? ($singularLanguageClass == null ? "Bitte ".$this->name." auswählen:" : $singularLanguageClass->getBrowserCaption().":") : ($singularLanguageClass == null ? $this->name : $singularLanguageClass->getPlural() ).":")*/ : null));
+		$valuesTab = new HTMLTable($cols,($lineWithId == -1 ? $this->displaySide == "left" ? $this->name : ""/*(!$this->onlyDisplayMode ? ($singularLanguageClass == null ? "Bitte ".$this->name." auswählen:" : $singularLanguageClass->getBrowserCaption().":") : ($singularLanguageClass == null ? $this->name : $singularLanguageClass->getPlural() ).":")*/ : null));
 		$valuesTab->addTableClass("contentBrowser");
 		/*if(isset($this->newColsRight["delete"]) AND ($this->displaySide == "default" OR $this->displaySide == "right"))
 			$valuesTab->setColClass($cols, "backgroundColor0");

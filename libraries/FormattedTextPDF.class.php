@@ -21,11 +21,12 @@
 #if(!class_exists("TemporaryPDFClass", false))
 #	eval("class TemporaryPDFClass extends FPDF {}");
 
+
 class FormattedTextPDF extends FPDI {
-	function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $copy = false) {
+	function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false){
 		if(file_exists(Util::getRootPath()."ubiquitous/Fonts/")){# AND !defined("FPDF_FONTPATH")) {
 			#define('FPDF_FONTPATH', Util::getRootPath()."ubiquitous/Fonts/");
-
+			
 			$this->AddFont("Ubuntu", "", "5e01bde68449bff64cefe374f81b7847_ubuntu-regular.php");
 			$this->AddFont("Ubuntu", "B", "70fed3593f0725ddea7da8f1c62577c1_ubuntu-bold.php");
 			$this->AddFont("Ubuntu", "I", "cfa4d284ee1dc737cb0fe903fbab1844_ubuntu-italic.php");
@@ -42,7 +43,7 @@ class FormattedTextPDF extends FPDI {
 			$this->AddFont("Raleway", "BI", "ed7ad2408e498cae8fab623a755883f6_raleway-thin-fakeBoldItalic.php");
 		}
 		
-		parent::__construct($orientation, $unit, $format, $copy);
+		parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache, $pdfa);
 
 	}
 
@@ -57,6 +58,7 @@ class FormattedTextPDF extends FPDI {
 	protected $heightStack = array(3);
 	protected $paragraph = 0;
 	protected $fontStack = array("Helvetica");
+	protected $inHTML = false;
 
 	protected function stackFont(array $font){
 		if(count($this->fontStack) > 0)
@@ -73,7 +75,9 @@ class FormattedTextPDF extends FPDI {
 
 		foreach($dom->childNodes as $child){
 			if($child->nodeType == XML_TEXT_NODE){
+				$this->inHTML = $this->getFont();
 				$this->Write($this->heightStack[count($this->heightStack) - 1] / 1.9, utf8_decode($child->nodeValue));
+				$this->inHTML = false;
 				#$this->Write(5, utf8_decode($child->nodeValue));
 			} else {
 				$p = simplexml_import_dom($child);
@@ -84,12 +88,17 @@ class FormattedTextPDF extends FPDI {
 		}
 	}
 
+	protected function getFont(){
+		return array($this->FontFamily, $this->FontStyle, $this->FontSizePt);
+	}
+	
 	private function startTag($xml){
 		if($xml->getName() == "p"){
 			if($this->paragraph > 0)
-				$this->Ln($this->heightStack[count($this->heightStack) - 1] * 2);
+				$this->Ln(4);#$this->heightStack[count($this->heightStack) - 1] * 2);
 			
 			array_push($this->heightStack, $this->findMaxStyle("font-size", $xml));
+			$this->heightStack[0] = $this->heightStack[count($this->heightStack) - 1];
 			
 			$this->paragraph++;
 		}
@@ -120,21 +129,30 @@ class FormattedTextPDF extends FPDI {
 				$styles = explode(";", $a);
 				foreach($styles AS $S){
 					if(stripos($S, "font-size:") !== false)
-						array_push($this->sizeStack, trim(str_replace(array("font-size:", "pt"), "", $S)));
+						array_push($this->sizeStack, trim(str_ireplace(array("font-size:", "pt"), "", $S)));
 
 					if(stripos($S, "text-decoration:") !== false)
 						array_push($this->styleStack, "U");
 
 					if(stripos($S, "color:") !== false)
-						array_push($this->colorStack, trim(str_replace(array("color:", "#"), "", $S)));
+						array_push($this->colorStack, trim(str_ireplace(array("color:", "#"), "", $S)));
 
 					if(stripos($S, "text-align:") !== false)
-						array_push($this->alignStack, trim(str_replace("text-align:", "", $S)));
+						array_push($this->alignStack, trim(str_ireplace("text-align:", "", $S)));
 
-					if(stripos($S, "font-family:") !== false){
-						$font = trim(str_replace(array("font-family:", ";"), "", $S));
-						if($font == "times new roman")
+					if(stripos(trim($S), "font-family:") === 0){
+						$font = trim(trim(str_ireplace(array("font-family:", ";"), "", $S)), "\"'");
+						if(stripos($font, ",") !== false){
+							$ex = explode(",", $font);
+							$font = trim($ex[0], "\"'");
+						}
+						
+						if(strtolower($font) == "times new roman")
 							$font = "times";
+						
+						if(strtolower($font) == "courier new")
+							$font = "courier";
+						
 						array_push($this->fontStack, $font);
 					}
 				}
@@ -151,8 +169,10 @@ class FormattedTextPDF extends FPDI {
 			return;
 		}
 		
-		if($xml->getName() == "p")
+		if($xml->getName() == "p"){
 			array_pop($this->heightStack);
+			$this->ln(5);
+		}
 
 		if($xml->getName() == "strong")
 			array_pop($this->styleStack);
@@ -172,6 +192,7 @@ class FormattedTextPDF extends FPDI {
 		if(preg_match_all("/h([0-9])/", $xml->getName(), $m)){
 			array_pop($this->styleStack);
 			array_pop($this->sizeStack);
+			$this->ln(5);
 		}
 
 		foreach($xml->attributes() AS $k => $a){
@@ -202,14 +223,38 @@ class FormattedTextPDF extends FPDI {
 
 	public function WriteHTML($html) {
 		if(trim($html) == "") return;
-
+		
+		if($this instanceof TCPDF)
+			return parent::writeHTML($html);
+		
 		$this->sizeStack[] = $this->getFontSize();
 		
 		$html = str_replace("\n", "", $html);
+		$html = preg_replace('/<!--\[if[^\]]*]>.*?<!\[endif\]-->/i', '', $html);
 		
 		$bad = array("&gt;", "&lt;", "&amp;");
 		$good = array("::gt::", "::lt::", "::amp::");
-		$this->translateXML(new SimpleXMLElement(str_replace($good, $bad, "<phynx>".html_entity_decode(str_replace($bad, $good, $html), ENT_NOQUOTES, "UTF-8")."</phynx>")));
+		
+		libxml_use_internal_errors(true);
+		try {
+			$xml = new SimpleXMLElement(str_replace($good, $bad, "<phynx>".html_entity_decode(str_replace($bad, $good, $html), ENT_NOQUOTES, "UTF-8")."</phynx>"));
+		} catch (Exception $e){
+			try {
+				$tidy = new tidy();
+				$tidy->parseString($html, array("show-body-only" => true, "output-xhtml" => true, "wrap" => 0), 'utf8');
+				$tidy->cleanRepair();
+				$xml = new SimpleXMLElement(str_replace($good, $bad, "<phynx>".html_entity_decode(str_replace($bad, $good, $tidy), ENT_NOQUOTES, "UTF-8")."</phynx>"));
+			} catch (Exception $e){
+				$errors = "";
+				foreach(libxml_get_errors() as $error) {
+					#echo "\t", $error->message;
+					$errors .= htmlentities(trim($error->message))."<br />";
+				}
+				$xml = new SimpleXMLElement("<phynx><p style=\"color:#dd0000;\">Der Textbaustein konnte nicht geladen werden:<br />$errors</p></phynx>");
+			}
+		}
+
+		$this->translateXML($xml);
 	}
 
 	private function findMaxStyle($style, SimpleXMLElement $xml){

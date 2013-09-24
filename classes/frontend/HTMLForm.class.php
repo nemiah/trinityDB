@@ -140,6 +140,11 @@ class HTMLForm {
 			$this->table->addColStyle(2, "width:$widths[2]px;");
 			$this->table->addColStyle(3, "width:$widths[1]px;");
 			$this->table->addColStyle(4, "width:$widths[2]px;");
+			
+			$this->table->setColClass(1, "backgroundColor3");
+			$this->table->setColClass(2, "backgroundColor2");
+			$this->table->setColClass(3, "backgroundColor3");
+			$this->table->setColClass(4, "backgroundColor2");
 		}
 	}
 
@@ -195,6 +200,8 @@ class HTMLForm {
 		$this->spaces = array();
 		$this->spaceLines = array();
 		$this->table = new HTMLTable(2, $title);
+		$this->table->setColClass(1, "backgroundColor3");
+		$this->table->setColClass(2, "backgroundColor2");
 		$this->title = $title;
 		$this->saveMode = null;
 		$this->onSubmit = null;
@@ -254,7 +261,7 @@ class HTMLForm {
 				$gui->setFieldDescription($k, $v);*/
 	}
 
-	public function setSaveMultiCMS($saveButtonLabel, $saveButtonBGIcon, $class, $action = "", $onSuccessFuntion = "", $checkIfValid = false){
+	public function setSaveMultiCMS($saveButtonLabel, $saveButtonBGIcon, $class, $action = "", $onSuccessFuntion = "", $checkIfValid = false, $onErrorFunction = ""){
 		$this->saveMode = "multiCMS";
 		$this->saveButtonLabel = $saveButtonLabel;
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
@@ -263,7 +270,7 @@ class HTMLForm {
 			$this->saveAction = $action;
 		else
 			$this->saveAction = $this->id;
-		$this->saveButtonSubmit = ($checkIfValid ? "if($('#$this->id').valid()) " : "")."multiCMS.formHandler('$this->id'".($onSuccessFuntion != "" ? ", $onSuccessFuntion" : "").");";
+		$this->saveButtonSubmit = ($checkIfValid ? "if($('#$this->id').valid()) " : "")."multiCMS.formHandler('$this->id', ".($onSuccessFuntion != "" ? "$onSuccessFuntion" : "function(){}")."".($onErrorFunction != "" ? ", $onErrorFunction" : "").");";
 		$this->onSubmit = "return false;";
 	}
 
@@ -286,6 +293,15 @@ class HTMLForm {
 		$this->saveButtonLabel = $saveButtonLabel;
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
 
+		if($this->useRecentlyChanged){
+			$RC = "\$j('#$this->id .recentlyChanged').removeClass('recentlyChanged');";
+			
+			if($onSuccessFunction != null AND strpos($onSuccessFunction, "function(") === 0)
+				$onSuccessFunction = substr($onSuccessFunction, 0, -1).$RC."}";
+			else
+				$onSuccessFunction .= $RC;
+		}
+		
 		if($onSuccessFunction != null AND strpos($onSuccessFunction, "function(") !== 0)
 			$onSuccessFunction = "function(transport){ $onSuccessFunction }";
 		
@@ -295,17 +311,20 @@ class HTMLForm {
 		$this->onSubmit = $this->saveButtonSubmit."return false;";
 	}
 	
-	public function setSaveRMEPCR($saveButtonLabel, $saveButtonBGIcon, $targetClass, $targetClassId, $targetMethod, $onSuccessFunction = null){
+	public function setSaveRMEPCR($saveButtonLabel, $saveButtonBGIcon, $targetClass, $targetClassId, $targetMethod, $onSuccessFunction = ""){
 		$this->saveMode = "rmeP";
 		$this->saveButtonLabel = $saveButtonLabel;
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
 
-		if($this->useRecentlyChanged)
-			$onSuccessFunction .= "\$j('#$this->id .recentlyChanged').removeClass('recentlyChanged');";
-		
-		
-		if($onSuccessFunction != null AND strpos($onSuccessFunction, "function(") !== 0)
-			$onSuccessFunction = "function(transport){ $onSuccessFunction }";
+
+		if($this->useRecentlyChanged){
+			$RC = "\$j('#$this->id .recentlyChanged').removeClass('recentlyChanged');";
+			
+			if($onSuccessFunction != null AND strpos($onSuccessFunction, "function(") === 0)
+				$onSuccessFunction = substr($onSuccessFunction, 0, -1).$RC."}";
+			else
+				$onSuccessFunction .= $RC;
+		}
 		
 		$values = "";
 		foreach($this->fields AS $f){
@@ -314,7 +333,7 @@ class HTMLForm {
 			else
 				$values .= ($values != "" ? ", " : "")."\$('$this->id').$f.checked ? '1' : '0'";
 		}
-		$this->saveButtonSubmit = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', [$values]".($onSuccessFunction != null ? ", $onSuccessFunction" : "").");";
+		$this->saveButtonSubmit = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', [$values]".($onSuccessFunction != "" ? ", $onSuccessFunction" : "").");";
 		$this->onSubmit = $this->saveButtonSubmit."return false;";
 	}
 	
@@ -499,6 +518,26 @@ class HTMLForm {
 		return $B;
 	}
 
+	private $saveButton;
+	public function saveButton(){
+		switch($this->saveMode){
+			case "class":
+				if($this->saveButton != null)
+					return $this->saveButton;
+				
+				$S = new HTMLInput("currentSaveButton", $this->saveButtonType, $this->saveButtonLabel);
+				if($this->saveButtonBGIcon != "")
+					$S->style("background-image:url($this->saveButtonBGIcon);background-position:98% 50%;background-repeat:no-repeat;");
+
+				if($this->saveButtonSubmit != null)
+					$S->onclick(str_replace("/*CALLBACKS*/", $this->callbacks, $this->saveButtonSubmit));
+				
+				$this->saveButton = $S;
+				return $S;
+			break;
+		}
+	}
+	
 	public function  __toString() {
 		$hiddenFields = "";
 
@@ -601,7 +640,7 @@ class HTMLForm {
 				$B = $this->getCustomButton($v, $Input);
 
 				$row[] = "<label>".(isset($this->labels[$v]) ? $this->labels[$v] : ucfirst($v)).":</label>";
-				$row[] = $B.$Input;
+				$row[] = $B.$Input.(isset($this->descriptionField[$v]) ? "<br /><small style=\"color:grey;\">".$this->descriptionField[$v]."</small>" : "");
 				/*if(!isset($this->types[$v]) OR $this->types[$v] != "hidden"){
 					$this->table->addLV(
 						(isset($this->labels[$v]) ? $this->labels[$v] : ucfirst($v)).":",
@@ -637,13 +676,9 @@ class HTMLForm {
 				break;
 			
 				case "class":
-					$S = new HTMLInput("currentSaveButton", $this->saveButtonType, $this->saveButtonLabel);
-					if($this->saveButtonBGIcon != "")
-						$S->style("background-image:url($this->saveButtonBGIcon);background-position:98% 50%;background-repeat:no-repeat;");
 
-					if($this->saveButtonSubmit != null)
-						$S->onclick(str_replace("/*CALLBACKS*/", $this->callbacks, $this->saveButtonSubmit));
-
+					$S = $this->saveButton();
+					
 					$this->table->addRow(array($S));
 					$this->table->addRowColspan(1, $this->cols);
 				break;

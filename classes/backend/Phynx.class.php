@@ -22,9 +22,13 @@ class Phynx {
 		if(!file_exists(Util::getRootPath()."system/build.xml"))
 			return false;
 		
-		$xml = new SimpleXMLElement(file_get_contents(Util::getRootPath()."system/build.xml"));
+		try {
+			$xml = new SimpleXMLElement(file_get_contents(Util::getRootPath()."system/build.xml"));
 		
-		return $xml->build->prefix."-".$xml->build->number;
+			return $xml->build->prefix."-".$xml->build->number;
+		} catch(Exception $e){
+			return false;
+		}
 	}
 }
 ?>

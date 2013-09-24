@@ -34,13 +34,58 @@ var contentManager = {
 	oldValue: null,
 	emptyContentBelow: true,
 	lastLoaded: [],
+	isAltUser: false,
+	updateTitle: true,
+	currentPlugin: null,
 	
 	maxHeight: function(){
-		return ($j(window).height() - $j('#navTabsWrapper').height() - $j('#footer').height() - 40);
+		if($j('#desktopWrapper').length > 0)
+			return $j('#wrapper').height() - $j('#wrapperTable').height() - 20; // 20 px padding on contentLeft and contentRight
+		
+		return ($j(window).height() - $j('#navTabsWrapper').height() - $j('#footer').height() - 30);
 	},
 			
-	maxWidth: function(){
+	maxWidth: function(getWindow){
+		if(!getWindow && $j('#desktopWrapper').length > 0)
+			return $j('#wrapper').width();
+		
 		return ($j(window).width() - $j('#phim:visible').outerWidth());
+	},
+			
+	scrollTable: function(tableID){
+		var header_table = $j( '<table aria-hidden="true" id=\"head'+tableID+'\"><thead><tr><td></td></tr></thead></table>' );
+		
+		var scroll_div = '<div id=\"body'+tableID+'\" style="height: 120px;overflow-y: auto;"></div>';
+
+		$j('table#'+tableID).before( header_table ).before( scroll_div );
+
+		var columnWidths = [];
+		var $targetDataTable = $j('table#'+tableID);
+		var $targetHeaderTable = $j("table#head"+tableID);
+
+		$j($targetDataTable).find('thead tr th').each(function (index) {
+			columnWidths[index] = $j(this).width();
+		});
+
+		$j('div#body'+tableID).prepend($targetDataTable);
+		$j('div#body'+tableID).css("width", $j($targetDataTable).width());
+		//.width($j($targetDataTable).width());
+			
+		$j($targetDataTable).css('width', '100%');
+		$j($targetDataTable).children('caption, thead, tfoot').hide();
+
+		$j($targetHeaderTable).find('thead').replaceWith( $j( $targetDataTable ).children('caption, thead').clone().show() );
+
+		var height = contentManager.maxHeight() - $j($targetHeaderTable).outerHeight() - $j("table#foot"+tableID+":visible").outerHeight();
+
+		$j($targetHeaderTable).closest('.browserContainer').find('.browserContainerSubHeight').each(function(k, v){
+			height -= $j(v).outerHeight();
+		});
+
+		$j('div#body'+tableID).css('height', height);
+		
+		$j($targetHeaderTable).closest('.browserContainer').css("position", "fixed");
+		$j('#contentRight').append("<div style=\"height:"+contentManager.maxHeight()+"px\"></div>");
 	},
 	
 	init: function(){
@@ -80,11 +125,17 @@ var contentManager = {
 		}
 	},
 	
-	newSession: function(physion, application, plugin, cloud){
+	newSession: function(physion, application, plugin, cloud, title, icon){
 		if(typeof cloud == "undefined")
 			cloud = "";
 		
-		Popup.load("Neue Sitzung", "Util", "-1", "newSession", [physion, application, plugin, cloud]);
+		if(typeof title == "undefined")
+			title = "";
+		
+		if(typeof icon == "undefined")
+			icon = "";
+		
+		Popup.load("Neue Sitzung", "Util", "-1", "newSession", [physion, application, plugin, cloud, title, icon]);
 	},
 	
 	contentBelow: function(content){
@@ -165,15 +216,27 @@ var contentManager = {
 		}});*/
 	},
 	
-	loadPlugin: function(targetFrame, targetPlugin, bps, withId){
-		contentManager.emptyFrame('contentLeft');
-		if(targetFrame != "contentRight")
-			contentManager.emptyFrame('contentRight');
-		contentManager.emptyFrame('contentScreen');
-		contentManager.emptyFrame('contentBelow');
+	loadPlugin: function(targetFrame, targetPlugin, bps, withId, options){
 		
-		contentManager.loadFrame(targetFrame, targetPlugin, -1, 0, bps, function(){if(typeof withId != "undefined") contentManager.loadFrame("contentLeft", targetPlugin.substr(1), withId);});
-		//$('windows').update('');
+		contentManager.loadFrame(targetFrame, targetPlugin, -1, 0, bps, function(){
+			if(typeof withId != "undefined" && withId != null) contentManager.loadFrame("contentLeft", targetPlugin.substr(1), withId);
+		},
+		false,
+		{
+			doBefore: function(){
+				if(typeof options == "object"){
+					if(typeof options.doBefore == "function")
+						options.doBefore();
+				}
+				
+				contentManager.emptyFrame('contentLeft');
+				if(targetFrame != "contentRight")
+					contentManager.emptyFrame('contentRight');
+				contentManager.emptyFrame('contentScreen');
+				contentManager.emptyFrame('contentBelow');
+			}
+		});
+		
 		Popup.closeNonPersistent();
 		
 		if($(targetPlugin+'MenuEntry'))
@@ -205,10 +268,15 @@ var contentManager = {
 	},
 
 	loadTitle: function(){
-    	new Ajax.Request("./interface/rme.php?class=Menu&method=getActiveApplicationName&constructor=&parameters=",{onSuccess: function(transport){
+		if(!contentManager.updateTitle)
+			return;
+		
+		contentManager.rmePCR("Menu", "-1", "getActiveApplicationName", "",  function(transport){
 			if(!Interface.isDesktop) document.title = transport.responseText;
 			else $("wrapperHandler").update(transport.responseText);
-    	}});
+    	});
+		
+    	//new Ajax.Request("./interface/rme.php?class=Menu&method=getActiveApplicationName&constructor=&parameters=",{onSuccess: });
 	},
 
 	setRoot: function(path){
@@ -344,9 +412,12 @@ var contentManager = {
 			alert("Backup unknown");
 			return;
 		}
-		if(contentManager.backupFrames[backupName][0] != -1 || (targetFrame == 'contentRight' && contentManager.backupFrames[backupName][1] != "") || force)
-			contentManager.loadFrame(targetFrame, contentManager.backupFrames[backupName][1], contentManager.backupFrames[backupName][0], contentManager.backupFrames[backupName][2],contentManager.backupFrames[backupName][1]+"GUI;-",onSuccessFunction,true);
-		else
+		if(contentManager.backupFrames[backupName][0] != -1 || (targetFrame == 'contentRight' && contentManager.backupFrames[backupName][1] != "") || force){
+			if(contentManager.backupFrames[backupName][1] == "")
+				contentManager.emptyFrame(targetFrame);
+			else
+				contentManager.loadFrame(targetFrame, contentManager.backupFrames[backupName][1], contentManager.backupFrames[backupName][0], contentManager.backupFrames[backupName][2],contentManager.backupFrames[backupName][1]+"GUI;-",onSuccessFunction,true);
+		} else
 			contentManager.emptyFrame(targetFrame);
 
 		contentManager.backupFrames[backupName] = null;
@@ -440,8 +511,9 @@ var contentManager = {
 		}});
 	},
 
-	loadFrame: function(target, plugin, withId, page, bps, onSuccessFunction, hideError){
+	loadFrame: function(target, plugin, withId, page, bps, onSuccessFunction, hideError, options){
 		if(typeof hideError == "undefined") hideError = false;
+
 
 		if(typeof page == "undefined") page = 0;
 		var arg = arguments;
@@ -450,31 +522,40 @@ var contentManager = {
 			lastLoadedRightPlugin = plugin;
 			lastLoadedRightPage = page;
 			lastLoadedRight = withId;
+			contentManager.currentPlugin = plugin;
 		}
 
 		if(target == "contentLeft"){
 			lastLoadedLeftPlugin = plugin;
 			lastLoadedLeftPage = page;
 			lastLoadedLeft = withId;
+			contentManager.currentPlugin = plugin;
 		}
 
 		if(target == "contentScreen"){
 			lastLoadedScreenPlugin = plugin;
 			lastLoadedScreenPage = page;
+			contentManager.currentPlugin = plugin;
 			lastLoadedScreen = withId;
 		}
 		
 		if(target != "contentRight" && target != "contentLeft" && target != "contentScreen")
 			contentManager.lastLoaded[target] = [plugin, withId, page];
 		
-
-		new Ajax.Request('./interface/loadFrame.php?p='+plugin+(typeof withId != "undefined" ? '&id='+withId : "")+((typeof bps != "undefined" && bps != "") ? '&bps='+bps : "")+((typeof page != "undefined" && page != "") ? '&page='+page : "")+"&r="+Math.random()+"&frame="+target, {onSuccess: function(transport){
+		new Ajax.Request('./interface/loadFrame.php?p='+plugin+(typeof withId != "undefined" ? '&id='+withId : "")+((typeof bps != "undefined" && bps != "") ? '&bps='+bps : "")+((typeof page != "undefined" && page != "") ? '&page='+page : "")+"&r="+Math.random()+"&frame="+target, {onSuccess: function(transport, textStatus, request){
 			if(checkResponse(transport, hideError)) {
+
+				if(typeof options == "object"){
+					if(typeof options.doBefore == "function")
+						options.doBefore();
+				}
+				
 				$j("#"+target).html(transport.responseText);
 				
 				if(typeof onSuccessFunction != "undefined" && onSuccessFunction != "") onSuccessFunction(transport);
 				
 				Aspect.joinPoint("loaded", "contentManager.loadFrame", arg, transport.responseText);
+				
 			}
 		}});
 
@@ -488,7 +569,7 @@ var contentManager = {
 		if(typeof targetMethodParameters != "string"){
 			for(var i = 0; i < targetMethodParameters.length; i++)
 				targetMethodParameters[i] = "'"+encodeURIComponent(targetMethodParameters[i]).replace(/\'/g,'\\\'')+"'";
-
+				
 			targetMethodParameters = targetMethodParameters.join(",");
 		}
 		else targetMethodParameters = "'"+targetMethodParameters.replace(/\'/g,'\\\'')+"'";
@@ -634,12 +715,16 @@ var contentManager = {
 		if(event.keyCode == 8)
 			return;
 		
+		
+		
 		if($j('#'+timeInputID).val().length == 2 && $j('#'+timeInputID).val().lastIndexOf(':') == -1){
 			if($j('#'+timeInputID).val() < 24)
 				$j('#'+timeInputID).val($j('#'+timeInputID).val()+':');
 			else
 				$j('#'+timeInputID).val($j('#'+timeInputID).val()[0]+':'+$j('#'+timeInputID).val()[1]);
 		}
+		
+		$j('#'+timeInputID).val($j('#'+timeInputID).val().replace(/:+/, ":").replace(/[^0-9:]/g, ""));
 	},
 	
 	connectedTimeInput: function(event, timeInput1ID, timeInput2ID){

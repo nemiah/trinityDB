@@ -123,6 +123,19 @@ class HTMLGUI implements icontextMenu {
 		
 		$this->tip = HTMLGUIX::tipJS($targetClass);
 	}
+
+	public function insertAttribute($where, $fieldName, $insertedFieldName){
+		if($where == "after")
+			$add = 1;
+
+		if($where == "before")
+			$add = 0;
+
+		$first = array_splice($this->showAttributes, 0, array_search($fieldName, $this->showAttributes) + $add);
+		$last = array_splice($this->showAttributes, array_search($fieldName, $this->showAttributes));
+
+		$this->showAttributes = array_merge($first, array($insertedFieldName), $last);
+	}
 	
 	/**
 	 *  This Method activates several features. Possible values are:
@@ -862,10 +875,15 @@ class HTMLGUI implements icontextMenu {
 		if(PMReflector::implementsInterface($pluginName,"iXMLExport")) $os .= "1";
 		else $os .= "0";
 
-		if($id != -1 AND $os != "00000")
-			$html .= "<span title=\"Operationen\" id=\"".$pluginName."Operations\" class=\"iconic wrench\" onclick=\"phynxContextMenu.start(this, 'HTML','operations:$pluginName:$id:$os','".$this->texts["Operationen"].":');\" style=\"float:right;margin-top:-3px;\" ></span>";
-
-		return $html;
+		if($id != -1 AND $os != "00000"){
+			$B = new Button("Operationen", "wrench", "iconic");
+			$B->id($pluginName."Operations");
+			$B->onclick("phynxContextMenu.start(this, 'HTML','operations:$pluginName:$id:$os','".$this->texts["Operationen"].":');");
+			$B->style("float:right;margin-top:-3px;");
+			
+			return $B;#"<span title=\"Operationen\" id=\"".$pluginName."Operations\" class=\"iconic wrench\" onclick=\"\" style=\"\" ></span>";
+		}
+		return "";
 	}
 	
 	/**
@@ -928,8 +946,8 @@ class HTMLGUI implements icontextMenu {
 				<div>
 				<table>
 					<colgroup>
-					   <col class=\"backgroundColor2\" style=\"width:120px;\" />
-					   <col class=\"backgroundColor3\" />
+					   <col class=\"backgroundColor3\" style=\"width:120px;\" />
+					   <col class=\"backgroundColor2\" />
 					</colgroup>";
 
 		$tab = 0;
@@ -982,7 +1000,7 @@ class HTMLGUI implements icontextMenu {
 			$html .= "
 					<tr ".(isset($this->style[$value]) ? "style=\"".$this->style[$value]."\"" : "").">
 						<td id=\"".$value."EditL\"><label for=\"".$value."\">".$label.":".(isset($this->labelDescriptions[$value]) ? "<br /><small>".$this->labelDescriptions[$value]."</small>" : "")."</label></td>
-						<td id=\"".$value."EditR\">".$this->getInput($value)."".(isset($this->fieldDescriptions[$value]) ? "<br /><small>".$this->fieldDescriptions[$value]."</small>" : "")."</td>
+						<td id=\"".$value."EditR\">".$this->getInput($value)."".(isset($this->fieldDescriptions[$value]) ? "<br /><small style=\"color:grey;\">".$this->fieldDescriptions[$value]."</small>" : "")."</td>
 					</tr>";
 			
 		}
@@ -1350,9 +1368,9 @@ class HTMLGUI implements icontextMenu {
 		}
 		#".(!$this->onlyDisplayMode ? ($singularLanguageClass == null ? /*Bitte ".$this->name." auswählen:*/"&nbsp;" : $singularLanguageClass->getBrowserCaption().":") : ($singularLanguageClass == null ? $this->name : $singularLanguageClass->getPlural() ).":")."
 		if($lineWithId == -1) $top .= "$this->tip
-				<div class=\"backgroundColor1 Tab\">
+				<!--<div class=\"backgroundColor1 Tab\">
 					<p>&nbsp;</p>
-				</div>
+				</div>-->
 				<table class=\"contentBrowser\">
 					<colgroup>
 						$cols

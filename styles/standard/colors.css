@@ -17,14 +17,14 @@
 }
 
 .backgroundColor1 {
-	background-color:#B8B8F0;
+	background-color:#c9c9f0;/*#B8B8F0;*/
 }
 .backgroundColor2 {
-	background-color:#ddddff;/*#D1D1FF;*/
+	background-color:#e7e7ff;/*#ddddff;/*#D1D1FF;*/
 }
 
 .backgroundColor3 {
-	background-color:#E6E6FF;
+	background-color:#f0f0ff;/*#E6E6FF;*/
 }
 
 .backgroundColorHeader td:not(.ACCell) {
@@ -85,6 +85,10 @@
 	background-color:rgba(255,204,0,0.3);
 }
 
+label {
+	color:#444;
+}
+
 /*.backgroundColorHeader td + td {
 	background-color:#FCFCFC;
 }*/
@@ -111,7 +115,13 @@ caption {
 	color:black;
 }
 
-input, select, textarea, .AJAXUpload {
+input[type=text],
+input[type=submit],
+input[type=password],
+input[type=radio],
+input[type=checkbox],
+input[type=button],
+input[type=submit], select, textarea, .AJAXUpload {
 	border-bottom-color:#9E9EF0;
 	
 	-moz-transition: background-color 1s;
@@ -125,13 +135,13 @@ input, select, textarea, .AJAXUpload {
   **/
   
 .hasFocus {
-	background-color:white;
-	border-bottom-color:#9E9EF0;
+	background-color:white !important;
+	border-bottom-color:#9E9EF0 !important;
 }
 
 .recentlyChanged {
 	/*background-color:#b8de9a;*/
-	background-color: rgba(184, 222, 154, 0.5);
+	background-color: rgba(184, 222, 154, 0.5) !important;
 	
 	-moz-transition: background-color .3s;
 	-webkit-transition: background-color .3s;
@@ -192,10 +202,11 @@ input, select, textarea, .AJAXUpload {
 }
 
 #contentRight .contentBrowser tr:hover .iconic,
-#contentLeft .contentBrowser tr:hover .iconic,
+#contentLeft tr:hover .iconic,
 .Tab:hover .iconic, #contentScreen tr:hover .iconic,
 .popup tr:hover .iconic,
-.popupSidePanel tr:hover .iconic {
+.popupSidePanel tr:hover .iconic,
+.selectionRow:hover .iconic {
 	color:#777;
 	border-color:#777;
 	
@@ -206,6 +217,7 @@ input, select, textarea, .AJAXUpload {
 }
 
 #contentRight .contentBrowser tr:hover .iconic.inactive,
+.popup .contentBrowser tr:hover .iconic.inactive,
 #contentLeft .contentBrowser tr:hover .iconic.inactive,
 .Tab:hover .iconic.inactive,
 #contentScreen tr:hover .iconic.inactive {
@@ -238,7 +250,7 @@ input, select, textarea, .AJAXUpload {
   **/
 
 .navBackgroundColor {
-	background-color:rgba(0,0,0,0.2);
+	background-color:rgba(0,0,0,0.1);
 	/*background-color:#7f7fdf;*/
 }
 
@@ -271,6 +283,9 @@ input, select, textarea, .AJAXUpload {
 	background-color:rgba(255, 255, 255, 0.5);
 }
 
+.tableWeightLight .lastSelected {
+	background-color:rgb(237, 237, 237);
+}
 
 .topBG {
 	background-image: linear-gradient(bottom, rgb(183,185,180) 0%, rgb(220,222,216) 1%, rgb(255,255,255) 5%);
@@ -287,4 +302,32 @@ input, select, textarea, .AJAXUpload {
 		color-stop(0.01, rgb(220,222,216)),
 		color-stop(0.05, rgb(255,255,255))
 	);
+}
+
+.selectionRow {
+	border-bottom: 1px solid #eee;
+	
+	color:#222;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.selectionRow:hover {
+	background-color:rgb(248, 248, 248);
+}
+
+.selectionRow .selectionRowHeightSetter {
+	padding:5px;
+}
+
+.tableWeightLightColored tr:nth-child(odd) {
+	background-color:#e5e5e5;
+}
+
+.tableWeightLightColored tr:nth-child(even){
+	background-color:#f4f4f4;
 }

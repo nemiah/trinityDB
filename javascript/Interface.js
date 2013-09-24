@@ -23,7 +23,7 @@ var Interface = {
 	TabBarLast: null,
 	TabBarLastTab: null,
 	isLoading: false,
-
+	
 	init: function(){
 		if($('wrapperHandler')){
 			Interface.isDesktop = true;
@@ -34,17 +34,26 @@ var Interface = {
 		}
 	},
 	
+	
+	/**
+	 * @deprecated text
+	 */
 	startWrapperDrag: function(){
-		$('wrapperTable').style.display = 'none';
+		alert("Interface.startWrapperDrag is deprecated!")
+		//$('wrapperTable').style.display = 'none';
 	},
 	
+	/**
+	 * @deprecated text
+	 */
 	stopWrapperDrag: function(){
-		$('wrapperTable').style.display = '';
+		alert("Interface.stopWrapperDrag is deprecated!")
+		//$('wrapperTable').style.display = '';
 	},
 	
 	resizeWrapper: function() {
 		size = Overlay.getPageSize(true);
-		$('wrapper').style.height = (size[1] - 150)+'px';
+		$j('#wrapper').css("height", ($j(window).height() - 150)+'px').css("width", (contentManager.maxWidth(true) - 250 - 50)+'px');
 	},
 	
 	translateStatusMessage: function(message, writeToFieldID){
@@ -104,6 +113,75 @@ var Interface = {
 		}
 		
 		window.setTimeout("Interface.showLoading()", 800);
+	},
+	
+	notifyPermission: function(){
+		if(typeof webkitNotifications == "object"){
+			var perm = webkitNotifications.checkPermission();
+			if(perm == 0)
+				return "granted";
+			
+			if(perm == 1 || perm == 2)
+				return "denied";
+		}
+		
+		return Notification.permission;
+	},
+	
+	notifyRequest: function(callback){
+		Notification.requestPermission(function(perm){
+			if(typeof callback == "function")
+				callback(perm);
+		});
+
+	},
+	
+	notify: function(title, message){
+		if(typeof Notification != "function")
+			return;
+		
+		if(Interface.notifyPermission() != "granted")
+			return;
+		
+		Interface.notifySend(title, message);
+	},
+			
+	notifySend: function(title, message){
+		var N = new Notification(title, {
+			body: message
+		});
+		
+		if(typeof N.close == "function")
+			setTimeout(function(){
+				N.close();
+			}, 5000);
+
+	},
+			
+	frameStash: function(frame){
+		$j("#"+frame).after("<div id=\""+frame+"New\"></div>");
+		$j('#'+frame).data("frame", frame).data("plugin", contentManager.currentPlugin);
+		$j('#stash').append($j('#'+frame).hide().attr("id", ""));
+		$j("#"+frame+"New").attr("id", frame);
+	},
+			
+	frameRestore: function(){
+		if(!$j('#stash').children().length)
+			return;
+
+		contentManager.emptyFrame('contentLeft');
+		contentManager.emptyFrame('contentRight');
+		contentManager.emptyFrame('contentScreen');
+		contentManager.emptyFrame('contentBelow');
+				
+		var frame = $j('#stash').children().last().data("frame");
+		var plugin = $j('#stash').children().last().data("plugin");
+		$j('#'+frame).replaceWith($j('#stash').children().last().attr("id", frame).show());
+		
+		contentManager.currentPlugin = plugin;
+		
+		if($(plugin+'MenuEntry'))
+			setHighLight($(plugin+'MenuEntry'));
 	}
 
 }
@@ -127,7 +205,7 @@ function checkVirtualBox(image, targetFieldId, setValue){
 /**
  * @deprecated since 27.11.2012
  */
-function showHideTBody(what, image){
+/*function showHideTBody(what, image){
 	alert("showHideTBody is DEPRECATED");
 	
 	while(what.tagName != "TABLE") what = what.parentNode;
@@ -142,7 +220,7 @@ function showHideTBody(what, image){
 		what.style.display = "none";
 		//image.src.replace(/less/,"more");
 	}
-}
+}*/
 
 function showMessage(message){
 	if(!$("messenger")) {

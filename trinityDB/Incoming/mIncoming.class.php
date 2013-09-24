@@ -36,6 +36,54 @@ class mIncoming extends anyC {
 
 		return $episodes;
 	}
+	
+	public function renameDownloaded($output = false){
+		$AC = anyC::get("JDownload");
+		$AC->addAssocV3("JDownloadFilename", "!=", "");
+		$AC->addAssocV3("JDownloadRenamed", "=", "0");
+		$AC->addAssocV3("JDownloadDate", ">=", time() - 3600 * 24 * 2);
+		
+		$dirs = array();
+		$ACI = anyC::get("Incoming", "IncomingUseForDownloads", "1");
+		while($I = $ACI->getNextEntry())
+			$dirs[] = $I->A("IncomingDir");
+		
+		while($D = $AC->getNextEntry()){
+			$filename = preg_replace("/\.htm$/", "", basename($D->A("JDownloadFilename")));
+			$ext = Util::ext($filename);
+			
+			$found = false;
+			foreach($dirs AS $dir){
+				if(file_exists($dir."/$filename")){
+					$found = true;
+					$newName = Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")).".$ext");
+					if(file_exists($dir."/".$newName)){
+						if($output)
+							echo "<p>$filename: $newName ALREADY EXISTS!</p>";
+						
+						$D->changeA("JDownloadRenamed", "-1");
+						$D->saveMe();
+						continue;
+					}
+					
+					if(rename($dir."/$filename", $dir."/".$newName)){
+						if($output)
+							echo "<p>renamed $dir/$filename to ".$newName."</p>";
+						$D->changeA("JDownloadRenamed", time());
+						$D->saveMe();
+					} else {
+						if($output)
+							echo "<p>$filename: ERROR RENAMING!</p>";
+					}
+				}
+				#	rename($filename, Util::makeFilename($D->A("JDownloadRenameto").".$ext"));
+			}
+			
+			if(!$found AND $output)
+				echo "<p>$filename: NOT FOUND!</p>";
+			
+		}
+	}
 
 	private function getAllFiles($dir){
 		$D = new mFile();

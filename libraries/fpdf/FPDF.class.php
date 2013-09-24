@@ -73,7 +73,7 @@ class FPDF {
 	protected $replaceWith;
 	protected $fakePage;
 
-	function __construct($orientation='P', $unit='mm', $format='A4', $copy = false) {
+	function __construct($orientation='P', $unit='mm', $format='A4') {
 		//Some checks
 		$this->_dochecks();
 		//Initialization of properties
@@ -183,14 +183,6 @@ class FPDF {
 		else
 			$s='[] 0 d';
 		$this->_out($s);
-	}
-
-	function Cell8($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=0, $link='') {
-		$this->Cell($w, $h, utf8_decode($txt), $border, $ln, $align, $fill, $link);
-	}
-
-	function MultiCell8($w, $h, $txt, $border=0, $align='J', $fill=0) {
-		$this->MultiCell($w, $h, utf8_decode($txt), $border, $align, $fill);
 	}
 
 	function AddCopyPage() {
@@ -540,6 +532,8 @@ class FPDF {
 		if ($style == 'IB')
 			$style = 'BI';
 		if ($size == 0)
+			$size = $this->FontSizePt;
+		if ($size === null)
 			$size = $this->FontSizePt;
 		//Test if font is already selected
 		if ($this->FontFamily == $family && $this->FontStyle == $style && $this->FontSizePt == $size)

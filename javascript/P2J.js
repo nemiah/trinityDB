@@ -121,6 +121,18 @@
 	});
 })(jQuery);
 
+/*
+ Color animation 20120928
+ http://www.bitstorm.org/jquery/color-animation/
+ Copyright 2011, 2012 Edwin Martin <edwin@bitstorm.org>
+ Released under the MIT and GPL licenses.
+*/
+/*(function(d){function m(){var b=d("script:first"),a=b.css("color"),c=false;if(/^rgba/.test(a))c=true;else try{c=a!=b.css("color","rgba(0, 0, 0, 0.5)").css("color");b.css("color",a)}catch(e){}return c}function j(b,a,c){var e="rgb"+(d.support.rgba?"a":"")+"("+parseInt(b[0]+c*(a[0]-b[0]),10)+","+parseInt(b[1]+c*(a[1]-b[1]),10)+","+parseInt(b[2]+c*(a[2]-b[2]),10);if(d.support.rgba)e+=","+(b&&a?parseFloat(b[3]+c*(a[3]-b[3])):1);e+=")";return e}function g(b){var a,c;if(a=/#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/.exec(b))c=
+[parseInt(a[1],16),parseInt(a[2],16),parseInt(a[3],16),1];else if(a=/#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/.exec(b))c=[parseInt(a[1],16)*17,parseInt(a[2],16)*17,parseInt(a[3],16)*17,1];else if(a=/rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(b))c=[parseInt(a[1]),parseInt(a[2]),parseInt(a[3]),1];else if(a=/rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9\.]*)\s*\)/.exec(b))c=[parseInt(a[1],10),parseInt(a[2],10),parseInt(a[3],10),parseFloat(a[4])];return c}
+d.extend(true,d,{support:{rgba:m()}});var k=["color","backgroundColor","borderBottomColor","borderLeftColor","borderRightColor","borderTopColor","outlineColor"];d.each(k,function(b,a){d.Tween.propHooks[a]={get:function(c){return d(c.elem).css(a)},set:function(c){var e=c.elem.style,i=g(d(c.elem).css(a)),h=g(c.end);c.run=function(f){e[a]=j(i,h,f)}}}});d.Tween.propHooks.borderColor={set:function(b){var a=b.elem.style,c=[],e=k.slice(2,6);d.each(e,function(h,f){c[f]=g(d(b.elem).css(f))});var i=g(b.end);
+b.run=function(h){d.each(e,function(f,l){a[l]=j(c[l],i,h)})}}}})(jQuery);
+*/
+
 var $j = jQuery.noConflict();
 
 jQuery(function($j){
@@ -141,6 +153,8 @@ jQuery(function($j){
                 dayStatus: 'Setze DD als ersten Wochentag', dateStatus: 'Wähle D, M d',
                 dateFormat: 'dd.mm.yy', firstDay: 1, 
                 initStatus: 'Wähle ein Datum', isRTL: false};
+			
+		$j.datepicker.regional['de_CH'] = $j.datepicker.regional['de_DE'];
 });
 
 var P2J = {
@@ -189,15 +203,43 @@ function PeriodicalExecuter(callback, delayInSeconds) {
 
 var Ajax = {
 	physion: "default",
+	build: null,
+	counter: 0,
 	
 	Request: function(anurl, options){
+		Ajax.counter++;
+		var counter = Ajax.counter;
+		var start;
 		$j.ajax({
-			url: anurl+(Ajax.physion != "default" ? "&physion="+Ajax.physion : ""), success: function(transport){
-
+			url: anurl+(Ajax.physion != "default" ? "&physion="+Ajax.physion : ""), 
+			beforeSend: function(){
+				start = new Date().getTime();
+			},
+					
+			success: function(transport, textStatus, request){
+				var duration = (new Date().getTime() - start) ;
+				if(window.console && request.getResponseHeader('X-Timers')){
+					var obj = jQuery.parseJSON(request.getResponseHeader('X-Timers'));
+					console.log(counter+": Timers");
+					$j.each(obj, function(k, v){
+						while(v[1].length < 6)
+							v[1] = " "+v[1];
+						
+						v[0] = v[0]+":";
+						while(v[0].length < 8)
+							v[0] = v[0]+" ";
+						
+						console.log("%c "+v[0]+" "+v[1]+" ("+v[2]+":"+v[3]+")", "color:grey;");
+					});
+					console.log(" total:    "+duration+"ms");
+				}
+				//if(request.getResponseHeader("X-Build") && Ajax.build && Ajax.build != request.getResponseHeader("X-Build"))
+				//	console.log("Update required!");
+				
 				var t = {
 					responseText: transport
 				}
-				options.onSuccess(t); 
+				options.onSuccess(t, textStatus, request); 
 			},
 			type: options.method ? options.method : "GET",
 			data: options.parameters ? options.parameters : null,
@@ -408,6 +450,8 @@ if(Modernizr.touch && useTouch == null){
 
 
 var Touch = {
+	trigger: "click",
+	use:false,
 	hook: function(){
 		var currentHTMLMethod = jQuery.fn.html;
 		jQuery.fn.html = function(){
@@ -429,18 +473,21 @@ var Touch = {
 	},
 			
 	make: function(){
-		$j("[onclick]").hammer().on("touch", function(){
-			$j(this).addClass("highlight");
-		}).on("release", function(){
-			$j(this).removeClass("highlight");
-		}).each(function(i, e){
-			$j(this).attr("ontouchend", $j(this).attr("onclick")).removeAttr("onclick");//prop("ontouchend", $j(e).prop("onclick"))
+		$j("[onclick]").each(function(k, e){
+			$j(e).attr("ontouchend", $j(e).attr("onclick")).removeAttr("onclick");
 		});
+		
+		/**$j("[onclick]").hammer().on("tap", function(ev){
+			ev.gesture.preventDefault();
+			//$j(this).attr("ontouchend", $j(this).attr("onclick")).removeAttr("onclick");
+		});*/
 	}
 }
 
 if(useTouch){
 	Touch.hook();
+	Touch.use = true;
+	Touch.trigger = "touchend";
 	
 	$j(document).on("touchend", ".contentBrowser td", function(ev){
 		$j(this).parent().removeClass("highlight");
@@ -452,6 +499,15 @@ if(useTouch){
 			return;
 
 		$j(this).parent().find("td").first().find(".editButton").triggerHandler("touchend");
+	});
+
+	$j(document).on("touchend mouseup", "[ontouchend]", function(ev){
+		$j(this).removeClass("highlight");
+	});
+	
+
+	$j(document).on("touchstart mousedown", "[ontouchend]", function(ev){
+		$j(this).addClass("highlight");
 	});
 
 	$j(document).on("touchstart", ".contentBrowser td", function(ev){
@@ -543,7 +599,7 @@ $j(document).on('mouseover', '.bigButton', function(event) {
 		},
 		content: {
 			text: function() {
-				return $j(this).prop('value');
+				return $j(this).html();
 			}
 		},
 		position: {
