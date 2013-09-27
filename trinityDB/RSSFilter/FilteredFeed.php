@@ -186,6 +186,7 @@ if($tvdbUnavailable !== false)
 		</item>";
 
 $Incoming = new mIncoming();
+$Incoming->renameDownloaded();
 $newFiles = $Incoming->getNewFiles();
 
 $ac = new anyC();

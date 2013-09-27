@@ -161,6 +161,9 @@ class FileStorage {
 			if(strpos(basename($file), "Customizer") === 0 AND strpos(basename($file), ".class.php") !== false)
 				continue;
 
+			if(strpos(basename($file), ".lock") !== false)
+				continue;
+
 			if(is_dir($dir.$file)) $dirs[] = $dir.$file;
 			else $files[] = $dir.$file;
 		}
@@ -231,7 +234,7 @@ class FileStorage {
 		if($A->FileIsDir == "1")
 			mkdir($file);
 		else {
-			if(file_exists($file)) return;
+			#if(file_exists($file)) return;
 			
 			$h = fopen($file, "w+");
 			fwrite($h, stripslashes($A->FileContent));
