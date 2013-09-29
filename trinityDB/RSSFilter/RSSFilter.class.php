@@ -134,7 +134,11 @@ class RSSFilter extends PersistentObject {
 					if($Series->A("sprache") == "de" AND strpos($title, "[DEUTSCH]") === false) continue;
 				}
 				
-				if(stripos($title, "S".($E->A("season") < 10 ? "0" : "").$E->A("season")."E".($E->A("episode") < 10 ? "0" : "").$E->A("episode")) === false) continue;
+				$ts01e01 = stripos($title, "S".($E->A("season") < 10 ? "0" : "").$E->A("season")."E".($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
+				$t01x01 = stripos($title, $E->A("season")."×".($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
+				
+				if($ts01e01 === false AND $t01x01 === false)
+					continue;
 
 				if(
 					strpos(strtolower($title), strtolower(str_replace(" ", ".", $Series->A("name")))) === false 

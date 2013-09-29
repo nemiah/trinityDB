@@ -64,7 +64,7 @@ class Serie extends PersistentObject {
 
 	public function checkRSS($newFiles = null){
 		$Episodes = $this->checkAllEpisodes(true, $newFiles);
-
+		
 		$RF = new RSSFilter($this->A("RSSFilterID"));
 
 		return $RF->filterFor($this, $Episodes);
