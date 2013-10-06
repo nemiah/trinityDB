@@ -136,8 +136,9 @@ class RSSFilter extends PersistentObject {
 				
 				$ts01e01 = stripos($title, "S".($E->A("season") < 10 ? "0" : "").$E->A("season")."E".($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
 				$t01x01 = stripos($title, $E->A("season")."×".($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
+				$t01ix01 = stripos($title, $E->A("season")."x".($E->A("episode") < 10 ? "0" : "").$E->A("episode"));
 				
-				if($ts01e01 === false AND $t01x01 === false)
+				if($ts01e01 === false AND $t01x01 === false AND $t01ix01 === false)
 					continue;
 
 				if(
