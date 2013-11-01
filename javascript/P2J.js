@@ -520,6 +520,10 @@ if(useTouch){
 	$j(document).on("touchstart", ".contentBrowser td", function(ev){
 		$j(this).parent().addClass("highlight");
 	});
+	
+	$j(document).on("focus", 'input[type=text]', function(){
+		this.select();
+	});
 }
 Touch.propagateCSS();
 

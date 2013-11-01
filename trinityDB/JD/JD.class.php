@@ -66,6 +66,22 @@ class JD extends PersistentObject {
 			$link = $links[0];
 		}
 		
+		$linkOld = $link;
+		if($this->A("JDLinkParser") != ""){
+			$C = $this->A("JDLinkParser");
+			$C = new $C();
+			$link = $C->parse($link, $this->A("JDLinkParserUser"), $this->A("JDLinkParserPassword"));
+		}
+		
+		if($this->A("JDDLType") == "4"){
+			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
+			
+			$id = $this->logDownload($logLink, $link, $logFilename);
+			file_put_contents($this->A("JDWgetFilesDir")."/$id.dl", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
+			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
+			return true;
+		}
+		
 		if($this->A("JDDLType") == "0")
 			Util::PostToHost($this->A("JDHost"), $this->A("JDPort"), "/link_adder.tmpl", "none", "do=Add&addlinks=".urlencode($link), $this->A("JDUser"), $this->A("JDPassword"));
 
@@ -125,10 +141,13 @@ class JD extends PersistentObject {
 		$F->sA("JDownloadURL", $logLink);
 		$F->sA("JDownloadFilename", $link);
 		$F->sA("JDownloadRenameto", $fileName);
-		if(!$F->exists()){
+		$id = $F->exists(true);
+		if($id === false){
 			$F->sA("JDownloadDate", time());
-			$F->store();
+			 $id = $F->store();
 		}
+		
+		return $id;
 	}
 
 	public function supportsAutoDownload(){

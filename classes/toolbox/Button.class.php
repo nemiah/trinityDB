@@ -143,6 +143,10 @@ class Button {
 		$this->class = $class;
 	}
 
+	function addClass($class){
+		$this->class .= " ".$class;
+	}
+
 	function newSession($physionName, $application, $plugin, $title = null, $icon = null){
 		$this->onclick = "contentManager.newSession('$physionName', '$application', '$plugin', ".(isset($_SESSION["phynx_customer"]) ? "'".$_SESSION["phynx_customer"]."'" : "''").", '".($title != null ? $title : "")."', '".($icon != null ? $icon : "")."');";
 	}
@@ -192,11 +196,11 @@ class Button {
 				$onSuccessFunction = "'".addslashes($onSuccessFunction)."'";
 		
 		#$this->rmeP($targetClass, $targetClassId, $targetMethod, $targetMethodParameters, $onSuccessFunction != "" ? addslashes("if(checkResponse(transport)) { ".$onSuccessFunction."}") : $onSuccessFunction, $bps);
-		$this->rme = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', Array(".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."), $onSuccessFunction, '$bps', ".($doResponseCheck ? "true" : "false")." ".($onFailureFunction != "" ? ", $onFailureFunction" : "").");";
+		$this->rme = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', [".(is_array($targetMethodParameters) ? implode(",",$targetMethodParameters) : "'".$targetMethodParameters."'")."], $onSuccessFunction, '$bps', ".($doResponseCheck ? "true" : "false")." ".($onFailureFunction != "" ? ", $onFailureFunction" : "").");";
 	}
 
 	function settings($plugin, $identifier = ""){
-		$this->settings = $B = new Button("Einstellungen", "./images/i2/settings.png", "icon");
+		$this->settings = $B = new Button("Einstellungen", "wrench", "iconic");
 
 		if(strpos($this->style, "float:right;") !== false)
 			$B->style("float:right;margin-right:-22px;");
@@ -204,7 +208,7 @@ class Button {
 			$B->style("margin-left:4px;margin-bottom:15px;");
 		$B->contextMenu($plugin, $identifier, "Einstellungen:");
 		
-		$B->className("buttonSettings");
+		$B->className("buttonSettings iconicG");
 		
 		return $B;
 	}

@@ -195,9 +195,9 @@ input[type=submit], select, textarea, .AJAXUpload {
 	transition: background-color .3s;
 }
 
-.phynxNoTouch #contentRight .contentBrowser tr:hover,
-.phynxNoTouch #contentLeft .contentBrowser tr:hover,
-.phynxNoTouch #contentScreen tr:hover {
+.phynxNoTouch #contentRight .contentBrowser tr:not(.noHover):hover,
+.phynxNoTouch #contentLeft .contentBrowser tr:not(.noHover):hover,
+.phynxNoTouch #contentScreen tr:not(.noHover):hover {
 	background-color:white;
 	
 	-moz-transition: background-color .3s;
@@ -206,7 +206,7 @@ input[type=submit], select, textarea, .AJAXUpload {
 	transition: background-color .3s;
 }
 
-.phynxNoTouch #contentRight .contentBrowser tr:hover .iconic,
+.phynxNoTouch #contentRight tr:hover .iconic,
 .phynxNoTouch #contentLeft tr:hover .iconic,
 .phynxNoTouch .Tab:hover .iconic,
 .phynxNoTouch #contentScreen tr:hover .iconic,

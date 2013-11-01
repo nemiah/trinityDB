@@ -81,7 +81,7 @@ class FeedFilter1DDL implements iFeedFilter {
 		curl_setopt($ch, CURLOPT_ENCODING , "gzip");
         $content = curl_exec($ch);
         curl_close($ch);
-
+		#echo $page;
 		#$content = file_get_contents($page);
 		#die($content);
 		$namepos = strpos($content, "<p><onelink /></p>");

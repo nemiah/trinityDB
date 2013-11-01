@@ -326,6 +326,9 @@ class HTMLForm {
 				$onSuccessFunction .= $RC;
 		}
 		
+		if($onSuccessFunction != "" AND stripos($onSuccessFunction, "function(") === false)
+			$onSuccessFunction = "function(){ $onSuccessFunction }";
+		
 		$values = "";
 		foreach($this->fields AS $f){
 			if(!isset($this->types[$f]) OR $this->types[$f] != "checkbox")
@@ -608,25 +611,33 @@ class HTMLForm {
 					$hiddenFields .= $Input;
 					continue;
 				}
-
+				
 				if(isset($this->spaces[$v])){
 					if($this->spaces[$v] == ""){
-						if(count($row) == 2) {
-							#$row[] = ""; $row[] = "";
-							$this->table->addRow(array("", "", "", ""));
-							$this->table->addRowClass("backgroundColor0");
-							#$row = array();
-						}
 						if(count($row) == 0) {
 							$this->table->addRow(array("", "", "", ""));
 							$this->table->addRowClass("backgroundColor0");
-							#$row[] = ""; $row[] = "";
-							#$row[] = ""; $row[] = "";
 						}
-						#$this->table->addRow(array());
-						#$this->table->addRowClass("backgroundColor0");
+						if(count($row) == 2) {
+							$row[] = "";
+							$row[] = "";
+							$this->table->addRow($row);
+							$row = array();
+							
+							$this->table->addRow(array("", "", "", ""));
+							$this->table->addRowClass("backgroundColor0");
+						}
 					} else {
 						if(count($row) == 0) {
+							$this->table->addRow(array($this->spaces[$v], "", "", ""));
+							$this->table->addRowClass("backgroundColor0");
+						}
+						if(count($row) == 2) {
+							$row[] = "";
+							$row[] = "";
+							$this->table->addRow($row);
+							$row = array();
+							
 							$this->table->addRow(array($this->spaces[$v], "", "", ""));
 							$this->table->addRowClass("backgroundColor0");
 						}

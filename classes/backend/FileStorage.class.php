@@ -87,6 +87,10 @@ class FileStorage {
 	}
 	
 	public static function getFilesDir(){
+		$path = realpath(Util::getRootPath()."specifics")."/";
+		
+		if(!file_exists($path.".htaccess") AND is_writable($path))
+			file_put_contents($path.".htaccess", "deny from all");
 		
 		$CH = Util::getCloudHost();
 		if($CH != null){
@@ -102,7 +106,7 @@ class FileStorage {
 			return $dir;
 		}
 		
-		return realpath(Util::getRootPath()."specifics")."/";
+		return $path;
 	}
 	
 	function loadMultipleV4(SelectStatement $statement){

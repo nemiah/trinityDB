@@ -22,42 +22,51 @@ class JDGUI extends JD implements iGUIHTML2 {
 		
 		$this->loadMeOrEmpty();
 		
-		$gui = new HTMLGUI2();
-		$gui->setObject($this);
-		$gui->setName("DL");
+		$gui = new HTMLGUIX($this);
+		$gui->name("DL");
 
-		$gui->setLabel("JDDLType", "Type");
-		$gui->setLabel("JDName", "Name");
-		$gui->setLabel("JDHost", "Host");
-		$gui->setLabel("JDPort", "Port");
-		$gui->setLabel("JDUser", "User");
-		$gui->setLabel("JDPassword", "Password");
-
-		$gui->setFieldDescription("JDPort", "Default: JD Web 8765; QNap 8080; JD RC 10025; pyLoad 7227");
-
-		$gui->insertSpaceAbove("JDUser");
-
-		$gui->setShowAttributes(array(
+		$gui->attributes(array(
 			"JDDLType",
 			"JDName",
 			"JDHost",
 			"JDPort",
 			"JDUser",
-			"JDPassword"
+			"JDPassword",
+			"JDWgetFilesDir",
+			"JDLinkParser",
+			"JDLinkParserUser",
+			"JDLinkParserPassword"
 		));
+		
+		$gui->label("JDDLType", "Type");
+		$gui->label("JDName", "Name");
+		$gui->label("JDHost", "Host");
+		$gui->label("JDPort", "Port");
+		$gui->label("JDUser", "User");
+		$gui->label("JDPassword", "Password");
+		$gui->label("JDWgetFilesDir", "Wget files dir");
+		
+		$gui->label("JDLinkParser", "Parser");
+		$gui->label("JDLinkParserUser", "User");
+		$gui->label("JDLinkParserPassword", "Password");
 
-		$gui->setStandardSaveButton($this);
+		$gui->descriptionField("JDPort", "Default: JD Web 8765; QNap 8080; JD RC 10025; pyLoad 7227");
 
-		$ST = new HTMLSideTable("right");
+		$gui->space("JDUser");
+		$gui->space("JDLinkParser", "Link");
+		
+		$FB = new FileBrowser();
+		$FB->addDir(__DIR__);
+		$gui->type("JDLinkParser", "select", array_merge(array("" => "None"), $FB->getAsLabeledArrayF("iLinkParser", ".class.php", true)));
+		
+		$gui->type("JDDLType", "select", array("JDownloader Web", "QNap Downloader", "JDownloader RC", "pyLoad", "wget"));
 
-		$gui->setType("JDDLType", "select");
-		$gui->setOptions("JDDLType", array(0, 1, 2, 3), array("JDownloader Web", "QNap Downloader", "JDownloader RC", "pyLoad"));
-
-		$B = $ST->addButton("test\ndownload", "./trinityDB/JD/testLink.png");
-
+		$gui->toggleFields("JDDLType", "4", array("JDWgetFilesDir"), array("JDHost", "JDPort", "JDUser", "JDPassword"));
+		
+		$B = $gui->addSideButton("test\ndownload", "./trinityDB/JD/testLink.png");
 		$B->popup("testLink", "test link", "JD", $this->getID(), "testDownloadPopup");
 
-		return $ST.$gui->getEditHTML();
+		return $gui->getEditHTML();
 	}
 
 	/*public function testLink(){
@@ -69,13 +78,13 @@ class JDGUI extends JD implements iGUIHTML2 {
 	public function testDownloadPopup(){
 		$F = new HTMLForm("tdl", array("link"));
 		$F->getTable()->setColWidth(1, 60);
-		$F->setSaveRMEPCR("test download", "", "JD", $this->getID(), "testDownload", OnEvent::closePopup("JD", "testLink"));
+		$F->setSaveRMEPCR("test download", "", "JD", $this->getID(), "testDownload", "function(t){ \$j('#downloadResult').html(t.responseText); }");
 		
-		echo $F;
+		echo $F."<pre style=\"padding:5px;\" id=\"downloadResult\"></pre>";
 	}
 	
 	public function testDownload($link){
-		$this->download($link);
+		echo $this->download($link);
 	}
 }
 ?>

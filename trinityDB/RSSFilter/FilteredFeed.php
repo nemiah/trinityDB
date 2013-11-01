@@ -220,7 +220,7 @@ while($S = $ac->getNextEntry()){
 
 			echo "
 			<item>
-				<title>".$S->A("name")." S".$En["season"]."E".$En["episode"]."".(($alreadyDLed OR $usedAutoDL) ? " OK" : "")."</title>
+				<title>".$S->A("name")." S".$En["season"]."E".$En["episode"]."".($alreadyDLed ? " already DLed" : "").($usedAutoDL ? " added to DL" : "")."</title>
 				<description><![CDATA[".$En["description"]."]]></description>
 				<pubDate>$En[pubDate]</pubDate>
 				<link>$DLLink</link>

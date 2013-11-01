@@ -49,7 +49,7 @@ class BackupManagerGUI implements iGUIHTML2 {
 			$RD = new Button("Backup anzeigen","./images/i2/search.png", "icon");
 			$RD->windowRme("BackupManager", "", "displayBackup", $name);
 
-			$TB->addRow(array($name,Util::formatByte($size, 2),$RD/*,$RB*/));
+			$TB->addRow(array($name,Util::formatByte($size, 2),$RD, $RB));
 			$gesamt += $size;
 		}
 
@@ -306,7 +306,8 @@ class BackupManagerGUI implements iGUIHTML2 {
 		$F->loadMe();
 
 		if($F->getA() == null){
-			file_put_contents($F->getID(), "AuthUserFile ".Util::getRootPath()."system/Backup/.htpasswd
+			file_put_contents($F->getID(), "deny from all");
+			/*file_put_contents($F->getID(), "AuthUserFile ".Util::getRootPath()."system/Backup/.htpasswd
 AuthGroupFile /dev/null
 AuthName \"Restricted\"
 AuthType Basic
@@ -314,7 +315,7 @@ AuthType Basic
 require valid-user
 </Limit>");
 
-			file_put_contents(Util::getRootPath()."system/Backup/.htpasswd", "Restricted:kV.RuW/ox2sc2".mt_rand(0, 20000000));
+			file_put_contents(Util::getRootPath()."system/Backup/.htpasswd", "Restricted:kV.RuW/ox2sc2".mt_rand(0, 20000000));*/
 		}
 
 		require Util::getRootPath()."libraries/PMBP.inc.php";
@@ -334,6 +335,7 @@ require valid-user
 		$PMBP_SYS_VAR["except_tables"] = "";
 
 		$filename = PMBP_dump($CONF, $PMBP_SYS_VAR, $_SESSION["DBData"]["datab"], true, true, false, false, "");
+		
 		if(file_exists($filename))
 			chmod(Util::getRootPath()."system/Backup/".$filename, 0666);
 		return $filename;
