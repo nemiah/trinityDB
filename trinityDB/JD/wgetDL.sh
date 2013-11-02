@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for f in /home/nemiah/wget/*;
+for f in /home/nemiah/wget/*.dl;
 do
 	if [ -f $f ]; then
 		content=`cat $f`;

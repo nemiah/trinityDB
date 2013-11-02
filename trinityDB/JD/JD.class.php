@@ -77,7 +77,8 @@ class JD extends PersistentObject {
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
 			$id = $this->logDownload($logLink, $link, $logFilename);
-			file_put_contents($this->A("JDWgetFilesDir")."/$id.dl", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
+			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
+			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
 			return true;
 		}
@@ -151,6 +152,7 @@ class JD extends PersistentObject {
 	}
 
 	public function supportsAutoDownload(){
+		if($this->A("JDDLType") == "4") return true;
 		if($this->A("JDDLType") == "3") return true;
 		if($this->A("JDDLType") == "2") return true;
 		if($this->A("JDDLType") == "1") return true;
