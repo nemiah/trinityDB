@@ -83,6 +83,11 @@ class SerieGUI extends Serie implements iGUIHTML2, icontextMenu {
 		$B->rmePCR("Serie", $this->ID, "checkAllEpisodes", "", "Popup.display('Episoden-Status', transport);");
 		$tab->addRow($B);
 
+		
+		$Image = new Button("", DBImageGUI::imageLink("Serie", $this->getID(), "cover", false, true), "icon");
+		$Image->style("width:150px;");
+		$tab->addRow(array($Image));
+		
 		return $tab.$gui->getEditHTML();
 	}
 

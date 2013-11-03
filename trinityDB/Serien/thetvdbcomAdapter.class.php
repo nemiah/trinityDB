@@ -130,7 +130,7 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		$S->changeA("status", $status);
 		$S->changeA("genre", $episodesList->Series->Genre);
 
-		$S->saveMe(true, false);
+		
 		
 		foreach($episodesList->Episode AS $k => $v){
 			$AC = anyC::get("Folge", "SerieID", $S->getID());
@@ -183,12 +183,23 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 			foreach($bannerList AS $banner){
 				if($banner->BannerType."" == "poster"){
 					#echo $banner->BannerPath."";
-					copy("http://www.thetvdb.com/banners/".$banner->BannerPath, $S->A("dir")."/Folder.jpg");
-					if($echo) $tab->addRow("Downloaded cover");
+					$cover = file_get_contents("http://www.thetvdb.com/banners/".$banner->BannerPath);
+					$temp = Util::getTempFilename("cover", "jpg");
+					file_put_contents($temp, $cover);
+					
+					if($S->A("dir") != "" AND file_exists($S->A("dir")))
+						file_put_contents($S->A("dir")."/Folder.jpg", $cover);
+					$S->changeA("cover", DBImageGUI::stringifyS("image/jpg", $temp));
+					#$S->saveMe();
+					unlink($temp);
+					
+					if($echo)
+						$tab->addRow("Downloaded cover");
 					break;
 				}
 			}
 		}
+		$S->saveMe(true, false);
 
 		if($echo) echo $tab;
 	}

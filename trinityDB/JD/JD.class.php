@@ -76,7 +76,7 @@ class JD extends PersistentObject {
 		if($this->A("JDDLType") == "4"){
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
-			$id = $this->logDownload($logLink, $link, $logFilename);
+			$id = $this->logDownload($logLink, $linkOld, $logFilename);
 			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
