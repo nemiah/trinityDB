@@ -18,16 +18,22 @@
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class JDownloadGUI extends JDownload implements iGUIHTML2 {
+	function __construct($ID) {
+		parent::__construct($ID);
+		
+		$this->setParser("JDownloadRenamed", "Util::CLDateTimeParser");
+	}
+	
 	function getHTML($id){
 		
 		$this->loadMeOrEmpty();
 		
-		$gui = new HTMLGUI2();
-		$gui->setObject($this);
-		$gui->setName("JDownload");
-
-		$gui->setStandardSaveButton($this);
+		$gui = new HTMLGUIX($this);
+		$gui->name("JDownload");
 	
+		#$B = $gui->addSideButton("Erneut\nherunterladen", "down");
+		
+		
 		return $gui->getEditHTML();
 	}
 }

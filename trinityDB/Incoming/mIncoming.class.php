@@ -54,6 +54,9 @@ class mIncoming extends anyC {
 			
 			$found = false;
 			foreach($dirs AS $dir){
+				if(!file_exists($dir."/$filename") AND file_exists($dir."/".basename($D->A("JDownloadFilename"))))
+					$filename = basename($D->A("JDownloadFilename"));
+				
 				if(file_exists($dir."/$filename")){
 					$found = true;
 					$newName = Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")).".$ext");

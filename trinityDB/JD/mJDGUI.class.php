@@ -33,6 +33,9 @@ class mJDGUI extends anyC implements iGUIHTMLMP2 {
 		$B = $gui->addSideButton("Downloads\nRSS feed", "./trinityDB/JD/rss.png");
 		$B->onclick("window.open('./trinityDB/JD/exportRSS.php');");
 		
+		$B = $gui->addSideButton("Downloads\nanzeigen", "empty");
+		$B->loadFrame("contentRight", "mJDownload");
+		
 		return $gui->getBrowserHTML($id);
 	}
 

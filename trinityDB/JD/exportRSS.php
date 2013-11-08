@@ -48,7 +48,7 @@ $AC->addAssocV3("JDownloadDate", ">", time() - 3600 * 24 * 7);
 $AC->addOrderV3("JDownloadDate", "DESC");
 
 while($D = $AC->getNextEntry())
-	$F->addEntry($newName = prettifyDB::apply("seriesEpisodeNameDownloaded", $D->A("JDownloadURL")), "", "", "", $D->getID(), date("r", $D->A("JDownloadDate")));
+	$F->addEntry(prettifyDB::apply("seriesEpisodeNameDownloaded", $D->A("JDownloadURL")), "DLID: ".$D->getID(), "", "", $D->getID(), date("r", $D->A("JDownloadDate")));
 
 
 echo $F;

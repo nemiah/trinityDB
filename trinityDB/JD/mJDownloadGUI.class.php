@@ -21,18 +21,30 @@
 class mJDownloadGUI extends anyC implements iGUIHTMLMP2 {
 
 	public function getHTML($id, $page){
+		#$this->setParser("JDownloadDate", "");
+		
+		$this->addOrderV3("JDownloadDate", "DESC");
 		$this->loadMultiPageMode($id, $page, 0);
 
 		$gui = new HTMLGUIX($this);
-		$gui->version("mJDownload");
+		$gui->version("mJD");
 
 		$gui->name("JDownload");
 		
-		$gui->attributes(array());
+		$gui->attributes(array("JDownloadDate", "JDownloadRenameto"));
+		
+		$gui->parser("JDownloadDate", "parserDate");
 		
 		return $gui->getBrowserHTML($id);
 	}
 
-
+	public static function parserDate($w, $l, $E){
+		$r = "";
+		if($E->A("JDownloadRenamed") == 0)
+			$r .= OnEvent::script ("\$j('#BrowsermJDownload".$E->getID()."').css('background-color', 'rgba(235, 64, 0, 0.4)');");
+		
+		return Util::CLDateTimeParser($w).$r;
+	}
+	
 }
 ?>
