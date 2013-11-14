@@ -18,6 +18,20 @@
  *  2007 - 2012, Rainer Furtmeier - Rainer@Furtmeier.de
  */
 class JD extends PersistentObject {
+	public function filesize($link, $resolve = false){
+		if($resolve AND $this->A("JDLinkParser") != ""){
+			$C = $this->A("JDLinkParser");
+			$C = new $C();
+			$link = $C->parse($link, $this->A("JDLinkParserUser"), $this->A("JDLinkParserPassword"));
+		}
+		
+		$info = get_headers($link, 1);
+		if($info === false)
+			return 0;
+		
+		return $info["Content-Length"];
+	}
+	
 	public function download($link, $logLink = null, $logFilename = ""){
 		if(strpos($link, "linksafe.")){
 			$newLocation = get_headers($link, 1);
@@ -76,7 +90,7 @@ class JD extends PersistentObject {
 		if($this->A("JDDLType") == "4"){
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
-			$id = $this->logDownload($logLink, $linkOld, $logFilename);
+			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link));
 			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
@@ -137,12 +151,13 @@ class JD extends PersistentObject {
 		}
 	}
 
-	private function logDownload($logLink, $link, $fileName = ""){
+	private function logDownload($logLink, $link, $fileName = "", $fileSize = 0){
 		$F = new Factory("JDownload");
 		$F->sA("JDownloadURL", $logLink);
 		$F->sA("JDownloadFilename", $link);
 		$F->sA("JDownloadRenameto", $fileName);
 		$F->sA("JDownloadJDID", $this->getID());
+		$F->sA("JDownloadFilesize", $fileSize);
 		
 		$id = $F->exists(true);
 		if($id === false){

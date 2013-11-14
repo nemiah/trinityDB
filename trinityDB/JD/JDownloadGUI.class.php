@@ -22,6 +22,7 @@ class JDownloadGUI extends JDownload implements iGUIHTML2 {
 		parent::__construct($ID);
 		
 		$this->setParser("JDownloadRenamed", "Util::CLDateTimeParser");
+		$this->setParser("JDownloadDate", "Util::CLDateTimeParser");
 	}
 	
 	function getHTML($id){
@@ -32,9 +33,15 @@ class JDownloadGUI extends JDownload implements iGUIHTML2 {
 		$gui->name("JDownload");
 	
 		#$B = $gui->addSideButton("Erneut\nherunterladen", "down");
-		
+		#$B = $gui->addSideButton("Dateigröße", "down");
+		#$B->popup("", "Dateigröße", "JDownload", $this->getID(), "getFilesize");
 		
 		return $gui->getEditHTML();
+	}
+	
+	function getFilesize(){
+		$DL = new JD($this->A("JDownloadJDID"));
+		$DL->filesize($this->A("JDownloadFilename"));
 	}
 }
 ?>
