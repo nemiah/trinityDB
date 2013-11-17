@@ -25,11 +25,23 @@ class SerieGUI extends Serie implements iGUIHTML2, icontextMenu {
 		$gui = new HTMLGUI2();
 		$gui->setObject($this);
 		$gui->setName("Serie");
-
-		$gui->setType("adapter", "hidden");
+		$gui->setShowAttributes(array(
+			"name",
+			"sprache",
+			"dir",
+			"lastupdate",
+			"genre",
+			"description",
+			"status",
+			"quality",
+			"RSSFilterID",
+			"altFeedName1",
+			"altFileName1"
+		));
+		#$gui->setType("adapter", "hidden");
 		#$gui->setType("lastupdate", "readonly");
-		$gui->setType("siteID", "hidden");
-		$gui->setType("url", "hidden");
+		#$gui->setType("siteID", "hidden");
+		#$gui->setType("url", "hidden");
 		$gui->setType("description", "textarea");
 
 		$gui->setLabel("sprache", "Language");

@@ -190,6 +190,7 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 					if($S->A("dir") != "" AND file_exists($S->A("dir")))
 						file_put_contents($S->A("dir")."/Folder.jpg", $cover);
 					$S->changeA("cover", DBImageGUI::stringifyS("image/jpg", $temp));
+					$S->changeA("coverThumb", DBImageGUI::stringifyS("image/png", $temp, 150, 220));
 					#$S->saveMe();
 					unlink($temp);
 					

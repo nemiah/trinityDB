@@ -20,15 +20,7 @@
 class CCSerien implements iCustomContent {
 	function __construct() {
 		addClassPath(dirname(__FILE__));
-		addClassPath(Util::getRootPath()."open3A/Adressen");
-		addClassPath(Util::getRootPath()."open3A/Kunden");
-		addClassPath(Util::getRootPath()."open3A/Auftraege");
-		addClassPath(Util::getRootPath()."open3A/Stammdaten");
-		addClassPath(Util::getRootPath()."open3A/Textbausteine");
-		addClassPath(Util::getRootPath()."open3A/Brief");
-		/*
-		if(!isset($_SESSION["BPS"]))
-			$_SESSION["BPS"] = new BackgroundPluginState();*/
+		addClassPath(Util::getRootPath()."trinityDB/JD");
 	}
 	
 	function getLabel(){
@@ -40,26 +32,11 @@ class CCSerien implements iCustomContent {
 	}
 	
 	function getCMSHTML() {
-		$html = "<h1>Neue Folgen</h1>";
-		
-		$AC = anyC::get("Folge");
-		$AC->addAssocV3("TIMESTAMP(airDate)", ">=", date("Y-m-d", time() - 3600 * 24 * 7));
-		$AC->addAssocV3("TIMESTAMP(airDate)", "<", date("Y-m-d"));
-		$AC->addOrderV3("airDate", "DESC");
-		
-		while($F = $AC->getNextEntry()){
-			$S = new Serie($F->A("SerieID"));
-			
-			$html .= "<div style=\"display:inline-block;width:33%;margin-bottom:2%;\">
-				<img style=\"float:left;margin-right:20px;width:150px;height:220px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($S->A("coverThumb")))."\" />
-				<div>
-					<h2 style=\"margin-top:0px;padding-top:0px;\">".$S->A("name")."</h2>
-					<p>Letzte Folge:<br />".Util::CLDateParserL(strtotime($F->A("airDate")))."</p>
-					
-				</div>
-			</div>";
-		}
-		
+		$mode = $_GET["mode"];
+		return $this->$mode();
+	}
+	
+	function browser(){
 		$html .= "<h1>Serien-Browser</h1>";
 		
 		$AC = anyC::get("Serie");
@@ -85,8 +62,8 @@ class CCSerien implements iCustomContent {
 			$next = $ACF->getNextEntry();
 			
 			//$imgData = DBImageGUI::resizeMax(DBImageGUI::getData($S->A("cover")), 150, 221);
-			$html .= "<div style=\"display:inline-block;width:33%;margin-bottom:2%;\">
-				<img style=\"float:left;margin-right:20px;width:150px;height:220px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($S->A("coverThumb")))."\" />
+			$html .= "<div style=\"vertical-align:top;display:inline-block;width:33%;margin-bottom:2%;\">
+				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($S->A("coverThumb")))."\" />
 				<div>
 					<h2 style=\"margin-top:0px;padding-top:0px;\">".$S->A("name")."</h2>
 					".($next != null ? "<p>Nächste Folge:<br />".Util::CLDateParserL(strtotime($next->A("airDate")))."</p>" : "")."
@@ -95,6 +72,40 @@ class CCSerien implements iCustomContent {
 			</div>";
 		}
 		
+		return $html;
+	}
+	
+	function newEpisodes(){
+		$html = "<h1>Neue Folgen</h1>";
+		
+		$AC = anyC::get("JDownload");
+		$AC->addAssocV3("JDownloadDate", ">", time() - 3600 * 24 * 7);
+		$AC->addOrderV3("JDownloadDate", "DESC");
+		$AC->addJoinV3("Serie", "JDownloadSerieID", "=", "SerieID");
+		while($D = $AC->getNextEntry()){
+			if($D->A("JDownloadSerieID") != "0" AND $D->A("cover") != "" AND trim($D->A("coverThumb")) == ""){
+				$S = new Serie($D->A("JDownloadSerieID"));
+				$S->changeA("coverThumb", DBImageGUI::stringifyDataS("image/png", DBImageGUI::getData($S->A("cover")), 150, 220));
+				$S->saveMe(true, false);
+				
+				$D->changeA("coverThumb", $S->A("coverThumb"));
+			}
+			preg_match("/S([0-9]+)E([0-9]+)/", $D->A("JDownloadRenameto"), $matches);
+			
+			$ACF = anyC::get("Folge", "SerieID", $D->A("SerieID"));
+			$ACF->addAssocV3("season", "=", $matches[1]);
+			$ACF->addAssocV3("episode", "=", $matches[2]);
+			$ACF->setLimitV3(1);
+			$F = $ACF->getNextEntry();
+			
+			$html .= "
+			<div style=\"display:inline-block;width:33%;margin-bottom:2%;vertical-align:top;\">
+				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($D->A("coverThumb")))."\" />
+				<h2 style=\"margin-top:0px;padding-top:0px;\">".$D->A("JDownloadRenameto")."</h2>
+				<p style=\"color:grey;\">".($F != null ? $F->A("description") : "Keine Beschreibung")." <small>".Util::CLDateParser($D->A("JDownloadDate"))."</small></p>
+			</div>";
+
+		}
 		return $html;
 	}
 	

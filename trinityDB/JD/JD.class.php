@@ -32,7 +32,7 @@ class JD extends PersistentObject {
 		return $info["Content-Length"];
 	}
 	
-	public function download($link, $logLink = null, $logFilename = ""){
+	public function download($link, $logLink = null, $logFilename = "", Serie $Serie = null){
 		if(strpos($link, "linksafe.")){
 			$newLocation = get_headers($link, 1);
 			$links = $newLocation["Location"];
@@ -90,7 +90,7 @@ class JD extends PersistentObject {
 		if($this->A("JDDLType") == "4"){
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
-			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link));
+			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie);
 			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
@@ -108,7 +108,7 @@ class JD extends PersistentObject {
 		
 			$xml = new SimpleXMLElement(substr($data, strpos($data, "<?xml ")));
 			if($xml->Result."" == "success")
-				$this->logDownload($logLink, $link, $logFilename);
+				$this->logDownload($logLink, $link, $logFilename, 0, $Serie);
 
 		}
 
@@ -117,7 +117,7 @@ class JD extends PersistentObject {
 			$content = file_get_contents("http://".$this->A("JDHost").":".$this->A("JDPort")."/action/add/links/grabber0/start1/$link");
 			
 			if(strpos($content, "Link(s) added. (\"$link\"") !== false AND $logLink != null)
-				$this->logDownload($logLink, $link, $logFilename);
+				$this->logDownload($logLink, $link, $logFilename, 0, $Serie);
 			
 		}
 
@@ -151,13 +151,14 @@ class JD extends PersistentObject {
 		}
 	}
 
-	private function logDownload($logLink, $link, $fileName = "", $fileSize = 0){
+	private function logDownload($logLink, $link, $fileName = "", $fileSize = 0, Serie $Serie = null){
 		$F = new Factory("JDownload");
 		$F->sA("JDownloadURL", $logLink);
 		$F->sA("JDownloadFilename", $link);
 		$F->sA("JDownloadRenameto", $fileName);
 		$F->sA("JDownloadJDID", $this->getID());
 		$F->sA("JDownloadFilesize", $fileSize);
+		$F->sA("JDownloadSerieID", $Serie != null ? $Serie->getID() : 0);
 		
 		$id = $F->exists(true);
 		if($id === false){

@@ -215,7 +215,7 @@ while($S = $ac->getNextEntry()){
 			$usedAutoDL = false;
 			$alreadyDLed = JDownload::testDownloaded($En["fileName"]);
 			if(!$alreadyDLed)
-				$usedAutoDL = $RSF->autoDownload($En["fileName"], $En["link"], $S->A("name")." S".$En["season"]."E".$En["episode"]);
+				$usedAutoDL = $RSF->autoDownload($En["fileName"], $En["link"], $S->A("name")." S".$En["season"]."E".$En["episode"], $S);
 
 
 			echo "

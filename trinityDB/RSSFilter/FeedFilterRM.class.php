@@ -73,7 +73,7 @@ class FeedFilterRM implements iFeedFilter {
 		return $hosts;
 	}
 
-	public function download(RSSFilter $RSF, $filename, $page, $targetFileName){
+	public function download(RSSFilter $RSF, $filename, $page, $targetFileName, Serie $Serie){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $page);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
