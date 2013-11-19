@@ -26,22 +26,53 @@ class JDownloadGUI extends JDownload implements iGUIHTML2 {
 	}
 	
 	function getHTML($id){
-		
 		$this->loadMeOrEmpty();
 		
 		$gui = new HTMLGUIX($this);
 		$gui->name("JDownload");
 	
-		#$B = $gui->addSideButton("Erneut\nherunterladen", "down");
-		#$B = $gui->addSideButton("Dateigröße", "down");
-		#$B->popup("", "Dateigröße", "JDownload", $this->getID(), "getFilesize");
+		$gui->parser("JDownloadFilesize", "parserSize");
+		$gui->parser("JDownloadSerieID", "parserSerie");
+		$gui->parser("JDownloadJDID", "parserJD");
 		
+		$gui->label("JDownloadSerieID", "Serie");
+		$gui->label("JDownloadJDID", "JD");
+		
+		$B = $gui->addSideButton("Erneut\nherunterladen", "down");
+		$B->popup("", "Erneut herunterladen", "JDownload", $this->getID(), "reDownload");
+
+		$gui->optionsEdit(false, false);
 		return $gui->getEditHTML();
 	}
 	
-	function getFilesize(){
+	public static function parserJD($w){
+		$JD = new JD($w);
+		
+		return $JD->A("JDName");
+	}
+	
+	public static function parserSerie($w){
+		$Serie = new Serie($w);
+		
+		return $Serie->A("name");
+	}
+	
+	public static function parserSize($w){
+		return Util::formatByte($w, 3);
+	}
+	
+	/*function getFilesize(){
 		$DL = new JD($this->A("JDownloadJDID"));
 		$DL->filesize($this->A("JDownloadFilename"));
+	}*/
+	
+	function reDownload(){
+		$JD = new JD($this->A("JDownloadJDID"));
+		$s = $JD->download($this->A("JDownloadFilename"), $this->A("JDownloadURL"), $this->A("JDownloadRenameto"), new Serie($this->A("JDownloadSerieID")));
+		if($s)
+			echo "<p>Download gestartet</p>";
+		else
+			echo "<p>Fehler</p>";
 	}
 }
 ?>

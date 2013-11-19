@@ -157,13 +157,18 @@ class JD extends PersistentObject {
 		$F->sA("JDownloadFilename", $link);
 		$F->sA("JDownloadRenameto", $fileName);
 		$F->sA("JDownloadJDID", $this->getID());
-		$F->sA("JDownloadFilesize", $fileSize);
 		$F->sA("JDownloadSerieID", $Serie != null ? $Serie->getID() : 0);
 		
-		$id = $F->exists(true);
-		if($id === false){
+		$E = $F->exists(true);
+		if($E === false){
 			$F->sA("JDownloadDate", time());
-			 $id = $F->store();
+			$F->sA("JDownloadFilesize", $fileSize);
+			$id = $F->store();
+		} else {
+			$E->changeA("JDownloadDate", time());
+			$E->changeA("JDownloadFilesize", $fileSize);
+			$E->saveMe();
+			$id = $E->getID();
 		}
 		
 		return $id;

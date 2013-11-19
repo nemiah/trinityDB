@@ -39,6 +39,7 @@ class mIncoming extends anyC {
 	
 	public function renameDownloaded($output = false){
 		$AC = anyC::get("JDownload");
+		$AC->addAssocV3("JDownloadRenameto", "!=", "");
 		$AC->addAssocV3("JDownloadFilename", "!=", "");
 		$AC->addAssocV3("JDownloadRenamed", "=", "0");
 		$AC->addAssocV3("JDownloadDate", ">=", time() - 3600 * 24 * 2);
