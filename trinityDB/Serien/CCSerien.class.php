@@ -63,7 +63,7 @@ class CCSerien implements iCustomContent {
 			
 			//$imgData = DBImageGUI::resizeMax(DBImageGUI::getData($S->A("cover")), 150, 221);
 			$html .= "<div style=\"vertical-align:top;display:inline-block;width:33%;margin-bottom:2%;\">
-				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($S->A("coverThumb")))."\" />
+				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"./index.php?D=trinityDB/Serien&M=getCover&P0=".$S->A("SerieID")."\" />
 				<div>
 					<h2 style=\"margin-top:0px;padding-top:0px;\">".$S->A("name")."</h2>
 					".($next != null ? "<p>Nächste Folge:<br />".Util::CLDateParserL(strtotime($next->A("airDate")))."</p>" : "")."
@@ -81,6 +81,7 @@ class CCSerien implements iCustomContent {
 		$AC = anyC::get("JDownload");
 		$AC->addAssocV3("JDownloadDate", ">", time() - 3600 * 24 * 7);
 		$AC->addOrderV3("JDownloadDate", "DESC");
+		$AC->addAssocV3("JDownloadSerieID", "!=", "0");
 		$AC->addJoinV3("Serie", "JDownloadSerieID", "=", "SerieID");
 		while($D = $AC->getNextEntry()){
 			if($D->A("JDownloadSerieID") != "0" AND $D->A("cover") != "" AND trim($D->A("coverThumb")) == ""){
@@ -100,7 +101,7 @@ class CCSerien implements iCustomContent {
 			
 			$html .= "
 			<div style=\"display:inline-block;width:33%;margin-bottom:2%;vertical-align:top;\">
-				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"data:image/png;base64,".base64_encode(DBImageGUI::getData($D->A("coverThumb")))."\" />
+				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"./index.php?D=trinityDB/Serien&M=getCover&P0=".$D->A("SerieID")."\" />
 				<h2 style=\"margin-top:0px;padding-top:0px;\">".$D->A("JDownloadRenameto")."</h2>
 				<p style=\"color:grey;\">".($F != null ? $F->A("description") : "Keine Beschreibung")." <small>".Util::CLDateParser($D->A("JDownloadDate"))."</small></p>
 			</div>";
@@ -109,6 +110,12 @@ class CCSerien implements iCustomContent {
 		return $html;
 	}
 	
+	
+	public function getCover($data){
+		$I = new DBImageGUI();
+		
+		$I->getHTML("Serie:::".$data["P0"].":::coverThumb");
+	}
 }
 
 ?>

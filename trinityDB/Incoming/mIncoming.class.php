@@ -70,6 +70,9 @@ class mIncoming extends anyC {
 						continue;
 					}
 					
+					if(filesize($dir."/$filename") != $D->A("JDownloadFilesize"))
+						continue;
+					
 					if(rename($dir."/$filename", $dir."/".$newName)){
 						if($output)
 							echo "<p>renamed $dir/$filename to ".$newName."</p>";
