@@ -56,7 +56,7 @@ class CCSerien implements iCustomContent {
 			
 			$ACF = anyC::get("Folge", "SerieID", $S->getID());
 			$ACF->addAssocV3("TIMESTAMP(airDate)", ">=", date("Y-m-d"));
-			$ACF->addOrderV3("airDate", "DESC");
+			$ACF->addOrderV3("airDate", "ASC");
 			$ACF->setLimitV3(1);
 			#$ACF->setFieldsV3(array("TIMESTAMP(airDate) AS ts"));
 			$next = $ACF->getNextEntry();
