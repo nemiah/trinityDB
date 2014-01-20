@@ -26,6 +26,7 @@
 		<icon>./images/navi/computer.png</icon>
 		<folder>Files</folder>
 		<javascript>File.js</javascript>
+		<menuEntryTarget>contentScreen</menuEntryTarget>
 
 		<deploy>
 			<table name="Datei" />

@@ -62,8 +62,10 @@ class File extends PersistentObject {
 		#if(strpos(strtolower($this->ID), ".gif") !== false) 
 		#	header("Content-Type: image/gif");
 		
+		$ex = explode(DIRECTORY_SEPARATOR, $this->ID);
+		
 		header("Content-Type: ".$this->A("FileMimetype"));
-		header("Content-Disposition: attachment; filename=\"".basename($this->ID)."\"");
+		header("Content-Disposition: attachment; filename=\"".$ex[count($ex) - 1]."\"");
 		header('Content-Length: '.filesize($this->ID));
 		readfile($this->ID);
 	}
@@ -107,7 +109,7 @@ class File extends PersistentObject {
 				die("{\"error\":\"Die angegebene Datei ist zu groß\"}");
 
 			$A->FileContent = addslashes(file_get_contents("php://input"));
-			$A->FileName = $_GET['qqfile'];
+			$A->FileName = (isset($_GET["targetFilename"]) AND $_GET["targetFilename"] != "") ? $_GET["targetFilename"].".".Util::ext($_GET['qqfile']) : $_GET['qqfile'];
 			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = (int) $_SERVER["CONTENT_LENGTH"];
 		} else { //iframe upload for IE8
@@ -116,7 +118,7 @@ class File extends PersistentObject {
 
 
 			$A->FileContent = addslashes(file_get_contents($_FILES['qqfile']['tmp_name']));
-			$A->FileName = $_FILES['qqfile']['name'];
+			$A->FileName = (isset($_GET["targetFilename"]) AND $_GET["targetFilename"] != "") ? $_GET["targetFilename"].".".Util::ext($_FILES['qqfile']['name']) : $_FILES['qqfile']['name'];
 			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = $_FILES['qqfile']['size'];
 		}

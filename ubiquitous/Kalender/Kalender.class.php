@@ -58,11 +58,9 @@ class Kalender {
 		$return = 0;
 		$counted = array();
 		$stack = array();
-		
 		foreach($this->events AS $D)
 			foreach($D AS $T)
 				foreach($T AS $E){
-					
 					if(($E->getDay() != $E->getEndDay() OR $E->allDay())){# AND !isset($counted[$E->ownerClass().$E->ownerClassID()])){
 						
 						$stackCalcFirst = Kalender::parseDay($E->currentWhen()->day);#$E->getDay()
@@ -98,7 +96,7 @@ class Kalender {
 						}
 					}
 				}
-				
+
 		$max = 0;
 		foreach($stack AS $ev)
 			if(count($ev) > $max)
@@ -142,8 +140,18 @@ class Kalender {
 					$this->holidays[$KHWhen->day][$KHWhen->time][] = $KH;
 			}
 			
-			foreach($this->holidays AS $d => $value)
+			foreach($this->holidays AS $d => $value){
 				ksort($this->holidays[$d]);
+				foreach($this->holidays[$d] AS $v){
+					foreach($v AS $pos => $obj)
+						$obj->maxPos($d, $pos);
+					#echo "<pre style=\"font-size:8px;\">";
+					#print_r($v);
+					#echo "</pre>";
+				}
+			}
+			
+			
 		}
 
 		if(!isset($this->holidays[$day]))

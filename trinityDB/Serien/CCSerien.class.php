@@ -99,9 +99,15 @@ class CCSerien implements iCustomContent {
 			$ACF->setLimitV3(1);
 			$F = $ACF->getNextEntry();
 			
+			$B = new Button("Abspielen", "play", "touch");
+			$B->onclick("parent.UPnP.search('".Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")))."');");
+			
 			$html .= "
 			<div style=\"display:inline-block;width:33%;margin-bottom:2%;vertical-align:top;\">
-				<img style=\"float:left;margin-right:20px;width:150px;height:220px;margin-bottom:5px;\" src=\"./index.php?D=trinityDB/Serien&M=getCover&P0=".$D->A("SerieID")."\" />
+				<div style=\"margin-right:20px;float:left;width:150px;\">
+					<img style=\"width:150px;height:220px;margin-bottom:5px;\" src=\"./index.php?D=trinityDB/Serien&M=getCover&P0=".$D->A("SerieID")."\" />
+						$B
+				</div>
 				<h2 style=\"margin-top:0px;padding-top:0px;\">".$D->A("JDownloadRenameto")."</h2>
 				<p style=\"color:grey;\">".($F != null ? $F->A("description") : "Keine Beschreibung")." <small>".Util::CLDateParser($D->A("JDownloadDate"))."</small></p>
 			</div>";

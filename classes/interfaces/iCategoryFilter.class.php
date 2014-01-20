@@ -20,5 +20,6 @@
 interface iCategoryFilter {
 	public function getAvailableCategories();
 	public function getCategoryFieldName();
+	public function getCategoryFieldLabel(array $KIDs);
 }
 ?>

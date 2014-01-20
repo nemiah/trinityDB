@@ -59,6 +59,10 @@ class KalenderEvent extends KalenderEntry {
 		parent::__construct();
 	}
 	
+	function timestamp(){
+		return Kalender::parseDay($this->day) + Kalender::parseTime($this->time) - 60;
+	}
+	
 	function status($status){
 		$this->status = $status;
 	}
@@ -104,6 +108,9 @@ class KalenderEvent extends KalenderEntry {
 	}
 	
 	function when($startDay, $endDay){
+		if($this->exception !== false AND $this->exception[1] == "1")
+			return array();
+		
 		$when = array();
 		$W = new stdClass();
 		$W->day = $this->day;
@@ -141,7 +148,7 @@ class KalenderEvent extends KalenderEntry {
 		$firstDay = Kalender::parseDay($this->day);
 
 		if($this->repeat){
-			switch($this->repeatInterval){
+			switch($this->repeatType){
 				case "daily":
 					$days = array();
 					if($this->repeatDayOfWeek != ""){
@@ -177,22 +184,37 @@ class KalenderEvent extends KalenderEntry {
 				break;
 				
 				case "weekly":
-
+					#echo Util::CLDateParser($firstDay)."<br />";
+					#echo $this->repeatInterval;
 					$weekDay = date("w", $pDay);
-					$D = new Datum($startDay);
+					$D = new Datum($firstDay > $startDay ? $firstDay : $startDay);
 					while($D->time() <= $endDay){
 						if(date("w", $D->time()) == $weekDay)
 							break;
 						
 						$D->addDay();
 					}
-
+					
+					$counter = floor(($D->time() - $firstDay) / (3600 * 24 * 7));
+					#echo $counter."<br />";
 					while($D->time() <= $endDay){
 						$newDay = Kalender::formatDay($D->time());
+						
+						if($this->repeatUntil > 0  AND $D->time() > $this->repeatUntil)
+							break;
+						
 						$D->addWeek(true);
-						if($newDay == $this->day)
-								continue;
+						if($newDay == $this->day){
+							$counter++;
+							continue;
+						}
+						
 
+						if($counter % ($this->repeatInterval + 1) != 0){
+							$counter++;
+							continue;
+						}
+						
 						if($D->time() <= $firstDay)
 							continue;
 
@@ -204,47 +226,51 @@ class KalenderEvent extends KalenderEntry {
 						$W->endDay = $newDay;
 						$W->time = $this->time;
 						$when[] = $W;
-
+						
+						$counter++;
 					}
 				break;
 				
 				case "monthly":
 					$D = new Datum($startDay);
-					
+					#echo $this->repeatWeekOfMonth;
 					if($this->repeatWeekOfMonth > 0 AND $this->repeatWeekOfMonth != 127){
-						$c = -1;
+						#$c = -1;
 						$weekDay = date("w", $pDay);
 						
-						if(date("d", $D->time()) > 1 AND date("d", $D->time()) < 20)
-							$c = 0;
-							
+						#if(date("d", $D->time()) > 1 AND date("d", $D->time()) < 20)
+							#$c = 0;
+						
 						while($D->time() <= $endDay){
 							$newStamp = Kalender::formatDay($D->time());
 							$newDay = date("d", $D->time());
 							$newWeekDay = date("w", $D->time());
-
-							if(date("d", $D->time()) == 1)
-								$c = 0;
 							
+							#if(date("d", $D->time()) == 1)
+							#	$c = 0;
+							$ts = $D->time();
 							$D->addDay();
 							
-							if($c < 0)
-								continue;
-
+							#if($c < 0)
+							#	continue;
+							
+							
 							if($newWeekDay != $weekDay)
 								continue;
 							
-							$c++;
+							#$c++;
 							
 							if($newStamp == $this->day)
 								continue;
-							
-							if($c != $this->repeatWeekOfMonth)
-								continue;
+							#if($c != $this->repeatWeekOfMonth)
+							#	continue;
 							
 							if(isset($this->exceptions[$newDay.$this->time]))
 								continue;
 
+							if(!$this->isNth($this->repeatWeekOfMonth, $ts))
+								continue;
+							
 							$W = new stdClass();
 							$W->day = $newStamp;
 							$W->endDay = $newStamp;
@@ -334,6 +360,22 @@ class KalenderEvent extends KalenderEntry {
 		#echo "</pre>";
 		
 		return $when;
+	}
+	
+	private function isNth($nth, $time){
+		$D = new Datum($time);
+		$D->setToMonth1st();
+		
+		$w = date("w", $time);
+		$c = 0;
+		for($i = 1; $i <= date("d", $time); $i++){
+			if(date("w", $D->time()) == $w)
+				$c++;
+			
+			$D->addDay();
+		}
+
+		return $nth == $c;
 	}
 	
 	function getDay(){
@@ -513,8 +555,12 @@ class KalenderEvent extends KalenderEntry {
 			}
 		}
 		
+		$minutes = $endTime - $startTime;
+		if($minutes < 30 * 60)
+			$minutes = 30 * 60;
+
 		$i = 0;
-		while($startTime + $i < $endTime){
+		while($i < $minutes){
 			self::$colsStack[$useCol][date("Hi", $startTime + $i)] = true;
 			$i += 60;
 		}
@@ -578,6 +624,7 @@ class KalenderEvent extends KalenderEntry {
 
 		$T = new HTMLTable(2, "Eventdetails");
 		$T->setColWidth(1, 120);
+		$T->addColStyle(1, "vertical-align:top;");
 		
 		$T->addLV("Betreff", $this->title);
 
@@ -588,7 +635,7 @@ class KalenderEvent extends KalenderEntry {
 		else
 			$T->addLV("Uhrzeit","Ganzer Tag");
 		
-		$T->addLV("Details", $this->summary);
+		$T->addLV("Details", "<div style=\"max-height:300px;overflow:auto;\">".$this->summary."</div>");
 		
 		if($this->organizer)
 			$T->addLV("Organisator", $this->organizer);
@@ -615,9 +662,9 @@ class KalenderEvent extends KalenderEntry {
 		
 		// TODO: Flag für Teilnehmer erstellen
 		// nur anzeigen, wenn es sich um eine ToDo handelt
-		#$buttonInvite = new Button("Teilnehmer einladen", "refresh", "icon");
-		#$buttonInvite->style("margin: 10px; float: right;");
-		#$buttonInvite->rmePCR("mKalender", "-1", "getInviteForm", array("'$this->className'", "'$this->classID'", "'getInviteForm'"), "function(transport){ \$j('#eventAdditionalContent').html(transport.responseText).slideDown(); }");
+//		$buttonInvite = new Button("Teilnehmer einladen", "refresh", "icon");
+//		$buttonInvite->style("margin: 10px; float: right;");
+//		$buttonInvite->rmePCR("mKalender", "-1", "getInviteForm", array("'$this->className'", "'$this->classID'", "'getInviteForm'"), "function(transport){ \$j('#eventAdditionalContent').html(transport.responseText).slideDown(); }");
 		
 		$topButtons = "";
 		foreach($this->topButtons AS $B){
@@ -661,7 +708,7 @@ class KalenderEvent extends KalenderEntry {
 		
 		return "
 			<div onclick=\"$onClick\" style=\"".($this->status == 2 ? "color:grey;" : "")."clear:left;padding:2px;padding-left:4px;cursor:pointer;".($grey ? "color:grey;" : "")."\">
-				".(($grey AND isset(mKalenderGUI::$colors[$this->owner])) ? "<div style=\"display:inline-block;margin-right:3px;width:5px;background-color:".mKalenderGUI::$colors[$this->owner].";\">&nbsp;</div>" : "")."$zeit&nbsp;$this->title
+				".(($grey AND isset(mKalenderGUI::$colors[$this->owner])) ? "<div style=\"display:inline-block;margin-right:3px;width:5px;background-color:".mKalenderGUI::$colors[$this->owner].";\">&nbsp;</div>" : "")."$zeit $this->title
 			</div>";
 	}
 	
@@ -678,36 +725,37 @@ class KalenderEvent extends KalenderEntry {
 	 */
 	public function toXCal() {
 		$xCalData = new xCalDataEvent();
-		$dateTime = new DateTime();
+		#$dateTime = new DateTime();
 		
 		$xCalData->setUid($this->UID);
 		$xCalData->setSummary($this->title);
 		// TODO: Wiederholende Termine über when holen --> Wiederholungen über xCal angeben
 		// Parameter vermutlich Timestamp
 		
-		if (is_null($this->time)) {
+		/*if (is_null($this->time)) {
 			$dtStart = $this->day;
 			// TODO: Testen ob Timestamp oder nicht
 			$xCalData->setDtStartValue(xCalDataEvent::DTVALUE_DATE);
 			$xCalData->setDtStart(gmdate("Ymd", $dtStart));
-		} else {
-			$dtStart = $this->day + $this->time;
+		} else {*/
+			$dtStart = Kalender::parseDay($this->day) + Kalender::parseTime($this->time) - 60;
+			#echo date("dmY His", $dtStart).": ".$this->title."<br />";
 			// TODO: Test des Formats
 			// parseTime parseDay Kalender-Klasse
 			$xCalData->setDtStartValue(xCalDataEvent::DTVALUE_DATETIME);
 			$xCalData->setDtStart(gmdate("Ymd", $dtStart) . "T" . gmdate("His", $dtStart) . "Z");
-		}
+		#}
 		
-		if (is_null($this->endTime)) {
+		/*if (is_null($this->endTime)) {
 			$dtEnd = $this->endDay;
 			$xCalData->setDtEnd(gmdate("Ymd", $dtEnd));
-			$xCalData->setDtEndValue(xCalDataEvent::DTVALUE_DATE);
-		} else {
-			$dtEnd = $this->endDay + $this->endTime;
+			$xCalData->setDtEndValue(xCalDataEvent::DTVALUE_DATE);*/
+		#} else {
+			$dtEnd = Kalender::parseDay($this->endDay) + Kalender::parseTime($this->endTime) - 60;
 			$xCalData->setDtEnd(gmdate("Ymd", $dtEnd) . "T" . gmdate("His", $dtEnd) . "Z");
 			$xCalData->setDtEndValue(xCalDataEvent::DTVALUE_DATETIME);
-		}
-		$dateTime->setTimestamp($dtStart);
+		#}
+		#$dateTime->setTimestamp($dtStart);
 		
 		return xCalUtil::getXCalEventByXCalDataEvent($xCalData);
 	}

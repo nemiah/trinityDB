@@ -26,6 +26,16 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		return $BF;
 	}
 	
+	public static function getManagerButtonCustomDir($targetClass, $targetID, $subDir, $usePool = false, $fieldDefaultFile = "", $targetFilename = null){
+		$args = array("$subDir", "'$targetClass'", "'$targetID'", $usePool ? "1" : "0", "'$fieldDefaultFile'");
+		if($targetFilename != null)
+			$args[] = "'$targetFilename'";
+		
+		$BF = new Button("Dateien","computer");
+		$BF->popup("", "Datei-Manager", "mFile", "", "getPopupManager", $args);
+		return $BF;
+	}
+	
 	public static function addFile($className, $classID, $fileID){
 		$F = new File($fileID);
 		$F->loadMe();
@@ -46,7 +56,7 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 	
 	public function getHTML($id, $page){
 
-		$bps = $this->getMyBPSData();
+		/*$bps = $this->getMyBPSData();
 		
 		$p = FileStorage::getFilesDir();
 		
@@ -58,12 +68,13 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		}
 		#print_r($bps);
 		
-		$t = new HTMLTable(1);
-		$t2 = "";
 		
 		if(strpos($p,"specifics") === false)
 			$p = FileStorage::getFilesDir();
 
+		$t = new HTMLTable(1);
+		$t2 = "";
+		
 		if(!is_readable($p)){
 			$t->addRow("Verzeichnis <code>$p</code> nicht lesbar.<br /><br /><input type=\"button\" class=\"bigButton backgroundColor3\" value=\"zurück\" style=\"background-image:url(./images/navi/back.png);\" onclick=\"contentManager.reloadFrameRight('mFileGUI;path:".realpath($p."/../")."');\" />");
 			return $t->getHTML();
@@ -83,20 +94,22 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		else $t->addRow("Verzeichnis $p nicht beschreibbar. Es können keine Unterverzeichnisse angelegt oder Dateien hochgeladen werden.<br /><br />Bitte machen Sie das Verzeichnis mit <code>chmod 777 ".basename($p)."</code> durch den Webserver beschreibbar.");
 		
 
-		$gesamt = $this->loadMultiPageMode($id, $page, 0);
-		$gui = new HTMLGUIX($this);
+		*/
+		
+		$gui = new HTMLColGUI($this);
+		$gui->cols(1);
+		
+		$gui->content("right", $this->rightCol(true));
+		
+		$gui->resize("var height = 0; \$j('#filesFrame').prevAll().each(function(k, v){ height += \$j(v).outerHeight(); }); \$j('#filesFrame').css('height', contentManager.maxHeight() - height);");
+		
+		return $gui;
+		
+		/*$gui = new HTMLGUIX($this);
 		$gui->name("Datei");
 		#$gui->setMultiPageMode($gesamt, $page, 0, "contentRight", str_replace("GUI","",get_class($this)));
 
 		$gui->blacklists(array($p."/.", $p."/.."));
-
-		#$gui->setObject();
-		#$gui->setAttributes($this->collector);
-		#$gui->setCollectionOf($this->collectionOf,"Datei");
-
-		#$gui->setIsDisplayMode(true);
-		#$gui->setDeleteInDisplayMode(true);
-		#$gui->setEditInDisplayMode(true);
 
 		$gui->attributes(array("FileIsDir","FileName"));
 		#$gui->setDisplaySide("right");
@@ -109,8 +122,231 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		
 		#$gui->autoCheckSelectionMode(get_class($this));
 
-		return "<form id=\"newDirForm\">".$t->getHTML()."</form>".$t2."<div style=\"margin-top:30px;\">".$gui->getBrowserHTML($id)."</div>";
+		return "<form id=\"newDirForm\">".$t->getHTML()."</form>".$t2."<div style=\"margin-top:30px;\">".$gui->getBrowserHTML($id)."</div>";*/
+	}
+	
+	public function rightCol($return = false){
+		$useDir = realpath(FileStorage::getFilesDir());
+		
+		$path = BPS::getProperty("mFileGUI", "path", false);
+		if($path){
+			$path = preg_replace("/^([A-Z])%/", "\\1:", $path);
+			
+			if(strpos($path, realpath(FileStorage::getFilesDir())) === 0)
+				$useDir = $path;
+		}
+		
+		$writable = is_writable($useDir);
+		$readable = is_readable($useDir);
+		
+		$this->setDir($useDir);
+		
+		$this->loadMultiPageMode(-1, 0, 10000);
+		
+		$showPath = str_replace(realpath(FileStorage::getFilesDir()), "", $useDir);
+		
+		
+		$BH = new Button("Root", "home", "iconicL");
+		$BH->onclick($this->pather(FileStorage::getFilesDir()));
+		$BH->style("float:left;");
+				
+		$way = realpath(FileStorage::getFilesDir());
+		$bread = "<div style=\"vertical-align:top;display:inline-block;border-right:1px solid #aaa;\" class=\"isFolder\" data-path=\"$way\">$BH&nbsp;</div>";
+		foreach(explode(DIRECTORY_SEPARATOR, $showPath) AS $k => $v){
+			if($k == 0)
+				continue;
+			
+			$way .= DIRECTORY_SEPARATOR."$v";
+			
+			$bread .= "<div class=\"selectionRow isFolder\" data-path=\"$way\" onclick=\"".$this->pather($way)."\" style=\"padding:8px;cursor:pointer;border-right:1px solid #aaa;color:#555;vertical-align:top;display:inline-block;padding-left:20px;padding-right:20px;border-bottom:0px;\">$v</div>";
+		}
+		
+		$I = new HTMLInput("upload", "file", null, array("path" => $way, "class" => "File"));
+		$I->style("width:250px;");
+		$I->onchange($this->pather($way));
+		
+		$IN = new HTMLInput("newDir", "text");
+		$IN->placeholder("Neues Verzeichnis");
+		$IN->style("width:250px;margin-right:20px;");
+		$IN->onEnter(OnEvent::rme($this, "makeDir", array("'$way'", "\$j(this).val()"), "function(){ ".$this->pather($way)." }"));
+		
+		$ISA = new HTMLInput("selectAll", "checkbox");
+		$ISA->onchange("console.log(\$j(this).prop('checked')); \$j('.selectFile').prop('checked', \$j(this).prop('checked'));");
+		
+		if(!$writable OR !$readable){
+			$I = "";
+			$IN = "";
+		}
+		
+		$html = "
+			<div style=\"background-color:#F7F7F7;border-bottom:1px solid #ddd;\">
+				$bread
+				<div style=\"display:inline-block;margin-top:2px;float:right;\">$IN</div>
+				<div style=\"display:inline-block;margin-top:1px;float:right;\">$I</div>
+			</div>
+			
+			<div id=\"filesFrame\" style=\"overflow:auto;\">
+			<form id=\"dlFiles\">
+			<div style=\"border-bottom:1px solid #ddd;color:#777;\">
+				<div style=\"display:inline-block;float:right;padding:5px;\">
+					Größe
+					<div style=\"display:inline-block;width:64px;\">&nbsp;</div>
+				</div>
+				<!--<div style=\"display:inline-block;width:57px;float:left;padding-left:5px;\">$ISA</div>-->
+				<div style=\"display:inline-block;width:26px;float:left;padding-left:5px;\">&nbsp;</div>
+				<div style=\"padding:5px;\">Dateiname</div>
+			</div>";
+		
+		if(!$readable){
+			$html .= "<div style=\"padding:5px;\" class=\"highlight\">Das Verzeichnis <code>$useDir</code> ist nicht lesbar.</div>";
+			return $html;
+		}
+		
+		if(!$writable)
+			$html .= "<div style=\"padding:5px;\" class=\"highlight\">Das Verzeichnis $useDir ist nicht beschreibbar.<br />
+				Es können keine Unterverzeichnisse angelegt oder Dateien hochgeladen werden.<br />
+				Bitte machen Sie das Verzeichnis mit <code>chmod 777 ".basename($useDir)."</code> durch den Webserver beschreibbar.</div>";
+		$i = 0;
+		while($F = $this->getNextEntry()){
+			if($F->A("FileName") == "." OR $F->A("FileName") == "..")
+				continue;
+			
+			$ext = Util::ext($F->A("FileName"));
+			
+			$B = "";
+			if($F->A("FileIsDir")){
+				$B = new Button("Verzeichnis öffnen", "./plugins/Files/icons/folder.png", "icon");
+				$B->style("margin-right:5px;margin-top:2px;");
+			} elseif(!$F->A("FileIsDir") AND file_exists(dirname(__FILE__)."/icons/file_extension_$ext.png")) {
+				$B = new Button("", "./plugins/Files/icons/file_extension_$ext.png", "icon");
+				$B->style("margin-right:5px;margin-top:2px;");
+			} elseif(!$F->A("FileIsDir") AND !file_exists(dirname(__FILE__)."/icons/file_extension_$ext.png")) {
+				$B = new Button("", "./plugins/Files/icons/file_extension_unknown.png", "icon");
+				$B->style("margin-right:5px;margin-top:2px;");
+			}
+			
+			$BDL = new Button("Datei herunterladen", "download", "iconic");
+			$BDL->style("margin-right:10px;");
+			$BDL->windowRme("File", $F->getID(), "download");
+			$size = "<div style=\"display:inline-block;margin-right:20px;color:grey;width:60px;text-align:right;\"></div>";
+			
+			if($F->A("FileIsDir")){
+				$onclick = $this->pather($F->getID());
+				$BDL = "";
+			} else {
+				$onclick = OnEvent::popup("Vorschau", "File", $F->getID(), "previewWindow", "", "", "{width:600, hPosition: 'center'}");
+				$size = "<div style=\"display:inline-block;margin-right:20px;color:grey;width:60px;text-align:right;\">".Util::formatByte($F->A("FileSize"))."</div>";
+			}
+			$onRename = OnEvent::rme($F, "rename", array("\$j('input[name=renameFile$i]').val()"), "function(t){ \$j('.fileName$i').html(t.responseText); \$j('#default$i').show(); \$j('#rename$i').hide(); }");
+			
+			$BD = new Button("Element löschen", "trash_stroke", "iconic");
+			#$BD->style("float:right;");
+			$BD->onclick("deleteClass('File','".$F->getID()."', function() { ".$this->pather(realpath(dirname($F->getID())))." },'Element wirklich löschen?');");
+			
+			$BR = new Button("Element umbenennen", "pen_alt2", "iconic");
+			$BR->style("margin-right:10px;");
+			$BR->onclick("\$j('.fileDefault').show(); \$j('.fileRename, #default$i').hide(); \$j('#rename$i').show();");
+			
+			$IR = new HTMLInput("renameFile$i", "text", $F->A("FileName"));
+			$IR->style("width:350px;");
+			$IR->onEnter($onRename);
+			
+			$BC = new Button("Umbenennen abbrechen", "x", "iconic");
+			$BC->onclick("\$j('#default$i').show(); \$j('#rename$i').hide();");
+			$BC->style("margin-left:10px;");
+			
+			$BO = new Button("Umbenennen abschließen", "check", "iconic");
+			$BO->onclick($onRename);
+			$BO->style("margin-left:10px;");
+			
+			$IC = new HTMLInput("select$i", "checkbox");
+			$IC->setClass("selectFile");
+			$IC->style("margin-top:2px;margin-right:10px;display:none;");
+			
+			
+			$html .= "
+			<div data-path=\"".$F->getID()."\" class=\"selectionRow ".($F->A("FileIsDir") ? "isFolder" : "")."\" style=\"\">
+				<div class=\"selectionRowHeightSetter\" style=\"display:inline-block;float:left;\">$IC$B</div>
+				<div class=\"selectionRowHeightSetter\" style=\"display:inline-block;float:right;\">$BDL$BR$size$BD</div>
+					
+				<div id=\"rename$i\" class=\"fileRename selectionRowHeightSetter\" style=\"display:none;margin-bottom:-3px;\">$IR$BC$BO</div>
+				<div id=\"default$i\" class=\"selectionRowHeightSetter fileDefault\" onclick=\"".$onclick."\" style=\"padding:5px;padding-top:9px;cursor:pointer;\">
+					<span class=\"fileName$i\">".str_replace(".$ext", "<span style=\"color:grey;\">.$ext</span>", $F->A("FileName"))."</span>
+					
+				</div>
+				
+				
+				<div style=\"clear:both;\"></div>
+			</div>";
+			
+			$i++;
+		}
+		
+		$html .= "</form></div>".OnEvent::script("
+\$j('.selectionRow').draggable({
+	revert: true,
+	helper: function(v){
+		var newE = \$j(v.target).closest('.selectionRow').clone();
+		newE.css('width', '400px').css('opacity', '0.7').addClass('selectionRow');
+		newE.find('.iconic').remove();
+		return newE;
+	}/*,
+	start: function (event, ui) {
+		 \$j(ui.helper).css('margin-left', event.clientX - \$j(event.target).offset().left + 10);
+		 \$j(ui.helper).css('margin-top', event.clientY - \$j(event.target).offset().top + 10);
+	 }*/
+});
 
+\$j('.isFolder').droppable({
+	hoverClass: 'highlight',
+	accept: '.selectionRow',
+	tolerance: 'pointer',
+	drop: function(event, ui) {
+		var newE = ui.helper.clone();
+		ui.helper.remove();
+		".OnEvent::rme($this, "moveFile", array("\$j(ui.draggable).data('path')", "\$j(this).data('path')"), "function(){ 
+			\$j(ui.draggable).fadeOut(400, function(){ \$j(this).remove(); }); 
+			\$j('body').append(newE);
+			\$j(newE).fadeOut(400, function(){ \$j(this).remove(); }); 
+		}")."
+	}
+});
+");
+		
+		if(!$return)
+			echo $html;
+		else
+			return $html;
+	}
+	
+	#public function preview(){
+	#	echo "<iframe src=\"\"></iframe>";
+	#}
+	
+	public function makeDir($path, $dirName){
+		$F = new File(-1);
+		$F->loadMeOrEmpty();
+		
+		$F->changeA("FileDir", $path);
+		$F->changeA("FileIsDir", true);
+		$F->changeA("FileName", $dirName);
+		
+		$F->newMe();
+	}
+	
+	public function moveFile($fileName, $dirName){
+		if(strpos($fileName, realpath(FileStorage::getFilesDir())) !== 0)
+			Red::errorD ("$fileName nicht im erlaubten Pfad!");
+		
+		if(strpos($dirName, realpath(FileStorage::getFilesDir())) !== 0)
+			Red::errorD ("$dirName ist kein erlaubter Pfad Pfad!");
+		
+		$F = new File($fileName);
+		$F->moveToDir($dirName);
+	}
+	
+	private function pather($path){
+		return OnEvent::rme($this, "rightCol", "", "function(t){ \$j('#contentScreenRight').html(t.responseText); fitFrames(); }", "mFileGUI;path:".preg_replace("/^([A-Z]):/", "\\1%", str_replace('\\', "/", realpath($path))));
 	}
 
 	public function getUploadForm($path, $onSuccess = "contentManager.reloadFrame('contentRight');", $label = true, $tableStyle = null){
@@ -126,7 +362,7 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 	}
 	
 	private static $fieldDefaultFile;
-	public function getPopupManager($rootDir = null, $class = null, $classID = null, $usePool = false, $fieldDefaultFile = ""){
+	public function getPopupManager($rootDir = null, $class = null, $classID = null, $usePool = false, $fieldDefaultFile = "", $uploadTargetFilename = null){
 		if($rootDir != null){
 			$T = new HTMLTable(1);
 
@@ -135,13 +371,13 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 
 			$_SESSION["BPS"]->setProperty("mFileGUI", "path", $root);
 			$_SESSION["BPS"]->setProperty("mFileGUI", "root", $root);
-
+			
 			$F = new File($root);
 			$F->loadMe();
 
 			if($F->getA() == null){
 				if(is_writable(FileStorage::getFilesDir())){
-					mkdir($root);
+					mkdir($root, 0777, true);
 				}
 				else{
 					$B = new Button("", "stop");
@@ -217,7 +453,17 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 				echo OnEvent::script("window.setTimeout(function(){ if(\$j('#editDetailsmFileSidePanel').length > 0) return; ".OnEvent::popupSidePanel("mFile", -1, "sidePanelPool", array("'{$class}Pool'", "'$rootDir'"))."}, 100);");
 		}
 		
-		echo $this->getUploadForm($bps["path"], OnEvent::reloadPopup("mFile"), false).$gui->getBrowserHTML(-1).$oldFiles;
+		
+		$F = new HTMLForm("fileUpload", array("datei"));
+		$s = array("path" => $bps["path"], "class" => "File");
+		if($uploadTargetFilename != null)
+			$s["targetFilename"] = $uploadTargetFilename;
+		
+		$F->setType("datei", "file", null, $s);
+		$F->addJSEvent("datei", "onChange", OnEvent::reloadPopup("mFile"));
+		$F->getTable()->setColWidth(1, 120);
+		
+		echo "<p class=\"prettyTitle\">/".  basename($bps["path"])."</p><p style=\"color:grey;margin-top:-15px;margin-bottom:10px;\"><small>".dirname(realpath($bps["path"]))."</small></p>".$F.$gui->getBrowserHTML(-1).$oldFiles;
 	}
 	
 	public function copyFile($poolDir, $specificDir, $fileName){

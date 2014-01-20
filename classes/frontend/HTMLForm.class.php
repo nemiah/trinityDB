@@ -287,6 +287,13 @@ class HTMLForm {
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
 		$this->saveButtonSubmit = ($checkIfValid ? "if($('#$this->id').valid()) " : "")."CustomerPage.rme('handleForm', $('#$this->id').serialize(), $onSuccessFunction)";
 	}
+	
+	public function setSaveCustom($saveButtonLabel, $saveButtonBGIcon = null, $onClick = ""){
+		$this->saveMode = "rmeP";
+		$this->saveButtonLabel = $saveButtonLabel;
+		$this->saveButtonBGIcon = $saveButtonBGIcon;
+		$this->saveButtonSubmit = $onClick;
+	}
 
 	public function setSaveJSON($saveButtonLabel, $saveButtonBGIcon, $targetClass, $targetClassId, $targetMethod, $onSuccessFunction = null){
 		$this->saveMode = "rmeP";
@@ -327,7 +334,7 @@ class HTMLForm {
 		}
 		
 		if($onSuccessFunction != "" AND stripos($onSuccessFunction, "function(") === false)
-			$onSuccessFunction = "function(){ $onSuccessFunction }";
+			$onSuccessFunction = "function(transport){ $onSuccessFunction }";
 		
 		$values = "";
 		foreach($this->fields AS $f){
@@ -444,6 +451,10 @@ class HTMLForm {
 		$this->spaces[$fieldName] = $label;
 	}
 
+	public function getSpaces(){
+		return $this->spaces;
+	}
+	
 	public function insertLineAbove($fieldName, $label = ""){
 		$this->spaceLines[$fieldName] = $label;
 	}
@@ -508,6 +519,10 @@ class HTMLForm {
 		return $Input;
 	}
 
+	public function getLabels(){
+		return $this->labels;
+	}
+	
 	private function getCustomButton($v, $Input){
 		$B = "";
 		if(!isset($this->types[$v]) OR $this->types[$v] != "parser"){

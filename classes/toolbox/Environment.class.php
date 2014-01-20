@@ -131,6 +131,10 @@ class Environment {
 		return $return;
 	}
 
+	public static function reset(){
+		Environment::$currentEnvironment = null;
+	}
+	
 	public static function load(){
 		if(Environment::$currentEnvironment != null) return;
 

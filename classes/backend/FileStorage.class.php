@@ -72,8 +72,10 @@ class FileStorage {
 		else {
 			$A = $F->newAttributes();
 
+			$ex = explode(DIRECTORY_SEPARATOR, $file);
+			
 			$A->FileDir = dirname(realpath($file));
-			$A->FileName = basename($file);
+			$A->FileName = $ex[count($ex) - 1];
 			$A->FileIsDir = $isDir;
 			$A->FileSize = filesize($file);
 			if(is_readable($file) AND $isDir == "0" AND function_exists("mime_content_type")) $A->FileMimetype = mime_content_type($file);
@@ -120,9 +122,13 @@ class FileStorage {
 		$dirs = array();
 		$files = array();
 		
-		$fp = opendir($dir);
-		while(($file = readdir($fp)) !== false) {
-			#if($file == ".") continue;
+		$dirIt = new DirectoryIterator($dir);
+		foreach ($dirIt as $fileObj) {
+			if($fileObj->isDot())
+				continue;
+			
+			$file = $fileObj->getFilename();
+			
 			if(strpos(basename($file), "NewsletterID") === 0)
 				continue;
 
@@ -153,6 +159,9 @@ class FileStorage {
 			if(strpos(basename($file), "NewsletterEmbID") === 0)
 				continue;
 
+			if(strpos(basename($file), "EingangsbelegID") === 0)
+				continue;
+
 			if(strpos(basename($file), "ArtikelID") === 0)
 				continue;
 
@@ -168,10 +177,17 @@ class FileStorage {
 			if(strpos(basename($file), ".lock") !== false)
 				continue;
 
-			if(is_dir($dir.$file)) $dirs[] = $dir.$file;
-			else $files[] = $dir.$file;
+			if($fileObj->isDir())
+				$dirs[] = $dir.$file;
+			else 
+				$files[] = $dir.$file;
 		}
-		closedir($fp);
+		
+		#$fp = opendir($dir);
+		#while(($file = readdir($fp)) !== false) {
+			#if($file == ".") continue;
+		#}
+		#closedir($fp);
 		if($this->affectedRowsOnly) {
 			$this->affectedRowsOnly = false;
 			return count($dirs) + count($files);
@@ -194,6 +210,7 @@ class FileStorage {
 			
 			$collector[] = $this->getFileClass($dirs[$i], 1);
 		}
+		
 		for($i = 0;$i < count($files); $i++){
 			$c++;
 			if($c < $start+1) continue;
@@ -201,6 +218,9 @@ class FileStorage {
 			
 			$collector[] = $this->getFileClass($files[$i], 0);
 		}
+		#echo "<pre>";
+		#print_r($collector);
+		#echo "</pre>";
 		return $collector;
 	}
 	

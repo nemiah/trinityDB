@@ -393,7 +393,7 @@ class HTMLGUIX {
 			$this->addToEvent("onSave", "/*ADD*/ contentManager.reloadFrame('contentLeft'); Popup.close('m".$this->object->getClearClass("GUI")."', 'edit');");
 
 		if($DM == "popup" AND $this->object instanceof Collection)
-			$this->addToEvent("onDelete", "Popup.refresh('".$this->object->getClearClass()."');");
+			$this->addToEvent("onDelete", "Popup.refresh('".$this->object->getClearClass()."'); /*ADD*/");
 
 		return $this->displayMode;
 	}
@@ -688,7 +688,7 @@ class HTMLGUIX {
 			if($this->showPageFlip)
 				$GUIF->buildFlipPageLine("top");
 
-			if($this->object->isFiltered()) $GUIF->buildFilteredWarningLine();
+			if($this->object->isFiltered()) $GUIF->buildFilteredWarningLine($this->object->isFilteredLabel());
 
 			$GUIF->buildNewEntryLine(($this->name == null ? $this->className : $this->name)." neu anlegen");
 		}
@@ -731,7 +731,7 @@ class HTMLGUIX {
 		}
 
 		if($lineWithId == -1) {
-			if($this->object->isFiltered()) $GUIF->buildFilteredWarningLine();
+			if($this->object->isFiltered()) $GUIF->buildFilteredWarningLine($this->object->isFilteredLabel());
 
 			if($this->multiPageDetails["total"] > $this->multiPageDetails["perPage"] AND $this->showPageFlip)
 				$GUIF->buildFlipPageLine("bottom");

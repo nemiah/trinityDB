@@ -80,8 +80,8 @@ class FileGUI extends File implements iGUIHTML2 {
 				$B->customSelect("contentRight", $this->getID(), "mFile", "pFile.move");
 			}
 			
-			$B = $gui->addSideButton("Umbenennen", "./plugins/Files/rename.png");
-			$B->popup("", "Datei umbenennen", "File", $this->getID(), "popupRename");
+			#$B = $gui->addSideButton("Umbenennen", "./plugins/Files/rename.png");
+			#$B->popup("", "Datei umbenennen", "File", $this->getID(), "popupRename");
 		}
 		
 		$gui->optionsEdit(false, false);
@@ -105,14 +105,14 @@ class FileGUI extends File implements iGUIHTML2 {
 		else
 			echo $pr;
 	}
-
+/*
 	public function popupRename(){
 		$F = new HTMLForm("newFileName", array("dateiName"));
 		$F->setLabel("dateiName", "Neuer Name");
 		$F->setSaveRMEPCR("Datei umbenennen", "./images/i2/save.gif", "File", $this->getID(), "rename", "function(transport) { contentManager.loadFrame('contentLeft', 'File', transport.responseText, 0); Popup.close('File', 'edit'); contentManager.reloadFrame('contentRight'); }");
 
 		echo $F;
-	}
+	}*/
 
 	public function rename($newName){
 		try {
@@ -122,34 +122,49 @@ class FileGUI extends File implements iGUIHTML2 {
 		}
 
 		if($result === false)
-			echo $this->getID();
+			$r = basename($this->getID());
 		else
-			echo $result;
+			$r = basename($result);
+		
+		$ext = Util::ext($r);
+		
+		echo str_replace(".$ext", "<span style=\"color:grey;\">.$ext</span>", $r);
 	}
 	
 	public function previewWindow(){
-		$this->loadMe();
-		$relPath = $this->getRelPath();
+		#echo $this->getID();
+		#$relPath = $this->getRelPath();
+		#echo $this->A("FileMimetype");
+		$BD = new Button("Datei\nherunterladen", "save");
+		$BD->style("margin:10px;float:right;");
+		$BD->windowRme("File", $this->getID(), "download");
+		$BD->onclick("".OnEvent::closePopup("File"));
 		
 		$display = "";
-		if($this->A->FileIsDir == "0")
-			switch($this->A->FileMimetype){
+		if($this->A("FileIsDir") == "0")
+			switch($this->A("FileMimetype")){
 				case "image/jpeg":
 				case "image/png":
-					
-					$display .= "<img src=\".".$relPath."\" />";
+				case "image/gif":
+				case "image/svg":
+				case "image/svg+xml":
+					$display .= "$BD<div style=\"clear:both;width:600px;max-height:450px;overflow:auto;\"><img style=\"margin:10px;max-width:560px;\" src=\"data:".$this->A("FileMimetype").";base64,".base64_encode(file_get_contents($this->getID()))."\" /></div>";
 				break;
 				case "text/plain":
 				case "text/x-php":
-					$display = "<body><p>".highlight_file($this->ID,true)."</p></body>";
+				case "text/x-c++":
+					$display = "$BD<div style=\"clear:both;width:600px;max-height:450px;overflow:auto;\"><p>".highlight_file($this->ID,true)."</p></div>";
 				break;
 				case "application/pdf":
-					$display = "<script>document.location='.".$relPath."';</script>";
+					$display = "<script type=\"text/javascript\">".OnEvent::window($this, "previewPDF").OnEvent::closePopup("File")."</script>";
 				break;
+				default:
+					$display = "<div  class=\"highlight\">$BD<p style=\"padding-top:10px;\">Es steht leider keine Vorschau<br />für diesen Dateityp zur Verfügung.</p><div style=\"clear:both;\"></div>";
 			}
 		else
 			$display = "Verzeichnis";
-		echo "<html>".$display."</html>";
+		
+		echo $display;
 	}
 
 	public static function sizeParser($w){
@@ -161,8 +176,13 @@ class FileGUI extends File implements iGUIHTML2 {
 	}
 
 	public function previewPDF(){
-		$this->loadMe();
-		echo "<html><script>document.location='.".$this->getRelPath()."';</script></html>";
+		if(strpos($this->getID(), realpath(FileStorage::getFilesDir())) === false)
+			return;
+		
+		header('Content-Type: application/pdf');
+		header('Content-Length: ' . filesize($this->getID()));
+		header('Content-disposition: inline; filename="' . basename($this->getID()) . '"');
+		readfile($this->getID());
 	}
 }
 ?>

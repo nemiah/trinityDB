@@ -36,7 +36,7 @@
 	var defaults = {
 		interval: 250,
 		force_process: false
-	}
+	};
 	var $window = $(window);
 
 	var $prior_appeared;
@@ -79,7 +79,7 @@
 		} else {
 			return false;
 		}
-	}
+	};
 
 	$.fn.extend({
 		// watching for element's appearance in browser viewport
@@ -133,6 +133,38 @@ d.extend(true,d,{support:{rgba:m()}});var k=["color","backgroundColor","borderBo
 b.run=function(h){d.each(e,function(f,l){a[l]=j(c[l],i,h)})}}}})(jQuery);
 */
 
+(function($) {
+	$.fn.extend({
+		insertAtCaret: function(myValue){
+			var obj;
+			if( typeof this[0].name !='undefined' ) obj = this[0];
+			else obj = this;
+
+			/*if ($.browser.msie) {
+				obj.focus();
+				sel = document.selection.createRange();
+				sel.text = myValue;
+				obj.focus();
+			}
+			else if ($.browser.mozilla || $.browser.webkit) {*/
+				var startPos = obj.selectionStart;
+				var endPos = obj.selectionEnd;
+				var scrollTop = obj.scrollTop;
+				obj.value = obj.value.substring(0, startPos)+myValue+obj.value.substring(endPos,obj.value.length);
+				obj.focus();
+				obj.selectionStart = startPos + myValue.length;
+				obj.selectionEnd = startPos + myValue.length;
+				obj.scrollTop = scrollTop;
+			/*} else {
+				obj.value += myValue;
+				obj.focus();
+			}*/
+		}
+	});
+})(jQuery);
+
+
+
 var $j = jQuery.noConflict();
 
 jQuery(function($j){
@@ -164,7 +196,7 @@ var P2J = {
 		
 		return element;
 	}
-}
+};
 
 String.prototype.makeHTML = function() {
 	if(this.substr(0, 3) == '<p ' || this.substr(0, 3) == '<p>')
@@ -174,7 +206,7 @@ String.prototype.makeHTML = function() {
 		return "<p><br /></p>";
 	
     return "<p>"+this.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2')+"</p>";
-}
+};
 
 function $(something){
 	var E = document.getElementById(something);
@@ -186,7 +218,7 @@ function $(something){
 		E.update = function(content){
 			//alert(something);
 			$j(document.getElementById(something)).html(content);
-		}
+		};
 	
 	return E;
 }
@@ -211,13 +243,13 @@ var Ajax = {
 		var counter = Ajax.counter;
 		var start;
 		$j.ajax({
-			url: anurl+(Ajax.physion != "default" ? "&physion="+Ajax.physion : ""), 
+			url: anurl+(Ajax.physion != "default" ? (anurl.indexOf("?") > -1 ? "&": "?")+"physion="+Ajax.physion : ""), 
 			beforeSend: function(){
 				start = new Date().getTime();
 			},
 					
 			success: function(transport, textStatus, request){
-				var duration = (new Date().getTime() - start) ;
+				var duration = (new Date().getTime() - start);
 				if(window.console && request.getResponseHeader('X-Timers')){
 					var obj = jQuery.parseJSON(request.getResponseHeader('X-Timers'));
 					console.log(counter+": Timers");
@@ -238,7 +270,7 @@ var Ajax = {
 				
 				var t = {
 					responseText: transport
-				}
+				};
 				options.onSuccess(t, textStatus, request); 
 			},
 			type: options.method ? options.method : "GET",
@@ -249,16 +281,16 @@ var Ajax = {
 	
 	Responders: {
 		register: function(options){
-			$j(document).ajaxStart(options.onCreate)
-			$j(document).ajaxSuccess(options.onComplete)
-			$j(document).ajaxError(options.onFailure)
+			$j(document).ajaxStart(options.onCreate);
+			$j(document).ajaxSuccess(options.onComplete);
+			$j(document).ajaxError(options.onFailure);
 		}
 	},
 	
 	Updater: function(){
 		alert("Ajax.Updater is no longer supported!");
 	}
-}
+};
 
 function Draggable(element, options) {
 	if(typeof options == "undefined") options = {};
@@ -321,21 +353,21 @@ var Effect = {
 	Highlight: function (element, options){
 		$j(P2J.make$(element)).effect("highlight", {}, 1000);
 	}
-}
+};
 
 var Sortable = {
 	create: function(element, options){
 		var cw = false;
-		if(options && options.containment && typeof options.containment == 'string'){
+		if(options && options.containment && typeof options.containment == 'string')
 			cw = options.containment;
-		}
+		
 		
 		if(options && options.containment && typeof options.containment != 'string'){
 			for(i = 0; i < options.containment.length; i++){
 				if(options.containment[i] == element)
 					continue;
 				
-				cw = $j(P2J.make$(options.containment[i]))
+				cw = $j(P2J.make$(options.containment[i]));
 			}
 		}
 
@@ -359,7 +391,7 @@ var Sortable = {
 		
 		return serial.replace(/&/g,";").replace(/\[\]\=/g,"");
 	}
-}
+};
 
 var Event = {
 	observe: function(element, action, call){
@@ -379,7 +411,7 @@ var Event = {
 			$j(P2J.make$(element)).resize(call);
 		
 	}
-}
+};
 
 var Builder = {
 	node: function(elementName, attributes, children){
@@ -393,7 +425,7 @@ var Builder = {
 		
 		return E;
 	}
-}
+};
 
 var qTipSharedRed = {
 	position: {
@@ -413,13 +445,13 @@ var qTipSharedRed = {
 	style: {
 		classes: 'ui-tooltip-shadow ui-tooltip-red ui-tooltip-rounded ui-tooltip-text'
 	}
-}
+};
 
 var qTipSharedYellow = $j.extend({}, qTipSharedRed, {
 	style: {
 		classes: 'ui-tooltip-rounded ui-tooltip-shadow'
 	}
-})
+});
 
 	
 /*$j("#container").hammer().on("touch dragdown release", function(){
@@ -446,7 +478,7 @@ if(Modernizr.touch && useTouch == null){
 			resizable: false
 		});
 	});
-}
+};
 
 
 var Touch = {
@@ -462,24 +494,36 @@ var Touch = {
 	hook: function(){
 		var currentHTMLMethod = jQuery.fn.html;
 		jQuery.fn.html = function(){
-			currentHTMLMethod.apply(this, arguments);
+			var r = currentHTMLMethod.apply(this, arguments);
 			Touch.make();
-		}
+		
+			Aspect.joinPoint("after", "jQuery.html", arguments);
+			return r;
+		};
 		
 		var currentPrependMethod = jQuery.fn.prepend;
 		jQuery.fn.prepend = function(){
-			currentPrependMethod.apply(this, arguments);
+			var r = currentPrependMethod.apply(this, arguments);
 			Touch.make();
-		}
+		
+			Aspect.joinPoint("after", "jQuery.prepend", arguments);
+			return r;
+		};
 		
 		var currentAppendMethod = jQuery.fn.append;
 		jQuery.fn.append = function(){
-			currentAppendMethod.apply(this, arguments);
+			var r = currentAppendMethod.apply(this, arguments);
 			Touch.make();
-		}
+			
+			Aspect.joinPoint("after", "jQuery.append", arguments);
+			return r;
+		};
 	},
 			
 	make: function(){
+		if(!Touch.use)
+			return;
+		
 		$j("[onclick]").each(function(k, e){
 			$j(e).attr("ontouchend", $j(e).attr("onclick")).removeAttr("onclick");
 		});
@@ -489,10 +533,11 @@ var Touch = {
 			//$j(this).attr("ontouchend", $j(this).attr("onclick")).removeAttr("onclick");
 		});*/
 	}
-}
+};
+
+Touch.hook(); //yes, always
 
 if(useTouch){
-	Touch.hook();
 	Touch.use = true;
 	Touch.trigger = "touchend";
 	
@@ -526,6 +571,9 @@ if(useTouch){
 	});
 }
 Touch.propagateCSS();
+
+Touchy.jQuery = $j;
+Touchy.trigger = Touch.trigger;
 
 $j(function(){
 	if(Modernizr.touch || useTouch != null){
@@ -627,4 +675,4 @@ $j(document).on('mouseover', '.bigButton', function(event) {
 		}
 		
 	}, event);
-})
+});

@@ -37,10 +37,20 @@ var Popup = {
 			targetPluginMethodParameters = new Array();
 		
 		var arrayCopy = targetPluginMethodParameters.slice(0, targetPluginMethodParameters.length); //because targetPluginMethodParameters is only a reference
-		 
-		contentManager.rmePCR(targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters, 'Popup.displayNamed(\''+name+'\', \''+title+'\', transport, \''+targetPlugin+'\''+(typeof options != "undefined" ? ", "+options : "")+');', bps);
+		
+		eval("Popup.displayNamed('"+name+"', '"+title+"', { responseText: '' }, '"+targetPlugin+"', "+(typeof options == "undefined" ? "{}" : options)+");");
+		
+		Popup.loading(targetPlugin, name);
+		
+		contentManager.rmePCR(targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters, function(transport){
+			Popup.update(transport, targetPlugin, name);
+		}, bps);
 		 
 		Popup.lastPopups[targetPlugin] = [title, targetPlugin, targetPluginID, targetPluginMethod, arrayCopy, null];
+	},
+
+	loading: function(targetPlugin, name){
+		Popup.update({ responseText: "<p style=\"color:grey;\"><img src=\"./images/loading.svg\" style=\"height:32px;width:32px;float:left;margin-right:10px;\" />Die Daten<br />werden geladen...</p>" }, targetPlugin, name);
 	},
 
 	refresh: function(targetPlugin, bps, firstParameter){
@@ -100,7 +110,8 @@ var Popup = {
 		Popup.lastSidePanels[targetPlugin] = [targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters.slice(0, targetPluginMethodParameters.length)];
 		
 		contentManager.rmePCR(targetPlugin, targetPluginID, targetPluginMethod, targetPluginMethodParameters, function(transport){
-			$j('#'+targetPluginContainer+'SidePanel').html(transport.responseText).fadeIn();
+			$j('#'+targetPluginContainer+'SidePanel').html(transport.responseText);
+			$j('#'+targetPluginContainer+'SidePanel').fadeIn();
 		});
 	},
 
@@ -299,13 +310,21 @@ var Popup = {
 		if(!checkResponse(transport)) return;
 
 		$(type+'DetailsContent'+ID).update(transport.responseText);
+		if($j("#"+type+'Details'+ID).outerHeight() > $j(window).height()){
+			$j("#"+type+'Details'+ID).css("top", 10);
+			//console.log($j(window).height());
+			//console.log($j("#"+type+'Details'+ID).offset().top);
+			$j("#"+type+'DetailsContent'+ID).css("max-height", $j(window).height() - 25 - 20).css("overflow", "auto");
+		}
+			
 		Popup.show(ID, type);
 		//Popup.windowsOpen++;
 	},
 
 	show: function(ID, type){
-		if($(type+'Details'+ID).style.display == "none")
-			new Effect.Appear(type+'Details'+ID,{duration: 0.4});
+		$j('#'+type+'Details'+ID).fadeIn();
+		//if($(type+'Details'+ID).style.display == "none")
+		//	new Effect.Appear(type+'Details'+ID,{duration: 0.4});
 	},
 	
 	closeNonPersistent: function(){
