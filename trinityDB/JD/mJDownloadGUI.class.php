@@ -28,7 +28,8 @@ class mJDownloadGUI extends anyC implements iGUIHTMLMP2 {
 
 		$gui = new HTMLGUIX($this);
 		$gui->version("mJD");
-
+		$gui->screenHeight();
+		
 		$gui->name("JDownload");
 		
 		$gui->attributes(array("JDownloadDate", "JDownloadRenameto"));

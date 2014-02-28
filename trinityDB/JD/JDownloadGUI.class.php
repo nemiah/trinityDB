@@ -31,6 +31,8 @@ class JDownloadGUI extends JDownload implements iGUIHTML2 {
 		$gui = new HTMLGUIX($this);
 		$gui->name("JDownload");
 	
+		$gui->parser("JDownloadURL", "parserURL");
+		$gui->parser("JDownloadFilename", "parserFilename");
 		$gui->parser("JDownloadFilesize", "parserSize");
 		$gui->parser("JDownloadSerieID", "parserSerie");
 		$gui->parser("JDownloadJDID", "parserJD");
@@ -43,6 +45,14 @@ class JDownloadGUI extends JDownload implements iGUIHTML2 {
 
 		$gui->optionsEdit(false, false);
 		return $gui->getEditHTML();
+	}
+	
+	public static function parserFilename($w){
+		return "<span style=\"display:block;width:100%;word-break:break-all;\">$w</span>";
+	}
+	
+	public static function parserURL($w){
+		return "<small>$w</small>";
 	}
 	
 	public static function parserJD($w){
