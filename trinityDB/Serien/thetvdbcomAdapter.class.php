@@ -71,17 +71,17 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 	}
 
 	public function download(Serie $S, $echo = false){
-		if($echo) $tab = new HTMLTable(1);
+		$tab = new HTMLTable(1);
 
 		$mirrorPath = $this->getMirror();
-		if($echo) $tab->addRow("Retrieving mirror list... using $mirrorPath");
+		$tab->addRow("Retrieving mirror list... using $mirrorPath");
 
 		$serverTime = $this->getServerTime();
-		if($echo) $tab->addRow("Retrieving server time... $serverTime");
+		$tab->addRow("Retrieving server time... $serverTime");
 		$S->changeA("lastupdate", $serverTime);
-		
+
 		if($S->A("siteID") == 0){
-			if($echo) $tab->addRow("Retrieving series information...");
+			$tab->addRow("Retrieving series information...");
 			
 			$data = file_get_contents("$mirrorPath/api/GetSeries.php?seriesname=".urlencode($S->A("name"))."&language=".$S->A("sprache"));
 			if($data === false)
@@ -97,22 +97,27 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 
 		$tempFile = Util::getTempFilename("SerieID".$S->getID(), "zip");
 
-		if($echo) $tab->addRow("Downloading episodes information...");
+		$tab->addRow("Downloading episodes information...");
 		$SZip = "$mirrorPath/api/$this->apiKey/series/$seriesID/all/".$S->A("sprache").".zip";
 		if(!copy($SZip, $tempFile))
 			Red::errorD("The download of $SZip failed!");
-
+		
 		try {
-			$zip = new ZipArchive;
+			$zip = new ZipArchive();
 			if ($zip->open($tempFile) === TRUE) {
 				$zip->extractTo(dirname($tempFile)."/SerieID".$S->getID());
 				$zip->close();
+				$tab->addRow("Extracting data...");
 			} else
 				throw new ClassNotFoundException("");
 		} catch (ClassNotFoundException $e){
-			if(!Util::isWindowsHost()) $commandUnzip = "unzip -o $tempFile -d SerieID".$S->getID();
-			else $commandUnzip = Util::getRootPath ()."trinityDB/Serien/unzip.exe -o $tempFile -d SerieID".$S->getID();
-			if($echo) $tab->addRow("Extracting data...<br />$commandUnzip");
+			if(!Util::isWindowsHost())
+				$commandUnzip = "unzip -o $tempFile -d SerieID".$S->getID();
+			else
+				$commandUnzip = Util::getRootPath ()."trinityDB/Serien/unzip.exe -o $tempFile -d SerieID".$S->getID();
+			
+			
+				$tab->addRow("Extracting data...<br />$commandUnzip");
 			$sc = new SystemCommand();
 			$sc->setCommand("cd ".dirname($tempFile)." && $commandUnzip");
 			$sc->execute();
@@ -174,8 +179,8 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 		}
 
 
-		if($echo) $tab->addRow("Loaded $e episodes");
-		if($echo) $tab->addRow("Updated $u episodes");
+		$tab->addRow("Loaded $e episodes");
+		$tab->addRow("Updated $u episodes");
 
 		if(mUserdata::getGlobalSettingValue("trinityDBdlCover", "0") == "1"){
 			$bannerList = new SimpleXMLElement(dirname($tempFile)."/SerieID".$S->getID()."/banners.xml", null, true);
@@ -194,8 +199,9 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 					#$S->saveMe();
 					unlink($temp);
 					
-					if($echo)
-						$tab->addRow("Downloaded cover");
+					
+					$tab->addRow("Downloaded cover");
+					
 					break;
 				}
 			}
