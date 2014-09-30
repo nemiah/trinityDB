@@ -86,12 +86,22 @@ class JD extends PersistentObject {
 			$C = new $C();
 			$link = $C->parse($link, $this->A("JDLinkParserUser"), $this->A("JDLinkParserPassword"));
 		}
+			
 		
 		if($this->A("JDDLType") == "4"){
+			if($logFilename == ""){
+				$info = get_headers($link, 1);
+				if($info !== false){
+					preg_match("/filename=\"(.*)\"/ismU", $info["Content-Disposition"], $matches);
+					if(isset($matches[1]))
+						$logFilename = $matches[1];
+				}
+			}
+		
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
 			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie);
-			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".  str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
+			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
 			return true;

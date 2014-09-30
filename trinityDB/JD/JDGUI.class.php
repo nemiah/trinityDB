@@ -77,14 +77,28 @@ class JDGUI extends JD implements iGUIHTML2 {
 	
 	public function testDownloadPopup(){
 		$F = new HTMLForm("tdl", array("link"));
+		$F->setType("link", "textarea");
 		$F->getTable()->setColWidth(1, 60);
 		$F->setSaveRMEPCR("test download", "", "JD", $this->getID(), "testDownload", "function(t){ \$j('#downloadResult').html(t.responseText); }");
+		
+		$F->setInputStyle("link", "font-size:10px;height:200px;");
 		
 		echo $F."<pre style=\"padding:5px;\" id=\"downloadResult\"></pre>";
 	}
 	
 	public function testDownload($link){
-		echo $this->download($link);
+		if(trim($link) == "")
+			return;
+		
+		$ex = explode("\n", trim($link));
+		
+		echo "<div style=\"overflow:auto;max-height:400px;\">";
+		
+		foreach($ex AS $l)
+			echo $l.": ".($this->download($l) ? "OK" : "FEHLER")."<br>";
+		
+		echo "</div>";
+		
 	}
 }
 ?>

@@ -60,7 +60,7 @@ class mIncoming extends anyC {
 				
 				if(file_exists($dir."/$filename")){
 					$found = true;
-					$newName = Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")).".$ext");
+					$newName = Util::makeFilename(str_replace(" ", ".", $D->A("JDownloadRenameto")).($ext != "" ? ".$ext" : ""));
 					if(file_exists($dir."/".$newName)){
 						if($output)
 							echo "<p>$filename: $newName ALREADY EXISTS!</p>";
