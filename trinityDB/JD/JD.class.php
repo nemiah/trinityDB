@@ -100,8 +100,8 @@ class JD extends PersistentObject {
 		
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
-			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie);
-			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($linkOld)." $link");
+			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie, true);
+			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".basename($logFilename)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);
 			return true;
@@ -161,13 +161,15 @@ class JD extends PersistentObject {
 		}
 	}
 
-	private function logDownload($logLink, $link, $fileName = "", $fileSize = 0, Serie $Serie = null){
+	private function logDownload($logLink, $link, $fileName = "", $fileSize = 0, Serie $Serie = null, $renamed = false){
 		$F = new Factory("JDownload");
 		$F->sA("JDownloadURL", $logLink);
 		$F->sA("JDownloadFilename", $link);
 		$F->sA("JDownloadRenameto", $fileName);
 		$F->sA("JDownloadJDID", $this->getID());
 		$F->sA("JDownloadSerieID", $Serie != null ? $Serie->getID() : 0);
+		if($renamed)
+			$F->sA("JDownloadRenamed", time());
 		
 		$E = $F->exists(true);
 		if($E === false){
