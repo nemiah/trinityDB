@@ -98,6 +98,9 @@ class JD extends PersistentObject {
 				}
 			}
 		
+			if($logFilename == "")
+				$logFilename = basename($link);
+			
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
 			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie, true);
