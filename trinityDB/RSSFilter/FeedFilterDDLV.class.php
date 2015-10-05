@@ -18,10 +18,10 @@
  *  2010, trinityDB - https://sourceforge.net/p/opentrinitydb/
  */
 
-class FeedFilter1DDL implements iFeedFilter {
-
+class FeedFilterDDLV implements iFeedFilter {
+	private static $links = array();
 	public function getLabel() {
-		return "wrzko.com";
+		return "ddlvalley.cool";
 	}
 
 	public function filterFilename(Serie $Series, SimpleXMLElement $item) {
@@ -47,7 +47,11 @@ class FeedFilter1DDL implements iFeedFilter {
 
 		$FE->language = "en";
 
-
+		self::$links[$item->link.""] = array();
+		foreach($item->enclosure AS $link)
+			self::$links[$item->link.""][] = $link->attributes()->url."";
+		#debug_print_backtrace();
+		#print_r($FE->links);
 		preg_match("/s([0-9]+)e([0-9]+)/i", $title, $matches);
 
 		$FE->name = trim(str_replace(".", " ", substr($title, 0, strpos($title, $matches[0]))));
@@ -67,15 +71,21 @@ class FeedFilter1DDL implements iFeedFilter {
 		$available = $RSF->getAvailableHosts();
 
 		$hosts = array();
-		if($RSF->A("RSSFilterProviderRapidshare") == "1" AND in_array("Rapidshare.com", $available)) $hosts["Rapidshare.com"] = "Rapidshare";
-		if($RSF->A("RSSFilterProviderNetload") == "1" AND in_array("Netload", $available)) $hosts["Netload.com"] = "Netload";
-		if($RSF->A("RSSFilterProviderUploaded") == "1" AND in_array("Uploaded", $available)) $hosts["Uploaded.to"] = "Uploaded";
+		#if($RSF->A("RSSFilterProviderRapidshare") == "1" AND in_array("Rapidshare.com", $available)) $hosts["Rapidshare.com"] = "Rapidshare";
+		#if($RSF->A("RSSFilterProviderNetload") == "1" AND in_array("Netload", $available)) $hosts["Netload.com"] = "netload";
+		if($RSF->A("RSSFilterProviderUploaded") == "1" AND in_array("Uploaded", $available)) $hosts["Uploaded.to"] = "uploaded";
 
 		return $hosts;
 	}
 
 	public function download(RSSFilter $RSF, $filename, $page, $targetFileName, Serie $Serie){
-        $ch = curl_init();
+		#s$args = func_get_args();
+		#print_r($args);
+		#print_r(self::$links[$page]);
+		#die();
+		#return false;
+	
+        /*$ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $page);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_ENCODING , "gzip");
@@ -116,25 +126,37 @@ class FeedFilter1DDL implements iFeedFilter {
 		
 		if(count($matches) != 3 OR !isset($matches[1][0]))
 			return array("I could not find any suitable links, please try again", "");
-
+*/
+		
 		$usableHosts = $this->getAvailableHosts($RSF);
 
 		if(count($usableHosts) == 0)
 			return array("You did not select any hosts to download from", "");
 
-		$JD = new JD($RSF->A("RSSFilterJDID"));
 		
 
-		$dl = array();
-		foreach($matches[1] AS $k => $host){
-			$host = ucfirst(strtolower($host));
-			if(!in_array($host, $usableHosts) OR isset($dl[$host]))
+		$JD = new JD($RSF->A("RSSFilterJDID"));
+		foreach(self::$links[$page] AS $link){
+			$url = parse_url($link);
+			#print_r($url);
+			#echo $link."\n";
+			$found = false;
+			foreach($usableHosts AS $host){
+				if(stripos($url["host"], $host) === false)
+					continue;
+				#echo Serie::determineQuality($link);
+				#echo $Serie->A("quality");
+				if(Serie::determineQuality($link) != SerieGUI::getQualities($Serie->A("quality")))
+					continue;
+				
+				$found = $link;
+			}
+			
+			if(!$found)
 				continue;
-
-			$DLFrom = $matches[2][$k];
-			$JD->download($DLFrom, $filename, $targetFileName, $Serie);
-			#echo $matches[2][$k];
-			$dl[$host] = true;
+			
+			$JD->download($link, $filename, $targetFileName, $Serie);
+			break;
 		}
 
 		return true;
