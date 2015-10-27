@@ -23,6 +23,27 @@ class CCSerien implements iCustomContent {
 		addClassPath(Util::getRootPath()."trinityDB/JD");
 	}
 	
+	function getScript(){
+		return "var g = {
+	sameHeight: function(element){
+		g.doSameHeight(element);
+		
+		$(window).resize(function(){ g.doSameHeight(element); });
+	},
+	
+	doSameHeight: function(element){
+		var maxHeight = 0;
+		$(element).css('height', '');
+		$(element).each(function(k, v){
+			if($(v).outerHeight() > maxHeight)
+				maxHeight = $(v).outerHeight();
+		});
+		$(element).css('height', maxHeight);
+	}
+	
+};";
+	}
+	
 	function getLabel(){
 		return "Serien";
 	}
@@ -76,7 +97,35 @@ class CCSerien implements iCustomContent {
 	}
 	
 	function newEpisodes(){
-		$html = "<h1>Neue Folgen</h1>";
+		$html = "<h1>Demnächst</h1>";
+		
+		$AC = anyC::get("Folge");
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", ">=", time());
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "<=", (time() + 3600 * 24 * 7));
+		$AC->addAssocV3("RSSFilterID", ">", "0");
+		$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
+		$AC->addOrderV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "ASC");
+		
+		$i = 0;
+		$lastAD = null;
+		while($S = $AC->getNextEntry()){
+			if($lastAD != $S->A("airDate")){
+				if($lastAD !== null)
+					$html .= "</div>";
+				
+				$date = strtotime($S->A("airDate"));
+				
+				$html .= "<div class=\"comingUp\" style=\"box-sizing:border-box;".($i % 2 == 0 ? "background-color: #F2F2F2;" : "")."padding:10px;display:inline-block;width:calc(100% / 7);vertical-align:top;\"><h2 style=\"margin-top:0;padding-top:0;\">".Util::CLDateParser($date)."</h2>";
+				
+				$i++;
+			}
+			$html .= $S->A("name")." <span style=\"color:grey;\">S".($S->A("season") < 10 ? "0" : "").$S->A("season")."E".($S->A("episode") < 10 ? "0" : "").$S->A("episode")."</span><br>";
+			
+			$lastAD = $S->A("airDate");
+		}
+		$html .= "</div>".OnEvent::script("g.sameHeight('.comingUp');");
+		
+		$html .= "<h1>Neue Folgen</h1>";
 		
 		$AC = anyC::get("JDownload");
 		$AC->addAssocV3("JDownloadDate", ">", time() - 3600 * 24 * 7);
