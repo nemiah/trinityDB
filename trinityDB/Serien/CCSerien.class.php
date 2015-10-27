@@ -115,7 +115,7 @@ class CCSerien implements iCustomContent {
 				
 				$date = strtotime($S->A("airDate"));
 				
-				$html .= "<div class=\"comingUp\" style=\"box-sizing:border-box;".($i % 2 == 0 ? "background-color: #F2F2F2;" : "")."padding:10px;display:inline-block;width:calc(100% / 7);vertical-align:top;\"><h2 style=\"margin-top:0;padding-top:0;\">".Util::CLDateParser($date)."</h2>";
+				$html .= "<div class=\"comingUp\" style=\"box-sizing:border-box;".($i % 2 == 0 ? "background-color: #F2F2F2;" : "")."padding:10px;display:inline-block;width:calc(100% / 7);vertical-align:top;\"><h2 style=\"margin-top:0;padding-top:0;\">".  mb_substr(Util::CLWeekdayName(date("w", $date)), 0, 2).", ".Util::CLDateParser($date)."</h2>";
 				
 				$i++;
 			}
