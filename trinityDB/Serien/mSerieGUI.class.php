@@ -127,8 +127,8 @@ class mSerieGUI extends anyC implements iGUIHTMLMP2, iCategoryFilter {
 		$K = new Kalender();
 
 		$AC = anyC::get("Folge");
-		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", ">=", $firstDay);
-		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "<=", $lastDay);
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d')) + 120", ">=", $firstDay);
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d'))", "<=", $lastDay);
 		$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
 		#$AC->addAssocV3("type", "=", "default");
 		#$AC->addAssocV3("AuftragID", "=", "-1");

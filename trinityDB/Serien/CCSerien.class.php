@@ -100,8 +100,8 @@ class CCSerien implements iCustomContent {
 		$html = "<h1>Demnächst</h1>";
 		
 		$AC = anyC::get("Folge");
-		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", ">=", time());
-		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "<=", (time() + 3600 * 24 * 7));
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d')) + 120", ">=", mktime(0, 0, 1));
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d'))", "<=", (time() + 3600 * 24 * 7));
 		$AC->addAssocV3("RSSFilterID", ">", "0");
 		$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
 		$AC->addOrderV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "ASC");
