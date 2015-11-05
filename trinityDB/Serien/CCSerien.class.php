@@ -101,7 +101,7 @@ class CCSerien implements iCustomContent {
 		
 		$AC = anyC::get("Folge");
 		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d')) + 120", ">=", mktime(0, 0, 1));
-		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d'))", "<=", (time() + 3600 * 24 * 7));
+		$AC->addAssocV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d'))", "<=", (time() + 3600 * 24 * 6));
 		$AC->addAssocV3("RSSFilterID", ">", "0");
 		$AC->addJoinV3("Serie", "SerieID", "=", "SerieID");
 		$AC->addOrderV3("UNIX_TIMESTAMP(STR_TO_DATE(airDate, '%Y-%m-%d 18:00'))", "ASC");
