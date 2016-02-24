@@ -79,55 +79,6 @@ class FeedFilterDDLV implements iFeedFilter {
 	}
 
 	public function download(RSSFilter $RSF, $filename, $page, $targetFileName, Serie $Serie){
-		#s$args = func_get_args();
-		#print_r($args);
-		#print_r(self::$links[$page]);
-		#die();
-		#return false;
-	
-        /*$ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $page);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_ENCODING , "gzip");
-        $content = curl_exec($ch);
-        curl_close($ch);
-		#echo $page;
-		#$content = file_get_contents($page);
-		#die($content);
-		$namepos = strpos($content, "<p><onelink /></p>");
-		$lastpos = strpos($content, "<p><download /></p>", $namepos);
-
-		if($namepos === false){
-			$namepos = strpos($content, "<p><onelink/></p>");
-			$lastpos = strpos($content, "<p><download/></p>", $namepos);
-		}
-		
-		if($namepos === false)
-			return array("I could not find any suitable links, please try downloading the file manually", "");
-
-
-		$subcontent = substr($content, $namepos, $lastpos - $namepos);
-		$middle = strpos($subcontent, $filename);
-		if($middle !== false)
-			$subcontent = substr($content, $namepos + $middle, $lastpos - ($namepos + $middle));
-		else {
-			$lastpos2 = strpos($content, "<p><download /></p>", $lastpos + 20);
-			if($lastpos2 === false)
-				$lastpos2 = $lastpos;
-			
-			$subcontent = substr($content, $namepos, $lastpos2 - $namepos);
-			$middle = strpos($subcontent, $filename);
-			$subcontent = substr($content, $namepos + $middle, $lastpos2 - ($namepos + $middle));
-		}
-		
-		preg_match_all("/<strong>([a-zA-Z0-9\(\)]*)[a-zA-Z0-9: \(\)]*<\/strong><br\s*\/>\s*\<a\s*href\=\"([a-zA-Z0-9 \-_\/:\.]*)\"[ a-zA-Z=\"_]*>/", $subcontent, $matches);
-
-		#print_r($matches);
-		
-		if(count($matches) != 3 OR !isset($matches[1][0]))
-			return array("I could not find any suitable links, please try again", "");
-*/
-		
 		$usableHosts = $this->getAvailableHosts($RSF);
 
 		if(count($usableHosts) == 0)

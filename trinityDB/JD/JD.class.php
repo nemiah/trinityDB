@@ -86,7 +86,7 @@ class JD extends PersistentObject {
 			$C = new $C();
 			$link = $C->parse($link, $this->A("JDLinkParserUser"), $this->A("JDLinkParserPassword"));
 		}
-			
+		
 		
 		if($this->A("JDDLType") == "4"){
 			if($logFilename == ""){
@@ -97,13 +97,17 @@ class JD extends PersistentObject {
 						$logFilename = $matches[1];
 				}
 			}
-		
+			
 			if($logFilename == "")
 				$logFilename = basename($link);
 			
 			$DL = anyC::getFirst("Incoming", "IncomingUseForDownloads", "1");
 			
-			$id = $this->logDownload($logLink, $linkOld, $logFilename, $this->filesize($link), $Serie, true);
+			$size = $this->filesize($link);
+			if($size < 10 * 1024 * 1024)
+				return false;
+			
+			$id = $this->logDownload($logLink, $linkOld, $logFilename, $size, $Serie, true);
 			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".str_replace(" ", "." , basename($logFilename)).".".Util::ext($link)." $link");
 			rename($this->A("JDWgetFilesDir")."/$id.temp", $this->A("JDWgetFilesDir")."/$id.dl");
 			chmod($this->A("JDWgetFilesDir")."/$id.dl", 0666);

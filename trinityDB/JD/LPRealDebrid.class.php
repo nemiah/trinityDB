@@ -23,26 +23,14 @@ class LPRealDebrid implements iLinkParser {
 	}
 
 	public function parse($link, $username, $password) {
-		$ckfile = Util::getTempFilename("RDCookies", "txt");
-		
-		$ch = curl_init("http://real-debrid.fr/ajax/login.php?user=".urlencode($username)."&pass=".urlencode($password)."&captcha_challenge=&captcha_answer=&time=".time());
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_COOKIEJAR, $ckfile);
-		
-		$response = json_decode(curl_exec($ch));
-		curl_close($ch);
-		
-		#print_r($response);
-		
-		$ch = curl_init("http://real-debrid.fr/ajax/unrestrict.php?link=".urlencode($link)."&password=&remote=0&time=".time());
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0'));
-		curl_setopt($ch, CURLOPT_COOKIEFILE, $ckfile);
+		$ch = curl_init("https://api.real-debrid.com/rest/1.0/unrestrict/link");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer '.urlencode($username)));
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "link=".urlencode($link));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$output = json_decode(curl_exec($ch));
 		
-		unlink($ckfile);
-		return $output->main_link;
-		
+		return $output->download;
 	}
 }
 
