@@ -32,8 +32,6 @@ class trinityDBDesktopGUI extends ADesktopGUI implements iGUIHTML2 {
 		
 		switch($id){
 			case "1":
-				$html = "";
-				
 				$AC = anyC::get("JDownload");
 				$AC->addOrderV3("JDownloadDate", "DESC");
 				$AC->setLimitV3(19);

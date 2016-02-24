@@ -33,5 +33,4 @@ class LPRealDebrid implements iLinkParser {
 		return $output->download;
 	}
 }
-
 ?>
