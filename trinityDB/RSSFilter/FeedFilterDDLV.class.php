@@ -106,7 +106,10 @@ class FeedFilterDDLV implements iFeedFilter {
 			if(!$found)
 				continue;
 			
-			$JD->download($link, $filename, $targetFileName, $Serie);
+			try {
+				$JD->download($link, $filename, $targetFileName, $Serie);
+			} catch(Exception $e){}
+			
 			break;
 		}
 

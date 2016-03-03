@@ -25,9 +25,12 @@ class JD extends PersistentObject {
 			$link = $C->parse($link, $this->A("JDLinkParserUser"), $this->A("JDLinkParserPassword"));
 		}
 		
+		if(trim($link) == "")
+			throw new Exception("No link available");
+		
 		$info = get_headers($link, 1);
 		if($info === false)
-			return 0;
+			throw new Exception("No header information available ($link)");
 		
 		return $info["Content-Length"];
 	}
@@ -105,7 +108,7 @@ class JD extends PersistentObject {
 			
 			$size = $this->filesize($link);
 			if($size < 10 * 1024 * 1024)
-				return false;
+				throw new Exception ("File size too small");
 			
 			$id = $this->logDownload($logLink, $linkOld, $logFilename, $size, $Serie, true);
 			file_put_contents($this->A("JDWgetFilesDir")."/$id.temp", "-o wgetDL_".str_pad($id, 5, "0", STR_PAD_LEFT).".log -O ".rtrim($DL->A("IncomingDir"), "/")."/".str_replace(" ", "." , basename($logFilename)).".".Util::ext($link)." $link");

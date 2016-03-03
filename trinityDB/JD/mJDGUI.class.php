@@ -71,8 +71,13 @@ class mJDGUI extends anyC implements iGUIHTMLMP2 {
 		
 		echo "<div style=\"overflow:auto;max-height:400px;\">";
 		
-		foreach($ex AS $l)
-			echo $l.": ".($JD->download($l) ? "OK" : "FEHLER")."<br>";
+		foreach($ex AS $l){
+			try {
+				echo $l.": ".($this->download($l) ? "OK" : "FEHLER")."<br>";
+			} catch (Exception $e){
+				echo "<span style=\"color:red;\">$l: ".$e->getMessage()."</span><br>";
+			}
+		}
 		
 		echo "</div>";
 		

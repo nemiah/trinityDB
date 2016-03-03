@@ -29,6 +29,9 @@ class LPRealDebrid implements iLinkParser {
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "link=".urlencode($link));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$output = json_decode(curl_exec($ch));
+
+		if(isset($output->error))
+			throw new Exception ("RealDebrid: ".$output->error);
 		
 		return $output->download;
 	}

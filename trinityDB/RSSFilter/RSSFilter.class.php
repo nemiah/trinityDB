@@ -177,8 +177,10 @@ class RSSFilter extends PersistentObject {
 
 	public function download($link){
 		$JD = new JD($this->A("RSSFilterJDID"));
-		$JD->download($link, $link);
-
+		try {
+			$JD->download($link, $link);
+		} catch(Exception $e){}
+		
 		return true;
 	}
 
