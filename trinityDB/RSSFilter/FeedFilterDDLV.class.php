@@ -73,8 +73,11 @@ class FeedFilterDDLV implements iFeedFilter {
 		$hosts = array();
 		#if($RSF->A("RSSFilterProviderRapidshare") == "1" AND in_array("Rapidshare.com", $available)) $hosts["Rapidshare.com"] = "Rapidshare";
 		#if($RSF->A("RSSFilterProviderNetload") == "1" AND in_array("Netload", $available)) $hosts["Netload.com"] = "netload";
-		if($RSF->A("RSSFilterProviderUploaded") == "1" AND in_array("Uploaded", $available)) $hosts["Uploaded.to"] = "uploaded";
+		if($RSF->A("RSSFilterProviderUploaded") == "1" AND in_array("Uploaded", $available))
+			$hosts["Uploaded.to"] = "uploaded";
 
+		$hosts["openload.co"] = "openload";
+		
 		return $hosts;
 	}
 
@@ -84,7 +87,7 @@ class FeedFilterDDLV implements iFeedFilter {
 		if(count($usableHosts) == 0)
 			return array("You did not select any hosts to download from", "");
 
-		
+
 
 		$JD = new JD($RSF->A("RSSFilterJDID"));
 		foreach(self::$links[$page] AS $link){
@@ -95,6 +98,7 @@ class FeedFilterDDLV implements iFeedFilter {
 			foreach($usableHosts AS $host){
 				if(stripos($url["host"], $host) === false)
 					continue;
+				#echo $link;
 				#echo Serie::determineQuality($link);
 				#echo $Serie->A("quality");
 				if(Serie::determineQuality($link) != SerieGUI::getQualities($Serie->A("quality")))
