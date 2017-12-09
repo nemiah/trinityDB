@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 var phynxContextMenu = {
@@ -53,7 +53,11 @@ var phynxContextMenu = {
 		$('cMDiv').style.position = "absolute";
 		fakecMDiv.style.position = "absolute";
 		
-		new Draggable($('cMDiv'), {handler: $('cMHeader')});
+		$j("#cMDiv").draggable({
+			handle: $j('#cMHeader')
+		});
+		
+		//new Draggable($('cMDiv'), {handler: $('cMHeader')});
 		$('cMHeader').innerHTML = phynxContextMenu.headerText+"contextMenu";
 	},
 	
@@ -86,14 +90,7 @@ var phynxContextMenu = {
 	},
 	
 	saveSelection: function(saveTo, identifier, key, onSuccessFunction){
-		new Ajax.Request('./interface/rme.php?class='+saveTo+"&method=saveContextMenu&constructor='-1'&parameters='"+identifier+"','"+key+"'", {onSuccess: function(transport){
-			if(checkResponse(transport)){
-				phynxContextMenu.stop(transport);
-			
-				if(typeof onSuccessFunction != "undefined")
-					eval(onSuccessFunction);
-			}
-		}});
+		contentManager.rmePCR(saveTo, "-1", "saveContextMenu", [identifier, key], onSuccessFunction);
 	},
 	
 	appear: function(transport, options){
@@ -147,7 +144,5 @@ var phynxContextMenu = {
 		contentManager.rmePCR(targetClass, "", "getContextMenuHTML", [identifier], function(transport){
 			phynxContextMenu.appear(transport, options);
 		});
-		
-		//new Ajax.Request('./interface/rme.php?class='+targetClass+"&method=getContextMenuHTML&constructor=''&parameters='"+identifier+"'", {onSuccess: phynxContextMenu.appear});
 	}
 }

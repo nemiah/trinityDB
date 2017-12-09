@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class HTMLList {
@@ -79,6 +79,10 @@ class HTMLList {
 	
 	public function addListStyle($style){
 		$this->style .= $style;
+	}
+	
+	public function removeItem(){
+		array_pop($this->items);
 	}
 	
 	public function addItem($content){

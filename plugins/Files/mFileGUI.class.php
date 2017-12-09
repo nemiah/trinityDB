@@ -15,24 +15,59 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class mFileGUI extends mFile implements iGUIHTMLMP2 {
+		
+	/*public function getFolderSelection($targetFrame = "", $path = "/"){
+		echo $path;
+		$useDir = FileStorage::getFilesDir().$path;
+		
+		
+		$this->setDir($useDir);
+		
+		$html = "<div style=\"max-height:350px;overflow:auto;\">";
+		while($F = $this->getNextEntry()){
+			if($F->A("FileName") == "." OR $F->A("FileName") == "..")
+				continue;
+						
+			if(!$F->A("FileIsDir"))
+				continue;
+			
+			$B = new Button("Verzeichnis öffnen", "./plugins/Files/icons/folder.png", "icon");
+			$B->style("margin-right:5px;margin-top:2px;");
+
+			$html .= "<div style=\"padding:5px;\">$B <a href=\"#\" onclick=\"".OnEvent::rme($this, "getFolderSelection", array("'$targetFrame'", "'$path".$F->A("FileName")."/'"), "function(t){ \$j('#$targetFrame').html(t.responseText) }")." return false;\">".$F->A("FileName")."</a></div>";
+		}
+		
+		$html .= "</div>";
+		
+		echo $html;
+	}*/
 	
-	public static function getManagerButton($targetClass, $targetID, $usePool = false, $fieldDefaultFile = ""){
+	public static function getManagerButton($targetClass, $targetID, $usePool = false, $defaultFileField = "", $defaultFileOnChange = null, $useDirectories = false, $popupOptions = "{}"){
+		$dir = $targetClass."ID".str_pad($targetID."", 4, "0", STR_PAD_LEFT);
 		
 		$BF = new Button("Dateien","computer");
-		$BF->popup("", "Datei-Manager", "mFile", "", "getPopupManager", array("'".$targetClass."ID".str_pad($targetID."", 4, "0", STR_PAD_LEFT)."'", "'$targetClass'", "'$targetID'", $usePool ? "1" : "0", "'$fieldDefaultFile'"));
+		$BF->popup("", "Datei-Manager", "mFile", "", "getPopupManager", array("'".$dir."'", "'$targetClass'", "'$targetID'", $usePool ? "1" : "0", "'$defaultFileField'", "''", "'".addslashes($defaultFileOnChange)."'", $useDirectories ? "1" : "0"), "", $popupOptions);
+		
+		if(file_exists(FileStorage::getFilesDir().$dir) AND !Util::isDirEmpty(FileStorage::getFilesDir().$dir))
+			$BF->className("confirm");
+		
 		return $BF;
 	}
 	
-	public static function getManagerButtonCustomDir($targetClass, $targetID, $subDir, $usePool = false, $fieldDefaultFile = "", $targetFilename = null){
+	public static function getManagerButtonCustomDir($targetClass, $targetID, $subDir, $usePool = false, $fieldDefaultFile = "", $targetFilename = null, $linkTo = null){
 		$args = array("$subDir", "'$targetClass'", "'$targetID'", $usePool ? "1" : "0", "'$fieldDefaultFile'");
 		if($targetFilename != null)
 			$args[] = "'$targetFilename'";
 		
+		
 		$BF = new Button("Dateien","computer");
+		if($linkTo)
+			$BF->link($linkTo);
 		$BF->popup("", "Datei-Manager", "mFile", "", "getPopupManager", $args);
+		
 		return $BF;
 	}
 	
@@ -161,14 +196,14 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 			$bread .= "<div class=\"selectionRow isFolder\" data-path=\"$way\" onclick=\"".$this->pather($way)."\" style=\"padding:8px;cursor:pointer;border-right:1px solid #aaa;color:#555;vertical-align:top;display:inline-block;padding-left:20px;padding-right:20px;border-bottom:0px;\">$v</div>";
 		}
 		
-		$I = new HTMLInput("upload", "file", null, array("path" => $way, "class" => "File"));
+		$I = new HTMLInput("upload", "file", null, array("path" => str_replace('\\', "/", realpath($way)), "class" => "File"));
 		$I->style("width:250px;");
 		$I->onchange($this->pather($way));
 		
 		$IN = new HTMLInput("newDir", "text");
 		$IN->placeholder("Neues Verzeichnis");
 		$IN->style("width:250px;margin-right:20px;");
-		$IN->onEnter(OnEvent::rme($this, "makeDir", array("'$way'", "\$j(this).val()"), "function(){ ".$this->pather($way)." }"));
+		$IN->onEnter(OnEvent::rme($this, "makeDir", array("'".str_replace('\\', "/", realpath($way))."'", "\$j(this).val()"), "function(){ ".$this->pather($way)." }"));
 		
 		$ISA = new HTMLInput("selectAll", "checkbox");
 		$ISA->onchange("console.log(\$j(this).prop('checked')); \$j('.selectFile').prop('checked', \$j(this).prop('checked'));");
@@ -361,16 +396,16 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		return $F;
 	}
 	
-	private static $fieldDefaultFile;
-	public function getPopupManager($rootDir = null, $class = null, $classID = null, $usePool = false, $fieldDefaultFile = "", $uploadTargetFilename = null){
-		if($rootDir != null){
-			$T = new HTMLTable(1);
+	private static $defaultFileField;
+	private static $args;
+	public function getPopupManager($rootDir = null, $class = null, $classID = null, $usePool = false, $defaultFileField = "", $uploadTargetFilename = null, $defaultFileOnChange = null, $useDirectories = false){
+		self::$args = func_get_args();
 
-			#$rel = "$rootDir";
+		if($rootDir != null){
 			$root = FileStorage::getFilesDir().$rootDir;
 
-			$_SESSION["BPS"]->setProperty("mFileGUI", "path", $root);
-			$_SESSION["BPS"]->setProperty("mFileGUI", "root", $root);
+			$_SESSION["BPS"]->setProperty("mFileGUI", "path", preg_replace("/^([A-Z]):/", "\\1%", $root));
+			$_SESSION["BPS"]->setProperty("mFileGUI", "root", preg_replace("/^([A-Z]):/", "\\1%", $root));
 			
 			$F = new File($root);
 			$F->loadMe();
@@ -378,28 +413,32 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 			if($F->getA() == null){
 				if(is_writable(FileStorage::getFilesDir())){
 					mkdir($root, 0777, true);
-				}
-				else{
+				} else {
 					$B = new Button("", "stop");
 					$B->type("icon");
 					$B->style("float:left;margin-right:10px;");
-
+					
+					$T = new HTMLTable(1);
 					$T->addRow($B."Das Verzeichnis <code>$rootDir</code> existiert nicht und kann nicht automatisch angelegt werden, da keine Schreibberechtigung für <code>specifics</code> vorliegt.");
+					
 					die($T);
 				}
 			}
 		}
 
 		$bps = $this->getMyBPSData();
-
+		
+		$bps["path"] = preg_replace("/^([A-Z])%/", "\\1:", $bps["path"]);
+		$bps["root"] = preg_replace("/^([A-Z])%/", "\\1:", $bps["root"]);
+			
 		if(strpos($bps["path"], $bps["root"]) === false)
 			$bps["path"] = $bps["root"];
 		
-
+		
 		if($bps != -1 AND isset($bps["path"]))
 			$this->setDir($bps["path"]);
 		
-		$this->hideDirs(true);
+		$this->hideDirs(!$useDirectories);
 		
 		
 		$gui = new HTMLGUIX();
@@ -407,9 +446,9 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		$gui->object($this);
 		$cols = array();
 		
-		if($fieldDefaultFile != ""){
+		if($defaultFileField != ""){
 			$C = new $class($classID);
-			self::$fieldDefaultFile = array($C, $C->A($fieldDefaultFile), $fieldDefaultFile);
+			self::$defaultFileField = array($C, $C->A($defaultFileField), $defaultFileField, $defaultFileOnChange);
 			
 			$cols[] = "isDefault";
 			$gui->colWidth("isDefault", 20);
@@ -423,10 +462,24 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 		$gui->options(true, false, false);
 
 		$gui->name("Datei");
+
+		$gui->caption("Dateien");
 		
 		$gui->addToEvent("onDelete", OnEvent::reloadPopup("mFile"));
 		
-		
+		if($defaultFileField){
+			$TC = new HTMLTable(2);
+			$TC->setColWidth(1, 32);
+			
+			$BC = new Button("Standard", "./plugins/Files/thisRow.png", "icon");
+			$BC->style("margin-left:5px;");
+			
+			$TC->addRow(array($BC, "Als Standard verwenden"));
+			$TC->addRowClass("backgroundColor0");
+			
+			$gui->append($TC);
+		}
+				
 		$oldFiles = "";
 		if($class != null AND $classID != null){
 			$AC = anyC::get("Datei", "DateiClassID", $classID);
@@ -438,12 +491,12 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 				$BDL = new Button("Datei herunterladen", "./plugins/Files/download.png", "icon");
 				$BDL->onclick("windowWithRme('File','".$F->A("DateiPath")."','download','');");
 				$BDL->style("float:right;");
-		
+				
 				$oldFiles->addRow(array($BDL.$F->A("DateiName")));
 			}
 		}
 		
-		$BPool = new Button("Pool\nanzeigen", "./lightCRM/Mail/images/attach.png");
+		$BPool = new Button("Pool\nanzeigen", "./plugins/Files/pool.png");
 		$BPool->style("float:right;margin:10px;");
 		$BPool->onclick(OnEvent::popupSidePanel("mFile", -1, "sidePanelPool", array("'{$class}Pool'", "'$rootDir'")));
 		
@@ -453,17 +506,44 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 				echo OnEvent::script("window.setTimeout(function(){ if(\$j('#editDetailsmFileSidePanel').length > 0) return; ".OnEvent::popupSidePanel("mFile", -1, "sidePanelPool", array("'{$class}Pool'", "'$rootDir'"))."}, 100);");
 		}
 		
+		$fields = array("datei");
+		if($useDirectories)
+			$fields[] = "verzeichnis";
 		
-		$F = new HTMLForm("fileUpload", array("datei"));
-		$s = array("path" => $bps["path"], "class" => "File");
+		$F = new HTMLForm("fileUpload", $fields);
+		
+		$s = array("path" => str_replace('\\', "/", realpath($bps["path"])), "class" => "File");
 		if($uploadTargetFilename != null)
 			$s["targetFilename"] = $uploadTargetFilename;
 		
 		$F->setType("datei", "file", null, $s);
+		
+		$B = new Button("Erstellen", "./plugins/Files/go-next.png", "icon");
+		$B->style("float:right;");
+		$B->rmePCR("mFile", "-1", "makeDir", array("'".$bps["path"]."'", "\$j('[name=verzeichnis]').val()"), OnEvent::reloadPopup("mFile"));
+		
+		$F->addFieldButton("verzeichnis", $B);
+		
 		$F->addJSEvent("datei", "onChange", OnEvent::reloadPopup("mFile"));
+		$F->addJSEvent("verzeichnis", "onEnter", OnEvent::rme($this, "makeDir", array("'".$bps["path"]."'", "\$j(this).val()"), OnEvent::reloadPopup("mFile")));
+		
+		
 		$F->getTable()->setColWidth(1, 120);
 		
-		echo "<p class=\"prettyTitle\">/".  basename($bps["path"])."</p><p style=\"color:grey;margin-top:-15px;margin-bottom:10px;\"><small>".dirname(realpath($bps["path"]))."</small></p>".$F.$gui->getBrowserHTML(-1).$oldFiles;
+		$B = new Button("Nach oben", "./plugins/Files/go-up.png", "icon");
+		$B->style("float:left;margin-right:5px;");
+		
+		$TP = new HTMLTable(2);
+		$TP->setColWidth(2, 20);
+		$TP->addRow(array(
+			"<a href=\"#\" onclick=\"".OnEvent::popup("Datei-Manager", "mFile", "", "getPopupManager", array("''", "'".self::$args[1]."'", self::$args[2], self::$args[3], "'".self::$args[4]."'", "'".self::$args[5]."'", "'".self::$args[6]."'", self::$args[7]), "_mFileGUI;path:".realpath($bps["path"]."/../"))." return false;\">$B Nach oben</a>",
+			"<div style=\"width:22px;height:20px;\"></div>"
+		));
+		
+		if($bps["root"] != $bps["path"])
+			$gui->prepend ($TP);
+		
+		echo "<p class=\"prettyTitle\">/".str_replace(dirname($bps["root"])."/", "", $bps["path"])."</p><p style=\"color:grey;margin-top:-15px;margin-bottom:10px;\"><small>".dirname(realpath($bps["root"]))."</small></p>".$F.$gui->getBrowserHTML(-1).$oldFiles;
 	}
 	
 	public function copyFile($poolDir, $specificDir, $fileName){
@@ -521,10 +601,20 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 	}
 
 	public static function nameParser2($w, $e){
-		$dl = "<img src=\"./plugins/Files/download.png\" class=\"mouseoverFade\" title=\"Datei herunterladen\" onclick=\"windowWithRme('File','".$e->getID()."','download','');\" style=\"float:right;margin-left:5px;\" /><span style=\"float:right;color:grey;\">".Util::formatByte(filesize($e->getID()))."</span>";
+		$BP = new Button("Datei anzeigen", "./images/i2/details.png", "icon");
+		$BP->popup("", "Vorschau", "File", $e->getID(), "previewWindow", "", "", "{width:600, hPosition: 'center'}");
+		$BP->style("float:right;margin-left:5px;");
+				
+		$dl = "$BP<img src=\"./plugins/Files/download.png\" class=\"mouseoverFade\" title=\"Datei herunterladen\" onclick=\"windowWithRme('File','".$e->getID()."','download','');\" style=\"float:right;margin-left:5px;\" /><span style=\"float:right;color:grey;\">".Util::formatByte(filesize($e->getID()))."</span>";
 
-		if($e->A("FileIsDir") == "0") return $dl.$w;
-		else return $w;
+		
+		if($e->A("FileIsDir") == "0") 
+			return $dl.$w;
+		 
+		$B = new Button("Verzeichnis öffnen", "./images/i2/folder.png", "icon");
+		$B->style("float:left;margin-right:5px;");
+		
+		return "<a href=\"#\" onclick=\"".OnEvent::popup("Datei-Manager", "mFile", "", "getPopupManager", array("''", "'".self::$args[1]."'", self::$args[2], self::$args[3], "'".self::$args[4]."'", "'".self::$args[5]."'", "'".self::$args[6]."'", self::$args[7]), "_mFileGUI;path:".realpath($e->getID()))." return false;\">".$B.$w."</a>";
 	}
 /*
 	public static function popupIsDirParser($w, $l, $p){
@@ -547,8 +637,8 @@ class mFileGUI extends mFile implements iGUIHTMLMP2 {
 	}
 	
 	public static function parserDefault($w, $E){
-		$I = new HTMLInput("isDefault", "checkbox", $E->getID() == self::$fieldDefaultFile[1] ? "1" : "0");
-		$I->onchange(OnEvent::rme(self::$fieldDefaultFile[0] , "saveMultiEditField", array("'".self::$fieldDefaultFile[2]."'", "this.checked ? '".$E->getID()."' : ''"), OnEvent::reloadPopup("mFile"), "", OnEvent::reloadPopup("mFile")));
+		$I = new HTMLInput("isDefault", "checkbox", $E->getID() == self::$defaultFileField[1] ? "1" : "0");
+		$I->onchange("var checked = this.checked;".OnEvent::rme(self::$defaultFileField[0] , "saveMultiEditField", array("'".self::$defaultFileField[2]."'", "this.checked ? '".$E->getID()."' : ''"), OnEvent::reloadPopup("mFile").(self::$defaultFileField[2] != null ? "\$j('[name=".self::$defaultFileField[2]."]').val(checked ? '".$E->getID()."' : '');" : "").(self::$defaultFileField[3] != null ? stripslashes(self::$defaultFileField[3]) : ""), "", OnEvent::reloadPopup("mFile")));
 		
 		return $I;
 	}

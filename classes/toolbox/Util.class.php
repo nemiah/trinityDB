@@ -15,13 +15,41 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class Util {
 	public static function ext($filename){
-		return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		return trim(strtolower(pathinfo($filename, PATHINFO_EXTENSION)));
 	}
 	
+	public static function isDirEmpty($dir) {
+		if (!is_readable($dir))
+			return null; 
+		
+		$handle = opendir($dir);
+		while (false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != "..") {
+				return false;
+			}
+		}
+		return true;
+	  }
+	
+	/**
+	 * From http://bavotasan.com/2011/convert-hex-color-to-rgb-using-php/
+	 * 
+	 * @param array $rgb
+	 * @return string
+	 */
+	public static function rgb2hex($rgb) {
+		$hex = "#";
+		$hex .= str_pad(dechex($rgb[0]), 2, "0", STR_PAD_LEFT);
+		$hex .= str_pad(dechex($rgb[1]), 2, "0", STR_PAD_LEFT);
+		$hex .= str_pad(dechex($rgb[2]), 2, "0", STR_PAD_LEFT);
+
+		return $hex; // returns the hex value including the number sign (#)
+	}
+
 	public static function filesTree($files){
 
 		$zipDirectories = array();
@@ -52,15 +80,17 @@ class Util {
 		return $zipDirectories;
 	}
 	
-	public static function getCloudHost(){
+	public static function getCloudHost($host = null){
+		if($host == null AND isset($_SERVER["HTTP_HOST"]))
+			$host = $_SERVER["HTTP_HOST"];
 		
-		$host = Aspect::joinPoint("host", null, __METHOD__, array($_SERVER["HTTP_HOST"]), $_SERVER["HTTP_HOST"]);
+		$host = Aspect::joinPoint("host", null, __METHOD__, array($host), $host);
 		
-		if($host == "*")
+		if($host == "*" OR $host === null)
 			return null;
 		
 		$h = "CloudHost".str_replace(array(":", "-"), "_", implode("", array_map("ucfirst", explode(".", $host))));
-		
+
 		if(defined("PHYNX_VIA_INTERFACE")){
 			if(file_exists(Util::getRootPath()."specifics/$h.class.php"))
 				require_once(Util::getRootPath()."specifics/$h.class.php");
@@ -147,7 +177,7 @@ class Util {
 	 * @deprecated since version 23.09.2012
 	 */
 	public static function utf8_str_col($string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT){
-		return phynx_mb_str_pad($string, $width, $pad_string, $pad_type, "UTF-8");
+		return phynx_mb_str_pad(mb_substr($string, 0, $width), $width, $pad_string, $pad_type, "UTF-8");
 		/*preg_match_all("/./su", $string, $ar);
 		
 		$ar = array_slice($ar[0], 0, $width);
@@ -239,9 +269,10 @@ class Util {
 			case "US":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{zusatz1}\n";
 				$r .= "{nr}{strasse}\n";
+				$r .= "{zusatz2}\n";
 				$r .= "{ort}\n";
 				$r .= "{plz}\n";
 				$r .= "{land}";
@@ -250,7 +281,7 @@ class Util {
 			case "CH":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{zusatz1}\n";
 				$r .= "{strasse}{nr}\n";
 				$r .= "{plz}{ort}\n";
@@ -261,7 +292,7 @@ class Util {
 			case "GR":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{nr}, {strasse}\n";
 				$r .= "{plz}{ort}\n";
 				$r .= "{land}";
@@ -270,7 +301,7 @@ class Util {
 			case "BE":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{strasse}, {nr}\n";
 				$r .= "{plz}{ort}\n";
 				$r .= "{land}";
@@ -279,7 +310,7 @@ class Util {
 			case "DK":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{strasse}{nr}\n";
 				$r .= "{bezirk}\n";
 				$r .= "{plz}{ort}\n";
@@ -289,7 +320,7 @@ class Util {
 			case "HU":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{ort}\n";
 				$r .= "{strasse}{nr}\n";
 				$r .= "{plz}\n";
@@ -300,7 +331,7 @@ class Util {
 			case "HR":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{strasse}{nr}\n";
 				$r .= "$ISOCountry-{plz}{ort}\n";
 				$r .= "{land}";
@@ -309,7 +340,7 @@ class Util {
 			case "ES":
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{bezirk}\n";
 				$r .= "{strasse}{nr}\n";
 				$r .= "{plz}{ort}\n";
@@ -327,15 +358,20 @@ class Util {
 			default:
 				$r .= "{firma}\n";
 				$r .= "{abteilung}\n";
-				$r .= "{position}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
+				$r .= "{position}{anredeWM}{titelPrefix}{vorname}{nachname}{titelSuffix}\n";
 				$r .= "{strasse}{nr}\n";
+				$r .= "{zusatz2}\n";
 				$r .= "{plz}{ort}\n";
 				$r .= "{land}";
 			break;
 		}
 
 		// <editor-fold defaultstate="collapsed" desc="Aspect:jP">
-		return Aspect::joinPoint("after", null, __METHOD__, $r);
+		$ret = Aspect::joinPoint("after", null, __METHOD__, array($r, $ISOCountry), $r);
+		if(is_array($ret))
+			return $ret[0];
+		
+		return $ret;
 		// </editor-fold>
 	}
 
@@ -443,6 +479,10 @@ class Util {
 	public static function isWindowsHost(){
 		return stripos(getenv("OS"), "Windows") !== false;
 	}
+	
+	public static function isLinuxHost(){
+		return stripos(PHP_OS, "Linux") !== false;
+	}
 
 	/**
 	 * Formatiert eine Zahl $number nach Sprache $language
@@ -488,6 +528,24 @@ class Util {
 		return Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number * 1, $digits, $showZero, $endingZeroes, $thousandSeparator);
 	}
 	
+	public static function formatByCurrency($currency, $number, $useSymbol = false, $dezimalstellen = null){
+		$format = Util::getCurrencyFormat($currency, $useSymbol);
+
+		$float = $number * 1;
+		
+		$negative = false;
+		if($float < 0) $negative = true;
+		$float = abs($float);
+
+		if($dezimalstellen != null)
+			$format[4] = $dezimalstellen;
+
+		$stringCurrency = number_format(Util::kRound($float, $format[4]), $format[4], $format[3], $format[5]);
+		$stringCurrency = str_replace("n", $stringCurrency, $negative ? $format[2] : $format[1]);
+		
+		return $stringCurrency;
+	}
+	
 	/**
 	 * Formatiert einen String oder eine Zahl als Währung
 	 * $number sollte entweder in der Sprache vorliegen, in der die Währung ausgegeben wird
@@ -498,7 +556,7 @@ class Util {
 		
 		$float = Util::parseFloat($language, $number);
 		
-		$float *= Util::getLangCurrencyFactor($language);
+		#$float *= Util::getLangCurrencyFactor($language);
 		
 		$negative = false;
 		if($float < 0) $negative = true;
@@ -509,12 +567,12 @@ class Util {
 		$stringCurrency = number_format(Util::kRound($float, $format[4]), $format[4], $format[3], $format[5]);
 		$stringCurrency = str_replace("n", $stringCurrency, $negative ? $format[2] : $format[1]);
 		
-		if(!$withSymbol) $stringCurrency = str_replace($format[0], "", $stringCurrency);
+		if(!$withSymbol) $stringCurrency = trim(str_replace($format[0], "", $stringCurrency));
 		
 		return $stringCurrency;
 	}
 	
-	public static function getLangCurrencyFactor($language){
+	/*public static function getLangCurrencyFactor($language){
 		if(!Session::isPluginLoaded("mSprache")) return 1;
 		
 		$Sprache = anyC::getFirst("Sprache", "SpracheIdentifier", $language);
@@ -530,10 +588,10 @@ class Util {
 		}
 		
 		return $faktor;
-	}
+	}*/
 	
 	public static function CLFormatCurrency($number, $withSymbol = false){
-		return Util::formatCurrency($_SESSION["S"]->getUserLanguage(), $number, $withSymbol);
+		return Util::formatCurrency($_SESSION["S"]->getUserLanguage(), $number * 1, $withSymbol);
 	}
 	
 	public static function CLNumberParser($number, $l = "load"){
@@ -541,21 +599,29 @@ class Util {
 		if($l == "store") return Util::parseFloat($_SESSION["S"]->getUserLanguage(), $number);
 	}
 	
-	public static function CLTimeParser($time, $l = "load"){
-		if($l == "load") return Util::formatTime($_SESSION["S"]->getUserLanguage(), $time);
+	public static function CLTimeParser($time, $l = "load", $showSeconds = false){
+		if(is_object($showSeconds))
+			$showSeconds = false;
+		
+		if($l == "load") return Util::formatTime($_SESSION["S"]->getUserLanguage(), $time, $showSeconds);
 		if($l == "store") return Util::parseTime($_SESSION["S"]->getUserLanguage(), $time);
 	}
 
-	public static function CLTimeParserE($time, $l = "load"){
+	public static function CLTimeParserE($time, $l = "load", $showSeconds = false){
 		if($l == "load" AND $time == "-1") return "";
 		if($l == "store" AND $time == "") return "-1";
 
-		return self::CLTimeParser($time, $l);
+		return self::CLTimeParser($time, $l, $showSeconds);
+	}
+	
+	public static function CLHoursParser($time, $l = "load"){
+		if($l == "load") return Util::formatSeconds($time, false, $_SESSION["S"]->getUserLanguage());
+		if($l == "store") return Util::parseTime($_SESSION["S"]->getUserLanguage(), $time);
 	}
 	
 	public static function CLNumberParserZ($number, $l = "load"){
 		if($l == "load") {
-			$n = Util::formatNumber($_SESSION["S"]->getUserLanguage(), $number * 1, 3, true, true);
+			$n = Util::formatNumber($_SESSION["S"]->getUserLanguage(), (float) $number, 3, true, true);
 			$l = strlen($n) - 1;
 			if($n[$l] == "0") $n = substr($n, 0, $l);
 			return $n;
@@ -567,31 +633,48 @@ class Util {
 		return self::formatAnrede(Session::getLanguage(), $Adresse, $shortmode, $lessFormal, $perDu);
 	}
 	
+	public static function formatAnredeWMShort($language, Adresse $Adresse){
+		$format = self::getLangAnrede($language);
+		
+		switch($Adresse->A("anrede")){
+			case "2":
+				return $format["maleShort"];
+			break;
+			case "1":
+				return $format["femaleShort"];
+			break;
+		
+			default:
+				return "";
+			break;
+		}
+	}
+	
 	public static function formatAnrede($language, Adresse $Adresse, $shortmode = false, $lessFormal = false, $perDu = false){
 		$format = self::getLangAnrede($language, $lessFormal);
 
 		switch($Adresse->A("anrede")){
 			case "2":
-				if($shortmode) $A = $format["maleShort"];
+				if($shortmode) $A = $format["maleShort"].($Adresse->A("titelPrefix") != "" ? " ".$Adresse->A("titelPrefix") : "");
 				else {
-					$A = $format["male"]." ".$Adresse->A("nachname");
+					$A = $format["male"].($Adresse->A("titelPrefix") != "" ? " ".$Adresse->A("titelPrefix") : "")." ".trim($Adresse->A("nachname"));
 					if(trim($Adresse->A("nachname")) == "")
 						$A = $format["unknown"];
 				}
 				
 				if($perDu == true)
-					$A = "Hallo ".$Adresse->A("vorname");
+					$A = "Hallo ".trim($Adresse->A("vorname"));
 			break;
 			case "1":
-				if($shortmode) $A = $format["femaleShort"];
+				if($shortmode) $A = $format["femaleShort"].($Adresse->A("titelPrefix") != "" ? " ".$Adresse->A("titelPrefix") : "");
 				else {
-					$A = $format["female"]." ".$Adresse->A("nachname");
+					$A = $format["female"].($Adresse->A("titelPrefix") != "" ? " ".$Adresse->A("titelPrefix") : "")." ".trim($Adresse->A("nachname"));
 					if(trim($Adresse->A("nachname")) == "")
 						$A = $format["unknown"];
 				}
 				
 				if($perDu == true)
-					$A = "Hallo ".$Adresse->A("vorname");
+					$A = "Hallo ".trim($Adresse->A("vorname"));
 			break;
 			case "3":
 				if($shortmode) $A = "";
@@ -602,7 +685,7 @@ class Util {
 			break;
 			case "4":
 				if($shortmode) $A = $format["familyShort"];
-				else $A = $format["family"]." ".$Adresse->A("nachname");
+				else $A = $format["family"]." ".trim($Adresse->A("nachname"));
 				
 				if($perDu == true)
 					$A = "Hallo";
@@ -649,8 +732,8 @@ class Util {
 		if(!$long) $format = $format[0];
 		else $format = $format[2];
 		
-		$weekdayNames = util::getLangWeekdayNames($language);
-		$monthNames = util::getLangMonthNames($language);
+		$weekdayNames = Util::getLangWeekdayNames($language);
+		$monthNames = Util::getLangMonthNames($language);
 
 		$date = date($format, $timeStamp);
 		$date = str_replace(date("l", $timeStamp), $weekdayNames[date("w", $timeStamp)], $date);
@@ -660,12 +743,12 @@ class Util {
 	}
 	
 	public static function CLMonthName($number){
-		$monthNames = util::getLangMonthNames($_SESSION["S"]->getUserLanguage());
+		$monthNames = Util::getLangMonthNames($_SESSION["S"]->getUserLanguage());
 		return $monthNames[$number*1];
 	}
 	
 	public static function CLWeekdayName($number){
-		$weekdayNames = util::getLangWeekdayNames($_SESSION["S"]->getUserLanguage());
+		$weekdayNames = Util::getLangWeekdayNames($_SESSION["S"]->getUserLanguage());
 		return $weekdayNames[$number*1];
 	}
 
@@ -686,6 +769,7 @@ class Util {
 	}
 
 	public static function CLDateParserE($date, $l = "load"){
+		if($date == null AND $l == "load") return "";
 		if($date == "0" AND $l == "load") return "";
 		if($date == "" AND $l == "store") return "0";
 		if($l == "load") return Util::formatDate($_SESSION["S"]->getUserLanguage(), $date);
@@ -747,6 +831,10 @@ class Util {
 		}
 		if($byte > 1024){
 			$byte /= 1024;
+			$unit = "TB";
+		}
+		if($byte > 1024){
+			$byte /= 1024;
 			$unit = "PB";
 		}
 		if($byte > 1024){
@@ -798,8 +886,8 @@ class Util {
 
 		$stringNumber = str_replace($format[2], "", stripslashes($stringNumber));
 		$stringNumber = str_replace($format[0], ".", $stringNumber);
-		$number = $stringNumber * 1;
-
+		$number = (float) $stringNumber;
+		
 		for($i = 0; $i < strlen($stringNumber); $i++) {
 			if(!strstr($stringNumber, ".")) break;
 			if($stringNumber{strlen($stringNumber) - 1 - $i} == "0" OR $stringNumber{strlen($stringNumber) - 1 - $i} == ".")
@@ -828,6 +916,7 @@ class Util {
 		
 		switch($languageTag){
 			case "en_GB":
+			case "en":
 				return array(
 					"male" => "Dear Mr",
 					"maleShort" => "Mr",
@@ -880,6 +969,64 @@ class Util {
 		}
 	}
 	
+	public static function getCurrencyFormat($currency, $useSymbol = true){
+		switch($currency) {
+			case "EUR":
+				if($useSymbol)
+					return array("€", "n €", "-n €", ",", 2, ".");
+				
+				return array("EUR", "n EUR", "-n EUR", ",", 2, ".");
+		
+			case "CHF":
+				if($useSymbol)
+					return array("SFr.", "SFr. n", "SFr. -n", ".", 2, "'");
+				
+				return array("CHF", "CHF n", "CHF -n", ".", 2, "'");
+				
+			case "AED":
+				if($useSymbol)
+					return array("?", "n ?", "-n ?", ".", 2, ",");
+				
+				return array("AED", "AED n", "AED -n", ".", 2, ",");
+		
+			case "USD":
+				if($useSymbol)
+					return array("$", "\$n", "\$(n)", ".", 2, ",");
+				
+				return array("USD", "n USD", "-n USD", ".", 2, ",");
+		
+			case "GBP":
+				if($useSymbol)
+					return array("£", "£ n", "-£ n", ".", 2, ",");
+				
+				return array("GBP", "GBP n", "-GBP n", ".", 2, ",");
+		
+			case "NOK":
+				if($useSymbol)
+					return array("kr", "kr n", "kr -n", ",", 2, " ");
+				
+				return array("NOK", "n NOK", "-n NOK", ",", 2, " ");
+		
+			case "DKK":
+				if($useSymbol)
+					return array("kr.", "kr. n", "kr. -n", ",", 2, ".");
+				
+				return array("DKK", "n DKK", "-n DKK", ",", 2, ".");
+		
+			case "SEK":
+				if($useSymbol)
+					return array("kr", "n kr", "-n kr", ",", 2, ".");
+				
+				return array("SEK", "n SEK", "-n SEK", ",", 2, ".");
+		
+			default:
+				if($useSymbol)
+					return array("€", "n €", "-n €", ",", 2, ".");
+				
+				return array("EUR", "n EUR", "-n EUR", ",", 2, ".");
+		}
+	}
+	
 	public static function getLangCurrencyFormat($languageTag = null){
 		if($languageTag == null)
 			$languageTag = Session::getLanguage();
@@ -893,7 +1040,6 @@ class Util {
 		// </editor-fold>
 		
 		$languageTag = substr($languageTag, strpos($languageTag, "_") + 1);
-
 		/* array(
 		 * Currency symbol, 
 		 * positive number Format,
@@ -904,55 +1050,60 @@ class Util {
 		 */
 		switch($languageTag) {
 			case "DE":
-				return array("€", "n€", "-n€", ",", 2, ".");
+				return self::getCurrencyFormat("EUR", true);
 			break;
 		
 			case "DE_EUR":
-				return array(" EUR", "n EUR", "-n EUR", ",", 2, ".");
+			case "US_EUR":
+				return self::getCurrencyFormat("EUR", false);
 			break;
 		
 			case "CH":
-				return array("SFr.", "SFr. n", "SFr. -n", ".", 2, "'");
+				return self::getCurrencyFormat("CHF", true);
 			break;
 		
 			case "CH_CHF":
-				return array(" CHF", "CHF n", "CHF -n", ".", 2, "'");
+				return self::getCurrencyFormat("CHF", false);
 			break;
 		
 			case "US":
-				return array("$", "\$n", "\$(n)", ".", 2, ",");
+				return self::getCurrencyFormat("USD", true);
 			break;
 		
 			case "GB":
-				return array("£", "£n", "-£n", ".", 2, ",");
+				return self::getCurrencyFormat("GBP", true);
+			break;
+		
+			case "GB_GBP":
+				return self::getCurrencyFormat("GBP", false);
 			break;
 		
 			case "NO":
-				return array("kr", "kr n", "kr -n", ",", 2, " ");
+				return self::getCurrencyFormat("NOK", true);
 			break;
 		
 			case "NO_NOK":
-				return array(" NOK", "n NOK", "-n NOK", ",", 2, " ");
+				return self::getCurrencyFormat("NOK", false);
 			break;
 		
 			case "DK":
-				return array("kr.", "kr. n", "kr. -n", ",", 2, ".");
+				return self::getCurrencyFormat("DKK", true);
 			break;
 		
 			case "DK_DKK":
-				return array(" DKK", "n DKK", "-n DKK", ",", 2, ".");
+				return self::getCurrencyFormat("DKK", false);
 			break;
 		
 			case "SE":
-				return array("kr", "n kr", "-n kr", ",", 2, ".");
+				return self::getCurrencyFormat("SEK", true);
 			break;
 		
 			case "SE_SEK":
-				return array(" SEK", "n SEK", "-n SEK", ",", 2, ".");
+				return self::getCurrencyFormat("SEK", false);
 			break;
 		
 			default:
-				return array("€", "n€", "-n€", ",", 2, ".");
+				return self::getCurrencyFormat("EUR", true);
 			break;
 		}
 	}
@@ -1041,9 +1192,10 @@ class Util {
 	public static function fillStdClassWithAssocArray($class, $values){
 	    $a = PMReflector::getAttributesArray($class);
 
-		for($i = 0;$i < count($a);$i++)
-			if(isset($values[$a[$i]])) $class->$a[$i] = str_replace("\$","\\$", $values[$a[$i]]);
-			
+		for($i = 0;$i < count($a);$i++){
+			$f = $a[$i];
+			if(isset($values[$a[$i]])) $class->$f = str_replace("\$","\\$", $values[$a[$i]]);
+		}
 		return $class;
 	}
 	
@@ -1105,7 +1257,9 @@ class Util {
 		return $us;
 	}
 
-	public static function formatSeconds($seconds, $showSeconds = true){
+	public static function formatSeconds($seconds, $showSeconds = true, $language = "de_DE"){
+		$format = Util::getLangTimeFormat($language);
+		
 		$h = ($seconds / 3600);
 		$hours = floor($h);
 		$minutes = floor(($seconds - $hours * 3600) / 60);
@@ -1113,7 +1267,7 @@ class Util {
 		if($sec < 10) $sec = "0".$sec;
 		
 		$minutes  = ($minutes < 10 ? "0" : "").$minutes;
-		return $hours.":".$minutes.($showSeconds ? ":".$sec : "");
+		return $hours.$format[2].$minutes.($showSeconds ? $format[2].$sec : "");
 	}
 	
 	public static function formatSecondsSigned($seconds, $showSeconds = true){
@@ -1203,7 +1357,7 @@ class Util {
 		$filename = str_replace(array("Ç","ç","É","È","Ê","é","è","ê", "ë", "Č"), array("C","c","E","E","E","e","e","e", "e", "C"), $filename);
 		$filename = str_replace(array("Í","Ì","í","ì", "ï","Õ","Ô","Ó"), array("I","I","i","i", "i","O","O","O"), $filename);
 		$filename = str_replace(array("õ","ô","ó","Ú","ú"), array("o","o","o","U","u"), $filename);
-    	$filename = str_replace(array(":", "–", "\n", "'", "?", "(", ")", ";", "\"", "+", "<", ">", ",", "´", "`"), array("_", "-", "", "", "", "", "", "", "", "", "", "", "", "", ""), $filename);
+    	$filename = str_replace(array(":", "–", "\n", "'", "?", "(", ")", ";", "\"", "+", "<", ">", ",", "´", "`", "|"), array("_", "-", "", "", "", "", "", "", "", "", "", "", "", "", "", "_"), $filename);
 		$filename = str_replace(array("__"), array("_"), $filename);
 
 		return $filename;
@@ -1214,7 +1368,12 @@ class Util {
 			$_SESSION["BPS"]->registerClass("showPDF");
 			$_SESSION["BPS"]->setACProperty("filename","$filename");
 			$_SESSION["BPS"]->setACProperty("delete", $delete ? "1" : "0");
-			echo "<!DOCTYPE html><html><script type=\"text/javascript\">document.location='./showPDF.php';</script></html>";
+			$CH = self::getCloudHost();
+			$physion = Session::physion();
+			if($CH AND isset($CH->usePreviewRewrite) AND $CH->usePreviewRewrite)
+				echo "<!DOCTYPE html><html><script type=\"text/javascript\">document.location='../preview/".basename($filename)."".($physion ? "?physion=$physion[0]" : "")."';</script></html>";
+			else
+				echo "<!DOCTYPE html><html><script type=\"text/javascript\">document.location='./showPDF.php".($physion ? "?physion=$physion[0]" : "")."';</script></html>";
 		} else
 			echo "<!DOCTYPE html><html><script type=\"text/javascript\">document.location='../system/IECache/".$_SESSION["S"]->getCurrentUser()->getID()."/".basename($filename)."?rand=".rand(100, 1000000)."';</script></html>";
 	}
@@ -1296,14 +1455,55 @@ class Util {
 		
 		$subdir = (isset($_SESSION["S"]) AND $_SESSION["S"]->getCurrentUser() != null) ? $_SESSION["S"]->getCurrentUser()->getID() : "info";
 		
+		$CH = Util::getCloudHost();
+		if($CH !== null AND get_class($CH) != "CloudHostAny"){
+			$dirtouse = "/tmp";
+			Environment::load();
+			$subdir = Environment::$currentEnvironment->cloudUser()."/$subdir";
+		}
+		
 		$dirtouse .= ($dirtouse[strlen($dirtouse) -1] != "/" ? "/" : "").$subdir."/";
+			
 		if(!is_dir($dirtouse)) {
-			mkdir($dirtouse, 0777);
+			#echo "create $dirtouse...\n";
+			if(!mkdir($dirtouse, 0777, true))
+				throw new Exception("Could not create temp dir ".$dirtouse);
+					
+			chmod($dirtouse."../", 0777);
+			chmod($dirtouse, 0777);
+		} else {
+			chmod($dirtouse."../", 0777);
 			chmod($dirtouse, 0777);
 		}
 		
-		if(strpos($dirtouse, Util::getRootPath()) !== false /*AND !file_exists($dirtouse.".htaccess")*/ AND is_writable($dirtouse))
-			file_put_contents($dirtouse.".htaccess", "allow from ".$_SERVER["REMOTE_ADDR"]."\ndeny from all\nallow from ".$_SERVER["REMOTE_ADDR"]."");
+		if(!is_dir($dirtouse)) 
+			throw new Exception("Did not create temp dir $dirtouse");
+		
+		#echo gethostname().":";
+		#var_dump(is_dir($dirtouse));
+		#print_r($dirtouse);
+		#die();
+		if(PHYNX_USE_TEMP_HTACCESS AND strpos($dirtouse, Util::getRootPath()) !== false /*AND !file_exists($dirtouse.".htaccess")*/ AND is_writable($dirtouse)){
+			$content = "<IfModule mod_authz_core.c>
+    Require ip ".$_SERVER["REMOTE_ADDR"]."
+</IfModule>";
+			
+			if(strstr($_SERVER["REMOTE_ADDR"], ".")) //USE ONLY WHEN ON IPV4 due to APACHE BUG https://issues.apache.org/bugzilla/show_bug.cgi?id=49737
+				$content .= "
+<IfModule !mod_authz_core.c>
+	allow from ".$_SERVER["REMOTE_ADDR"]."
+	deny from all
+	allow from ".$_SERVER["REMOTE_ADDR"]."
+</IfModule>";
+			
+			file_put_contents($dirtouse.".htaccess", $content);
+					
+		}
+		elseif(file_exists($dirtouse.".htaccess"))
+			unlink($dirtouse.".htaccess");
+		
+		if(!PHYNX_USE_TEMP_HTACCESS AND file_exists($dirtouse.".htaccess"))
+			unlink($dirtouse.".htaccess");
 		
 		return $dirtouse;
 	}
@@ -1355,9 +1555,14 @@ class Util {
 	}
 	
 	public static function catchParser($w, $l = "load", $p = ""){
-		if(!is_array($p))
+		
+		if(!is_array($p) AND !is_object($p))
 			$p = HTMLGUI::getArrayFromParametersString($p);
-		else
+		
+		if(is_object($p))
+			$p = array();
+		
+		if(is_array($p))
 			unset($p[0]);
 		return $w == 1 ? "<img ".(isset($p[0]) ? "title=\"$p[0]\"" : "")." src=\"./images/i2/ok.gif\" />" : "<img ".(isset($p[1]) ? "title=\"$p[1]\"" : "")." src=\"./images/i2/notok.gif\" />";
 	}
@@ -1416,8 +1621,20 @@ class Util {
 		#else
 		$head .= 'User-Agent: phynx Version checker'."\r\n";
 
+		
 		$head .= "X-Application: ".$_SESSION["applications"]->getActiveApplication()."\r\n";
 		$head .= "X-Version: ".$_SESSION["applications"]->getRunningVersion()."\r\n";
+		$head .= "X-PHPVersion: ".phpversion()."\r\n";
+		$head .= "X-UserID: ".(Session::currentUser() ? Session::currentUser()->getID() : "0")."\r\n";
+		try {
+			$xml = new SimpleXMLElement(file_get_contents(Util::getRootPath()."system/build.xml"));
+			if($xml->build AND $xml->build->customer)
+				$head .= "X-CustomerID: ".$xml->build->customer."\r\n";
+			
+		} catch (Exception $ex) {
+
+		}
+		
 
 		$head .= 'Connection: close'."\r\n"."\r\n";
 		
@@ -1469,7 +1686,7 @@ class Util {
 	 */
 	public static function lang_getfrombrowser($allowed_languages, $default_language, $lang_variable = null, $strict_mode = true) {
         // $_SERVER['HTTP_ACCEPT_LANGUAGE'] verwenden, wenn keine Sprachvariable mitgegeben wurde
-        if ($lang_variable === null) {
+        if ($lang_variable === null AND isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $lang_variable = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
         }
 
@@ -1572,6 +1789,7 @@ class Util {
 	public function getStatusMessagesLog($tableColumns = 1, $tableName = ""){
 		if($tableName != "") $tab = new HTMLTable($tableColumns, $tableName);
 		else $tab = new HTMLTable($tableColumns);
+		$tab->maxHeight(400);
 		
 		foreach($this->statusMessagesLog AS $k => $v)
 			$tab->addRow($v);
@@ -1644,25 +1862,61 @@ class Util {
 		return Util::getBasicHTML($message, $title);
 	}
 	
-	public static function getBasicHTML($content, $title, $js = true){
+	public static function getBasicHTMLMail($content, $title){
 		#header("Content-Type: text/html; charset=utf-8");
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>'.$title.'</title>
+	</head>
+	<body style="background-color:#efefef;color:#222;">
+		'.($title != "" ? '<h1 style="font-family:sans-serif;margin-left:30px;">'.$title.'</h1>' : "").'
+		<div style="font-family:sans-serif;background-color:white;font-size:14px;margin:20px;padding:10px;">
+		'.$content.'
+		</div>
+	</body>
+</html>';
+	}
+	
+	public static function getBasicHTML($content, $title, $js = true){
+		$physion = "default";
+		if(isset($_GET["physion"]))
+			$physion = $_GET["physion"];
+
+		#header("Content-Type: text/html; charset=utf-8");
+		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<link rel="shortcut icon" type="image/x-icon" href="data:image/x-icon;,"></link>
+		<title>'.$title.'</title>
 		'.($js ? '
 		<script type="text/javascript" src="../libraries/jquery/jquery-1.9.1.min.js"></script>
 		<script type="text/javascript" src="../libraries/jquery/jquery-ui-1.10.1.custom.min.js"></script>
+		<script type="text/javascript" src="../libraries/iconic/iconic.min.js"></script>
+		<script type="text/javascript" src="../libraries/jquery/jquery.qtip.min.js"></script>
+		<script type="text/javascript" src="../libraries/flot/jquery.flot.js"></script>
+		<script type="text/javascript" src="../libraries/flot/jquery.flot.time.js"></script>
 		<script type="text/javascript" src="../javascript/P2J.js"></script>
+		<script type="text/javascript" src="../javascript/Aspect.js"></script>
 		<script type="text/javascript" src="../javascript/handler.js"></script>
 		<script type="text/javascript" src="../javascript/contentManager.js"></script>
 		<script type="text/javascript" src="../javascript/Interface.js"></script>
 		<script type="text/javascript" src="../javascript/Overlay.js"></script>
-		<script type="text/javascript" src="../libraries/webtoolkit.base64.js"></script>' : "").'
+		<script type="text/javascript" src="../libraries/webtoolkit.base64.js"></script>
+		<script type="text/javascript">
+			$j(document).ready(function() {
+				Ajax.physion = "'.$physion.'";
+			});
+		</script>' : "").'
 		
+		<link rel="stylesheet" type="text/css" href="../libraries/jquery/jquery.qtip.min.css"></link>
 		<link rel="stylesheet" type="text/css" href="../styles/'.(isset($_COOKIE["phynx_color"])? $_COOKIE["phynx_color"] : "standard").'/colors.css"></link>
 		<link rel="stylesheet" type="text/css" href="../styles/standard/general.css"></link>
-		
+		<style type="text/css">
+			p {
+				padding:5px;
+			}
+		</style>
 	</head>
 	<body>
 		'.$content.'

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class KalenderEvent extends KalenderEntry {
 	private $day;
@@ -39,7 +39,9 @@ class KalenderEvent extends KalenderEntry {
 	private $currentWhen;
 	private $owner;
 	private $topButtons = array();
-	
+	private $isRepeatable;
+	private $isMovable;
+	private $isCloneable;
 	private $status = 0; //see TodoGUI::getStatus
 	
 	function __construct($className, $classID, $day, $time, $title) {
@@ -184,34 +186,52 @@ class KalenderEvent extends KalenderEntry {
 				break;
 				
 				case "weekly":
-					#echo Util::CLDateParser($firstDay)."<br />";
-					#echo $this->repeatInterval;
-					$weekDay = date("w", $pDay);
-					$D = new Datum($firstDay > $startDay ? $firstDay : $startDay);
+					#echo $this->title().":<br>";
+					#echo "Event first day: ".Util::CLDateParser($firstDay)."<br>";
+					#echo "Display start day: ".Util::CLDateParser($startDay)."<br>";
+					#echo "display end day: ".Util::CLDateParser($endDay)."<br>";
+					#echo "Event interval: ".($this->repeatInterval + 1)."<br>";
+
+					$D = new Datum($firstDay);
 					while($D->time() <= $endDay){
-						if(date("w", $D->time()) == $weekDay)
-							break;
-						
-						$D->addDay();
-					}
-					
-					$counter = floor(($D->time() - $firstDay) / (3600 * 24 * 7));
-					#echo $counter."<br />";
-					while($D->time() <= $endDay){
-						$newDay = Kalender::formatDay($D->time());
-						
-						if($this->repeatUntil > 0  AND $D->time() > $this->repeatUntil)
+						#echo $this->weeks($firstDay, $D->time())."<br>";
+						if(
+							$D->time() >= $startDay 
+							AND 
+							$this->weeks($firstDay, $D->time()) % ($this->repeatInterval + 1) == 0
+						)
 							break;
 						
 						$D->addWeek(true);
+						#if($this->weeks($firstDay, $D->time()) % ($this->repeatInterval + 1) == 0)
+						#	echo "!";
+						#$D->printer();
+					}
+					#$D->printer();
+					
+					#echo "------<br>";
+					
+					$D->subWeek(true);
+					#$D->printer();
+					#if($startDay < $firstDay)
+					#	$D = new Datum ($firstDay);
+					#$counter = floor(($D->time() - $firstDay) / (3600 * 24 * 7));
+					#echo $counter."<br />";
+					while($D->time() <= $endDay){
+						
+						if($this->repeatUntil > 0  AND $D->time() >= $this->repeatUntil)
+							break;
+						
+						$D->addWeek(true);
+						$newDay = Kalender::formatDay($D->time());
 						if($newDay == $this->day){
-							$counter++;
+							#$counter++;
 							continue;
 						}
 						
-
-						if($counter % ($this->repeatInterval + 1) != 0){
-							$counter++;
+						
+						if($this->weeks($firstDay, $D->time()) % ($this->repeatInterval + 1) != 0){
+							#$counter++;
 							continue;
 						}
 						
@@ -226,9 +246,8 @@ class KalenderEvent extends KalenderEntry {
 						$W->endDay = $newDay;
 						$W->time = $this->time;
 						$when[] = $W;
-						
-						$counter++;
 					}
+					#echo "END;<br><br>";
 				break;
 				
 				case "monthly":
@@ -362,6 +381,16 @@ class KalenderEvent extends KalenderEntry {
 		return $when;
 	}
 	
+	function weeks($date1, $date2) {
+		if($date1 > $date2) 
+			return $this->datediffInWeeks($date2, $date1);
+		
+		$first = new DateTime("@".$date1);
+		$second = new DateTime("@".$date2);
+		
+		return round($first->diff($second)->days / 7);
+	}
+	
 	private function isNth($nth, $time){
 		$D = new Datum($time);
 		$D->setToMonth1st();
@@ -414,7 +443,14 @@ class KalenderEvent extends KalenderEntry {
 	
 	function repeatable($callMethod){
 		$this->isRepeatable = $callMethod;
-		
+	}
+	
+	function movable($callMethod){
+		$this->isMovable = $callMethod;
+	}
+	
+	function cloneable($callMethod){
+		$this->isCloneable = $callMethod;
 	}
 
 	public static $multiDayColors = array();
@@ -511,7 +547,7 @@ class KalenderEvent extends KalenderEntry {
 			<div class=\"weekEventEntry\" onclick=\"$this->onClick\" style=\"background-color:".($grey ? "#DDD" : $bgColor).";padding:0px;cursor:pointer;height:".$height."px;overflow:hidden;position:absolute;margin-top:{$top}px;width:137px;\">
 				<div style=\"padding:5px;background-color:$titleColor;\">
 					<div style=\"overflow:hidden;\">
-					".(!$this->allDay ? "<b>".$this->formatTime($this->time)."</b>&nbsp;" : "")."".str_replace(" ", "&nbsp;", $this->title)."
+					<small>".(!$this->allDay ? "<b>".$this->formatTime($this->time)."</b>&nbsp;" : "")."".str_replace(" ", "&nbsp;", $this->title)."</small>
 					</div>
 				</div>
 			</div>";
@@ -595,6 +631,9 @@ class KalenderEvent extends KalenderEntry {
 	}
 
 	function getInfo($time){
+		if($time == null)
+			$time = Kalender::parseDay($this->day);
+		
 		$BE = "";
 		$BD = "";
 		$BDS = "";
@@ -605,17 +644,17 @@ class KalenderEvent extends KalenderEntry {
 				$BE->popup("", "Kalendereintrag bearbeiten", "mKalender", $this->classID, "editInPopup", array("'".$this->className."'", $this->classID, "'{$this->editable[0]}'"));
 			}
 			
-			$BD = new Button("Dieses Event Löschen", "trash", "icon");
+			$BD = new Button("Dieses Event löschen", "trash", "icon");
 			$BD->style("float:right;margin:10px;");
-			$BD->onclick("if(confirm('Löschen?')) ");
-			$BD->rmePCR(str_replace("GUI", "", $this->className), $this->classID, $this->editable[1], $this->classID, "contentManager.reloadFrame('contentLeft'); Popup.close('mKalender', 'edit');");
+			$BD->doBefore("if(confirm('Löschen?')) %AFTER");
+			$BD->rmePCR(str_replace("GUI", "", $this->className), $this->classID, $this->editable[1], $this->classID, "contentManager.reloadFrame('contentScreen'); Popup.close('mKalender', 'edit');");
 			
 			if($this->repeat() !== false){
 				$BD->rmePCR(str_replace("GUI", "", $this->className), $this->classID, $this->editable[1], array($this->classID, $time+Kalender::parseTime($this->time)-60), "contentManager.reloadFrame('contentLeft'); Popup.close('mKalender', 'edit');");
 				
 				$BDS = new Button("Alle Events Löschen", "./ubiquitous/Kalender/deleteSeries.png", "icon");
 				$BDS->style("float:right;margin:10px;");
-				$BDS->onclick("if(confirm('Löschen?')) ");
+				$BDS->doBefore("if(confirm('Löschen?')) %AFTER");
 				$BDS->rmePCR(str_replace("GUI", "", $this->className), $this->classID, $this->editable[1], $this->classID, "contentManager.reloadFrame('contentLeft'); Popup.close('mKalender', 'edit');");
 			
 			}
@@ -648,7 +687,7 @@ class KalenderEvent extends KalenderEntry {
 		$BN = "";
 		if($this->canNotify){
 			// TODO: Entfernen sobald Einladungen funktionieren
-			$BN = new Button("Termin-\nbestätigung", "mail".($this->notified ? "ed" : ""), "icon");
+			$BN = new Button("Terminbestätigung", "mail".($this->notified ? "ed" : ""), "icon");
 			$BN->style("margin-top:10px;margin-left:10px;");
 			$BN->popup("", "Terminbestätigung", "Util", "-1", "EMailPopup", array("'mKalender'", "-1", "'notification::$this->className::$this->classID::$time'", "'function(){ Kalender.refreshInfoPopup(); }'"));
 		}
@@ -657,14 +696,27 @@ class KalenderEvent extends KalenderEntry {
 		if($this->isRepeatable AND $this->getException() === false){
 			$BR = new Button("Wiederholungen", "refresh", "icon");
 			$BR->style("margin:10px;float:right;");
-			$BR->rmePCR("mKalender", "-1", "getRepeatable", array("'$this->className'", "'$this->classID'", "'$this->isRepeatable'"), "function(transport){ \$j('#eventAdditionalContent').html(transport.responseText).slideDown(); }");
+			$BR->rmePCR("mKalender", "-1", "getRepeatable", array("'$this->className'", "'$this->classID'", "'$this->isRepeatable'"), "function(transport){ \$j('#eventSideContent').html(''); \$j('#editDetailsmKalender').animate({'width':'400px'}, 200, 'swing'); \$j('#eventAdditionalContent').html(transport.responseText).slideDown(); }");
 		}
 		
-		// TODO: Flag für Teilnehmer erstellen
-		// nur anzeigen, wenn es sich um eine ToDo handelt
-//		$buttonInvite = new Button("Teilnehmer einladen", "refresh", "icon");
-//		$buttonInvite->style("margin: 10px; float: right;");
-//		$buttonInvite->rmePCR("mKalender", "-1", "getInviteForm", array("'$this->className'", "'$this->classID'", "'getInviteForm'"), "function(transport){ \$j('#eventAdditionalContent').html(transport.responseText).slideDown(); }");
+		$BI = new Button("Teilnehmer", "./ubiquitous/Kalender/einladungen.png", "icon");
+		$BI->style("margin: 10px; float: right;");
+		$BI->rmePCR("mKalender", "-1", "getInvitees", array("'$this->className'", "'$this->classID'"), "function(t){ \$j('#eventAdditionalContent').html(''); \$j('#editDetailsmKalender').animate({'width':'800px'}, 200, 'swing', function(){ \$j('#eventSideContent').html(t.responseText).fadeIn(); }); }");
+		
+		if(!$this->canInvite)
+			$BI = "";
+		
+		$closed = "";
+		if($this->closeable){
+			$BC = new Button("Termin abschließen", "bestaetigung", "icon");
+			$BC->style("margin: 10px; float: right;");
+			$BC->rmePCR("mKalender", "-1", "getClose", array("'$this->className'", "'$this->classID'"), "function(t){ \$j('#editDetailsContentmKalender').html(t.responseText); }");
+			
+			if($this->closed[0]){
+				$BC = "";
+				$closed = "<p>Termin abgeschlossen am ".Util::CLDateParser($this->closed[0]).($this->closed[1] != "" ? ":<br>".nl2br($this->closed[1]) : "")."</p>";
+			}
+		}
 		
 		$topButtons = "";
 		foreach($this->topButtons AS $B){
@@ -673,7 +725,7 @@ class KalenderEvent extends KalenderEntry {
 			$topButtons .= $B;
 		}
 		
-		return $BDS.$BD.$BE.$BN.$topButtons.$BR.$buttonInvite."<div style=\"clear:both;\"></div><div style=\"display:none;\" id=\"eventAdditionalContent\"></div>".$T;
+		return "<div style=\"width:400px;\">".$BDS.$BD.$BE.$BN.$topButtons.$BR.$BI.$BC.$closed."</div><div style=\"clear:both;\"></div><div style=\"display:none;\" id=\"eventAdditionalContent\"></div><div style=\"display:none;width:400px;float:right;\" id=\"eventSideContent\"></div><div style=\"width:400px;float:left;\" id=\"eventDefaultContent\"$T</div>";
 	}
 	
 	public function getInviteForm() {
@@ -707,8 +759,8 @@ class KalenderEvent extends KalenderEntry {
 			$zeit = "";
 		
 		return "
-			<div onclick=\"$onClick\" style=\"".($this->status == 2 ? "color:grey;" : "")."clear:left;padding:2px;padding-left:4px;cursor:pointer;".($grey ? "color:grey;" : "")."\">
-				".(($grey AND isset(mKalenderGUI::$colors[$this->owner])) ? "<div style=\"display:inline-block;margin-right:3px;width:5px;background-color:".mKalenderGUI::$colors[$this->owner].";\">&nbsp;</div>" : "")."$zeit $this->title
+			<div class=\"".($this->isMovable ? "movable" : "")."\" data-clonecallback=\"".str_replace("GUI", "", $this->ownerClass())."::".$this->isCloneable."\" data-movecallback=\"".str_replace("GUI", "", $this->ownerClass())."::".$this->isMovable."\" data-id=\"".$this->ownerClassID()."\" title=\"".strip_tags($this->title)."\" onclick=\"$onClick\" style=\"".($this->status == 2 ? "color:grey;" : "")."white-space:nowrap;overflow:hidden;height:13px;/*width:60px;*/clear:left;padding:2px;padding-left:4px;cursor:pointer;".($grey ? "color:grey;" : "")."\">
+				<small>".(($grey AND isset(mKalenderGUI::$colors[$this->owner])) ? "<div style=\"display:inline-block;margin-right:3px;width:5px;background-color:".mKalenderGUI::$colors[$this->owner].";\">&nbsp;</div>" : "")."$zeit $this->title</small>
 			</div>";
 	}
 	

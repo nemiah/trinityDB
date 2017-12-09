@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class PMReflector {
 
@@ -23,6 +23,9 @@ class PMReflector {
 		
 		if(is_object($className)) return PMReflector::getAttributesArrayAnyObject($className);
 
+		if(trim($className) == "")
+			throw new Exception("Empty class name");
+		
 	    /*$a = array();
 	    $class = new ReflectionClass("$className");
 		$props = $class->getProperties();
@@ -34,6 +37,9 @@ class PMReflector {
 	}
 
 	public static function implementsInterface($className, $interfaceName){
+		if(trim($className) == "")
+			return false;
+		
 		$r = new ReflectionClass($className);
 
 		foreach($r->getInterfaces() as $in)
@@ -43,70 +49,17 @@ class PMReflector {
 	}
 	
 	public static function getAttributesArrayAnyObject($O){
-		/*$t = array();
-		$v = var_export($O, true);
-		
-		$s = explode("::__set_state(",$v);
-		if(count($s) >= 2){
-			$s[1]{strlen($s[1])-1} = ";";
-			eval("\$c = ".$s[1]."");
-			return array_keys($c);
-		}
-		*/
-		#$s = var_export($O, true);
-		
-		#$s2 = "";
-		#$mode = "copy";
-		#$subMode = "none";
-		
-		#$newword = "";
-		#$lastword = "";
-		
 		$vars = array();
-		if($O == null) return $vars;
-		foreach($O as $key => $value)
-			$vars[] = $key;
+		if($O == null)
+			return $vars;
 		
-		/*
-		for($i = 0; $i < strlen($s); $i++){
-			
-			if($s[$i] == "'" AND $mode == "copy" AND $s[$i - 1] != "\\") {
-				#$s2 .= $s[$i];
-				$mode = "noCopy";
+		foreach($O as $key => $value){
+			if(is_array($value))
 				continue;
-			}
-			if($s[$i] == "'" AND $mode == "noCopy" AND $s[$i - 1] != "\\") {
-				#$s2 .= $s[$i];
-				$mode = "copy";
-				continue;
-			}
-			if($mode == "noCopy") continue;
-			#echo $s[$i];
-			#if($mode == "copy")
-			#	$s2 .= $s[$i];
 			
-			if($s[$i] == " ") {
-				$newword = $lastword;
-				$lastword = "";
-			} else $lastword .= $s[$i];
-			
-			
-			if($subMode == "none" AND $s[$i] == "\$" AND ($newword == "private" OR $newword == "public" OR $newword == "protected") AND $mode == "copy") {
-				$vars[] = "";
-				$subMode = "variable";
-				continue;
-			}
-			
-			if($subMode == "variable" AND $s[$i] == " ") {
-				$subMode = "none";
-			}
-			
-			if($subMode == "variable" AND $mode == "copy"){
-				$vars[count($vars) - 1] .= $s[$i];
-			}
-			
-			
-		}*/
+			$vars[] = $key;
+		}
+		
 		return $vars;
 	}
 }

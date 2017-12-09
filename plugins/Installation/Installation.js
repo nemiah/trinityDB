@@ -15,41 +15,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
-/*
-function loadWithHighlighter(folder){
-	alert("hi");
-	loadFrame('contentLeft','CIs','',folder);
-	initHighlight($('contentLeft'));
-}*/
-
-/*function installTable(cl){
-	new Ajax.Request("./interface/rme.php?class="+cl+"&construct=&method=createMyTable&parameters=''", {
-	method: 'get',
-	onSuccess: function(transport) {
-    	$('contentLeft').update(transport.responseText);
-    	
-		contentManager.reloadFrame('contentRight');
-	}});
-}
-
-function checkFields(plugin){
-	new Ajax.Request("./interface/rme.php?class="+plugin+"&constructor=&method=checkMyTables&parameters=''", {
-	method: 'get',
-	onSuccess: function(transport) {
-		if(transport.responseText == "-2") {
-			showMessage("Plugin besitzt keine Tabelle.");
-			return;
-		}
-		if(transport.responseText == "-1") showMessage("Es ist ein Fehler aufgetreten");
-		if(transport.responseText == "0") {
-			showMessage("kein Update notwendig.");
-			return;
-		}
-		if(transport.responseText != "-1") showMessage(transport.responseText+" Feld"+(transport.responseText != "1" ? "er" : "")+" aktualisiert.");
-	}});
-}*/
 
 var Installation = {
 	reloadApp: function() {

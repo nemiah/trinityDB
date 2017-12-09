@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class mFile extends anyC {
 	private $hideDirs = false;
@@ -30,7 +30,7 @@ class mFile extends anyC {
 		$this->hideDirs = $bool;
 	}
 
-	public function lCV3($id = -1, $returnCollector = true){
+	public function lCV3($id = -1, $returnCollector = true, $lazyload = false){
 		$num = parent::lCV3($id, $returnCollector);
 
 		$c = array();

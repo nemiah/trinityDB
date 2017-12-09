@@ -15,14 +15,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
-if(!function_exists("array_fill_keys")){
+if(!function_exists("hash_equals")){
 	require_once "./system/basics.php";
 	
-	emoFatalError("I'm sorry, but your PHP version is too old.", "You need at least PHP version 5.2.0 to run this program.<br />You are using ".phpversion().". Please talk to your provider about this.", "phynx");
+	emoFatalError("I'm sorry, but your PHP version is too old.", "You need at least PHP version 5.6.0 to run this program.<br />You are using ".phpversion().". Please talk to your provider about this.", "phynx");
 }
+
+$scripts = array(
+	"./libraries/jquery/jquery-1.9.1.min.js",
+	"./libraries/jquery/jquery-ui-1.10.1.custom.min.js",
+	"./libraries/jquery/jquery.json-2.3.min.js",
+	"./libraries/jquery/jquery.timers.js",
+	"./libraries/jquery/jquery.qtip.min.js",
+	"./libraries/jquery/jquery.scrollTo-1.4.2-min.js",
+	"./libraries/jquery/jquery.hammer.js",
+	"./libraries/jstorage.js",
+	"./libraries/webtoolkit.base64.js",
+	"./libraries/webtoolkit.sha1.js",
+	"./libraries/flot/jquery.flot.js",
+	"./libraries/flot/jquery.flot.time.js",
+	"./libraries/flot/jquery.flot.threshold.js",
+	"./libraries/flot/jquery.flot.pie.js",
+	"./libraries/flot/jquery.flot.selection.js",
+	"./libraries/flot/jquery.flot.orderBars.js",
+	"./libraries/modernizr.custom.js",
+	"./libraries/snap.svg/snap.svg-min.js",
+	"./libraries/touchy/Touchy.js",
+	"./libraries/iconic/iconic.min.js");
+
+foreach($scripts AS $url)
+	header("Link: <$url>; rel=preload; as=script", false);
+
+if(file_exists(dirname(__FILE__)."/styles/standard/merge.css"))
+	header("Link: <./styles/standard/merge.css>; rel=preload; as=style", false);
 
 $dir = new DirectoryIterator(dirname(__FILE__));
 $notExecutable = array();
@@ -68,6 +96,7 @@ T::load(Util::getRootPath()."libraries");
 $E = new Environment();
 */
 $cssColorsDir = Environment::getS("cssColorsDir", (isset($_COOKIE["phynx_color"]) ? $_COOKIE["phynx_color"] : "standard"));
+$cssCustomFiles = Environment::getS("cssCustomFiles", null);
 /*
 if(file_exists(Util::getRootPath()."plugins/Cloud/Cloud.class.php")){
 	require_once Util::getRootPath()."plugins/Cloud/Cloud.class.php";
@@ -121,7 +150,8 @@ if(Phynx::build()){
 
 $validUntil = Environment::getS("validUntil", null);
 
-if($_SESSION["S"]->checkIfUserLoggedIn() == false) $_SESSION["CurrentAppPlugins"]->scanPlugins();
+if($_SESSION["S"]->checkIfUserLoggedIn() == false) 
+	$_SESSION["CurrentAppPlugins"]->scanPlugins();
 
 $updateTitle = true;
 $title = Environment::getS("renameFramework", "phynx by Furtmeier Hard- und Software");
@@ -134,317 +164,8 @@ $sephy = Session::physion();
 if($sephy AND isset($sephy[3]) AND $sephy[3])
 		$favico = $sephy[3];
 
-?><!DOCTYPE html>
-<html>
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<meta name="revisit-after" content="14 days" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-		<title><?php echo $title ?></title>
-
-		<link rel="shortcut icon" href="<?php echo $favico ?>" /> 
-		
-		<!--<script src="https://login.persona.org/include.js"></script>-->
-		
-		<script type="text/javascript" src="./libraries/jquery/jquery-1.9.1.min.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery-ui-1.10.1.custom.min.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery.json-2.3.min.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery.timers.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery.qtip.min.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery.scrollTo-1.4.2-min.js"></script>
-		<script type="text/javascript" src="./libraries/jquery/jquery.hammer.js"></script>
-		<script type="text/javascript" src="./libraries/jstorage.js"></script>
-		<script type="text/javascript" src="./libraries/webtoolkit.base64.js"></script>
-		<script type="text/javascript" src="./libraries/webtoolkit.sha1.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.time.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.threshold.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.pie.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.selection.js"></script>
-		<script type="text/javascript" src="./libraries/flot/jquery.flot.orderBars.js"></script>
-		<script type="text/javascript" src="./libraries/nicEdit/nicEdit.js"></script>
-		<script type="text/javascript" src="./libraries/modernizr.custom.js"></script>
-		<script type="text/javascript" src="./libraries/snap.svg/snap.svg-min.js"></script>
-		<script type="text/javascript" src="./libraries/touchy/Touchy.js"></script>
-
-		
-		<script type="text/javascript" src="./javascript/P2J.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Registry.js?r=<?php echo $build; ?>"></script>
-
-		<script type="text/javascript" src="./javascript/Aspect.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Observer.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Overlay.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Menu.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/autoComplete.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/phynxContextMenu.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/userControl.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Interface.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Popup.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/contentManager.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/DesktopLink.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/notificationArea.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/handler.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./javascript/Util.js?r=<?php echo $build; ?>"></script>
-
-		<script type="text/javascript" src="./libraries/TextEditor.js?r=<?php echo $build; ?>"></script>
-		<script type="text/javascript" src="./libraries/fileuploader.js?r=<?php echo $build; ?>"></script>
-
-			
-		<?php if(file_exists(Util::getRootPath()."ubiquitous/Wysiwyg/tiny_mce/tiny_mce.js")) echo '
-		<script type="text/javascript" src="./ubiquitous/Wysiwyg/tiny_mce/tiny_mce.js?r='.$build.'"></script>
-		<script type="text/javascript" src="./ubiquitous/Wysiwyg/tiny_mce/jquery.tinymce.js?r='.$build.'"></script>'; ?> 
-		<!--<script type="text/javascript" src="./javascript/DynamicJS.php?r=<?php echo rand(); ?>"></script> MOVED TO JSLOADER 22042013!!-->
-
-		<script type="text/javascript">
-			if(typeof contentManager == "undefined")
-				alert("Die JavaScript-Dateien konnten nicht geladen werden.\nDies kann an der Server-Konfiguration liegen.\nBitte versuchen Sie, diese Anwendung in ein Unterverzeichnis zu installieren.");
-		</script>
-		<script>
-			window.define = function(factory) {
-				try{ delete window.define; } catch(e){ window.define = void 0; } // IE
-				window.when = factory();
-			};
-			window.define.amd = {};
-		</script>
-		<link rel="stylesheet" type="text/css" href="./libraries/jquery/jquery-ui-1.10.1.custom.css" />
-		<link rel="stylesheet" type="text/css" href="./libraries/jquery/jquery.qtip.min.css" />
-		<link rel="stylesheet" type="text/css" href="./libraries/touchy/Touchy.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/overlayBox.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/frames.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/general.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/navigation.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/autoCompletion.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/phynxContextMenu.css" />
-		<link rel="stylesheet" type="text/css" href="./styles/standard/TextEditor.css" />
-		<!--<link rel="stylesheet" type="text/css" href="./styles/standard/calendar.css" />-->
-		<link rel="stylesheet" type="text/css" href="./styles/standard/colors.css" />
-		<?php
-		
-		if($cssColorsDir != "standard") 
-			echo '<link rel="stylesheet" type="text/css" href="./styles/'.$cssColorsDir.'/colors.css" />';
-		
-		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "vertical"))
-			echo '<link rel="stylesheet" type="text/css" href="./styles/standard/vertical.css" />';
-		
-		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "desktop"))
-			echo '<link rel="stylesheet" type="text/css" href="./styles/standard/desktop.css" />';
-		
-		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "fixed"))
-			echo '<link rel="stylesheet" type="text/css" href="./styles/standard/fixed.css" />';
-		?>
-
-		<!--[if lt IE 8]>
-		<script type="text/javascript">
-			alert("Sie benötigen mindestens Internet Explorer Version 8!");
-		</script>
-		<![endif]-->
-
-	</head>
-	<body>
-		<div id="DynamicJS" style="display: none;"></div>
-		<!--<div style="position:fixed;top:0px;left:0px;width:20px;" id="growlContainer"></div>-->
-		<div id="boxInOverlay" style="display: none;" class="backgroundColor0 borderColor1">
-			<?php if(Environment::getS("showCopyright", "1") == "1") { ?>
-			<p style="color:grey;left:10px;position:fixed;bottom:10px;"><a style="color:grey;" target="_blank" href="http://www.furtmeier.it"><?php echo T::_("Unternehmenssoftware"); ?></a> <?php echo T::_("von Furtmeier Hard- und Software"); ?></p>
-			<?php } ?>
-			<form id="loginForm" onsubmit="return false;">
-				<table class="loginWindow" style="border-spacing: 0 0px;">
-					<colgroup>
-						<col class="" style="width:120px;" />
-						<col class="" />
-					</colgroup>
-					<tr>
-						<td><label><?php echo T::_("Benutzername"); ?>:</label></td>
-						<td><input style="width:285px;" tabindex="1" onfocus="focusMe(this);" onblur="blurMe(this);" type="text" name="loginUsername" id="loginUsername" onkeydown="userControl.abortAutoCertificateLogin(); userControl.abortAutoLogin(); if(event.keyCode == 13) userControl.doLogin();" /></td>
-					</tr>
-					<tr>
-						<td><label><?php echo T::_("Passwort"); ?>:</label></td>
-						<td>
-							<img
-								style="float:right;"
-								class="mouseoverFade"
-								onclick="$j('#loginOptions, #altLogins').toggle();"
-								src="./images/i2/settings.png"
-								title="<?php echo T::_("Optionen anzeigen"); ?>"
-								alt="<?php echo T::_("Optionen anzeigen"); ?>"/>
-							
-							<img
-								style="float:right;margin-right:5px;"
-								class="mouseoverFade"
-								onclick="rmeP('Users', -1, 'lostPassword', [$('loginUsername').value], 'checkResponse(transport);');"
-								src="./images/i2/hilfe.png"
-								title="<?php echo T::_("Passwort vergessen?"); ?>"
-								alt="<?php echo T::_("Passwort vergessen?"); ?>"/>
-							<input
-								style="width:240px;"
-								onfocus="focusMe(this);"
-								onblur="blurMe(this);"
-								type="password"
-								id="loginPassword"
-								tabindex="2"
-								onkeydown="userControl.abortAutoCertificateLogin(); userControl.abortAutoLogin(); if(event.keyCode == 13) userControl.doLogin();"
-							/>
-						</td>
-					</tr>
-					<tr id="loginOptions">
-						<td><label><?php echo T::_("Anwendung"); ?>:</label></td>
-						<td>
-							<?php
-							
-							if(Environment::getS("showApplicationsList", "1") == "1"){ ?>
-								<select
-									style=""
-									id="anwendung"
-									name="anwendung"
-									tabindex="3"
-									onkeydown="if(event.keyCode == 13) userControl.doLogin();">
-									<?php echo $_SESSION["applications"]->getHTMLOptions(isset($_GET["application"]) ? $_GET["application"] : null); ?>
-								</select>
-							<?php }
-							
-							if(Environment::getS("showApplicationsList", "1") == "0"){ ?>
-								<input
-									type="hidden"
-									id="anwendung"
-									name="anwendung"
-									value="<?php echo Environment::getS("defaultApplication", ""); ?>"/>
-							<?php } ?>
-								
-							<input
-								type="hidden"
-								id="loginSprache"
-								name="loginSprache"
-								value="default"/>
-								
-							<!--<select
-								style="width:160px;margin-top:5px;"
-								id="loginSprache"
-								name="loginSprache"
-								tabindex="4"
-								onkeydown="if(event.keyCode == 13) userControl.doLogin();">
-								
-								<option value="default"><?php echo T::_("Sprache"); ?></option>
-								<option value="de_DE">deutsch</option>
-								<option value="en_US">english</option>
-								<option value="it_IT">italiano</option>
-							</select>-->
-								
-							</td>
-					</tr>
-					<tr>
-						<td colspan="2" style="background-color:#EEE;">
-							<input
-								class="bigButton"
-								type="button"
-								style="float:right;background-image:url(./images/navi/keys.png);background-color:#CCC;width: 150px;"
-								onclick="userControl.doLogin();"
-								value="<?php echo T::_("Anmelden"); ?>" />
-							
-							<div id="countdownCertificateLogin" style="float:right;margin-top:20px;width:20px;text-align:right;margin-right:5px;"></div>
-								
-							<div style="padding-top:3px;" id="saveLoginDataContainer">
-								<input
-									type="checkbox"
-									style="margin:0px;margin-right:5px;float:left;"
-									onclick="if($j(this).prop('checked')) $j('#doAutoLoginContainer').fadeIn(); else { $j('#doAutoLogin').prop('checked', false); $j('#doAutoLoginContainer').fadeOut(); }"
-									name="saveLoginData"
-									id="saveLoginData" />
-								<label
-									style="float:none;display:inline;font-weight:normal;color:grey;"
-									for="saveLoginData">
-									<?php echo T::_("Zugangsdaten speichern"); ?>
-								</label>
-							</div>
-							<div style="padding-top:5px;display:none;" id="doAutoLoginContainer">
-								<input
-									type="checkbox"
-									style="margin:0px;margin-right:5px;float:left"
-									name="doAutoLogin"
-									id="doAutoLogin"
-									onclick="userControl.abortAutoLogin();"/>
-								<label
-									style="float:none;display:inline;font-weight:normal;color:grey;"
-									for="doAutoLogin">
-									<?php echo T::_("Automatisch anmelden"); ?>
-								</label>
-							</div>
-							<input type="hidden" value="" name="loginSHAPassword" id="loginSHAPassword" />
-						</td>
-					</tr>
-					<?php if(strstr($_SERVER["SCRIPT_FILENAME"],"demo") OR $validUntil != null) { ?>
-						<tr>
-							<td colspan="2">
-								<?php echo ($validUntil != null ? "Bitte beachten Sie: Diese Version läuft noch bis ".date("d.m.Y", $validUntil) : "Für den Demo-Zugang verwenden Sie bitte Max//Max oder Admin//Admin"); ?>
-							</td>
-						</tr>
-					<?php } ?>
-					
-					<tr id="loginCertOptions" style="display:none;" class="backgroundColor3">
-						<td colspan="2">In diesem Browser wurde noch kein Zertifikat für die Ein-Klick-Anmeldung hinterlegt. Bitte bestellen Sie ein Zertifikat für Ihren Benutzer bei <a href="http://www.furtmeier.it/page-Kontakt" target="_blank">Furtmeier Hard- und Software</a> und kopieren Sie es anschließend in das Textfeld:
-							<br />
-							<br />
-							<textarea id="loginNewCertificate" class="backgroundColor2" style="width:99%;font-size:10px;height:100px;"></textarea>
-							<br />
-							<br />
-							<input type="button" class="bigButton backgroundColor2" style="background-image:url(./images/navi/bestaetigung.png);float:right;" onclick="userControl.saveCertificate();" value="speichern"/>
-						</td>
-					</tr>
-					
-					<?php if(Environment::getS("impressum", "") != "") { ?>
-						<tr>
-							<td colspan="2" style="text-align:right;font-size:10px;">
-								<a target="_blank" href="<?php echo Environment::getS("impressum", ""); ?>" onclick="window.open('<?php echo Environment::getS("impressum", ""); ?>','Impressum','height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes'); return false;">Impressum</a>
-								<?php
-								
-								if(Environment::getS("datenschutz", "") != "")
-									echo '
-									| <a target="_blank" href="'.Environment::getS("datenschutz", "").'" onclick="window.open(\''.Environment::getS("datenschutz", "").'\',\'Datenschutz\',\'height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes\'); return false;">Datenschutz</a>';
-								
-								if(Environment::getS("registrierung", "") != "")
-								echo '
-									| <a target="_blank" href="'.Environment::getS("registrierung", "").'" onclick="window.open(\''.Environment::getS("registrierung", "").'\',\'Datenschutz\',\'height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes\'); return false;">Registrieren</a>';
-								?>
-							</td>
-						</tr>
-					<?php }
-					
-					if(strstr($_SERVER["SCRIPT_FILENAME"],"demo_all")){ ?>
-						<tr>
-							<td colspan="2">
-								Dies ist die erweiterte Demoversion. Sie können sich auch als Mitarbeiter//Mitarbeiter einloggen, um eine für Mitarbeiter angepasste Version zu sehen.
-							</td>
-						</tr>
-					<?php } ?>
-				</table>
-			</form>
-			
-			<div style="float:right;margin-bottom:-70px;opacity:0.3;" id="altLogins">
-				<?php if(extension_loaded("openssl") AND Environment::getS("showCertificateLoginButton", "1") == "1") { ?>
-				<img
-					class="mouseoverFade"
-					src="./plugins/Users/certificateLogin.png"
-					style="margin-top:15px;margin-right:10px;"
-					onclick="userControl.doCertificateLogin();"
-					id="buttonCertificateLogin"
-					title="<?php echo T::_("Mit Zertifikat anmelden");?>"
-					alt="<?php echo T::_("Mit Zertifikat anmelden");?>"/>
-				<?php } ?>
-				<?php if(extension_loaded("curl")) { ?>
-				<img
-					class="mouseoverFade"
-					src="./images/persona.png"
-					style="margin-top:15px;display:none;"
-					onclick="navigator.id.request({siteName: 'phynx'});"
-					id="buttonPersonaLogin"
-					title="<?php echo T::_("Mit Mozilla Persona anmelden"); ?>"
-					alt="<?php echo T::_("Mit Mozilla Persona anmelden"); ?>"/>
-				<?php } ?>
-			</div>
-		</div>
-		
-		<div id="lightOverlay" style="display: none;" class="backgroundColor0">
-			<img src="./images/html5.png" style="position:fixed;bottom:20px;right:20px;" alt="HTML5" title="HTML5" />
-			<svg
+$background = '
+	<svg
 				style="width:5000px;height:4000px;"
 				xmlns="http://www.w3.org/2000/svg"
 				xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -528,17 +249,412 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 					id="rect3263"
 					style="opacity:0.48318092;fill:url(#linearGradient3025);fill-opacity:1;stroke:#a05a2c" />
 				</g>
-			</svg>
+			</svg>';
+
+$backgroundStyle = "";
+try {
+	if(file_exists(Util::getRootPath()."ubiquitous/Hintergrundbilder")){
+		require_once Util::getRootPath()."ubiquitous/Hintergrundbilder/Hintergrundbild.class.php";
+
+		$HG = Hintergrundbild::find();
+		if($HG){
+			$backgroundStyle = "background-image: url(".$HG->A("HintergrundbildImageURL").");background-size: cover;background-position: bottom center;background-repeat: no-repeat;";
+			$background = "";
+		}
+	}
+} catch (Exception $ex) {
+
+}
+$CH = Util::getCloudHost();
+$mandanten = array();
+if(file_exists(Util::getRootPath()."plugins/multiInstall/plugin.xml") AND ($CH == null OR get_class($CH) == "CloudHostAny")){
+	$selected = false;
+	list($folder) = Installation::getDBFolder();
+	$MI = new mInstallation();
+	$MI->changeFolder($folder);
+	while($I = $MI->n()){
+		if($I->A("httpHost") == "cloudData")
+			continue;
+
+		if($I->A("httpHost") == $_SERVER["HTTP_HOST"])
+			$selected = $I->getID();
+		
+		$mandanten[$I->getID()] = $I->A("httpHost");
+	}
+}
+
+?><!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+		<title><?php echo $title ?></title>
+
+		<link rel="shortcut icon" href="<?php echo $favico ?>" /> 
+		
+		<script type="text/javascript">
+			window.paceOptions = {
+				ajax: {
+					trackMethods: ['POST'],
+					trackWebSockets: false,
+					ignoreURLs: []
+				},
+				elements: false//,
+				//document: false,
+				//eventLag: false,
+				
+				//restartOnRequestAfter: 500,
+				//restartOnPushState: true
+			};
+		</script>
+		<script type="text/javascript" src="./libraries/pace/pace.min.js"></script>
+		<link href="./libraries/pace/pace-theme-minimal.css" rel="stylesheet" />
+		<?php
+		foreach($scripts AS $url)
+			echo "
+		<script type=\"text/javascript\" src=\"$url\"></script>";
+		?>
+		
+		<script type="text/javascript" src="./libraries/tinymce/tinymce.min.js?r=<?php echo $build; ?>" async></script>
+		<script type="text/javascript" src="./libraries/tinymce/jquery.tinymce.min.js?r=<?php echo $build; ?>" async></script>
+		
+		<script type="text/javascript" src="./javascript/P2J.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Registry.js?r=<?php echo $build; ?>"></script>
+
+		<script type="text/javascript" src="./javascript/Aspect.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Overlay.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Menu.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/autoComplete.js?r=<?php echo $build; ?>" async></script>
+		<script type="text/javascript" src="./javascript/phynxContextMenu.js?r=<?php echo $build; ?>" async></script>
+		<script type="text/javascript" src="./javascript/userControl.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Interface.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Popup.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/contentManager.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/handler.js?r=<?php echo $build; ?>"></script>
+		<script type="text/javascript" src="./javascript/Util.js?r=<?php echo $build; ?>"></script>
+		
+		<script type="text/javascript" src="./libraries/TextEditor.js?r=<?php echo $build; ?>" async></script>
+		<script type="text/javascript" src="./libraries/fileuploader.js?r=<?php echo $build; ?>" async></script>
+
+		<script type="text/javascript">
+			if(typeof contentManager == "undefined")
+				alert("Die JavaScript-Dateien konnten nicht geladen werden.\nDies kann an der Server-Konfiguration liegen.\nBitte versuchen Sie, diese Anwendung in ein Unterverzeichnis zu installieren.");
+		</script>
+		<script>
+			/*window.define = function(factory) {
+				try{ delete window.define; } catch(e){ window.define = void 0; } // IE
+				window.when = factory();
+			};
+			window.define.amd = {};*/
+			<?php
+			if(!Environment::getS("usePWEncryption", true))
+				echo "\$j(function(){
+					userControl.usePWEncryption = false;
+					\$j('#loginPWEncrypted').val('0');
+				});";
+			?>
+		</script>
+		<?php if(!file_exists(dirname(__FILE__)."/styles/standard/merge.css")){ ?>
+		
+		<link rel="stylesheet" type="text/css" href="./libraries/jquery/jquery-ui-1.10.1.custom.css" />
+		<link rel="stylesheet" type="text/css" href="./libraries/jquery/jquery.qtip.min.css" />
+		<link rel="stylesheet" type="text/css" href="./libraries/touchy/Touchy.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/overlayBox.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/frames.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/general.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/navigation.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/autoCompletion.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/phynxContextMenu.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/TextEditor.css" />
+		<link rel="stylesheet" type="text/css" href="./styles/standard/colors.css" />
+		<?php
+		} else
+			echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"./styles/standard/merge.css\" />";
+		
+		if($cssColorsDir != "standard") 
+			echo '
+		<link rel="stylesheet" type="text/css" href="./styles/'.$cssColorsDir.'/colors.css" />';
+		
+		if($cssCustomFiles != null){
+			foreach (explode("\n", $cssCustomFiles) AS $cssFile)
+				echo '
+		<link rel="stylesheet" type="text/css" href="'.$cssFile.'" />';
+		}
+		
+		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "vertical"))
+			echo '
+		<link rel="stylesheet" type="text/css" href="./styles/standard/vertical.css" />';
+		
+		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "desktop"))
+			echo '
+		<link rel="stylesheet" type="text/css" href="./styles/standard/desktop.css" />';
+		
+		if((isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "fixed"))
+			echo '
+		<link rel="stylesheet" type="text/css" href="./styles/standard/fixed.css" />';
+		
+			echo '
+		<link rel="stylesheet" type="text/css" href="./styles/standard/mobile.css" />';
+		?>
+	</head>
+	<body>
+		<div id="DynamicJS" style="display: none;"></div>
+		<!--<div style="position:fixed;top:0px;left:0px;width:20px;" id="growlContainer"></div>-->
+		<div id="boxInOverlay" style="display: none;" class="backgroundColor0 borderColor1">
+
+			<?php
+			echo Environment::getS("contentLoginTop", "");
+			
+			if(Environment::getS("showCopyright", "1") == "1") { ?>
+			<p style="color:grey;left:10px;position:fixed;bottom:10px;"><a style="color:grey;" target="_blank" href="http://www.furtmeier.it"><?php echo T::_("Unternehmenssoftware"); ?></a> <?php echo T::_("von Furtmeier Hard- und Software"); ?></p>
+			<?php } ?>
+			<form id="loginForm" onsubmit="return false;">
+				<table class="loginWindow" style="border-spacing: 0 0px;">
+					<colgroup>
+						<col class="" style="width:120px;" />
+						<col class="" />
+					</colgroup>
+					<tr <?php if(count($mandanten) <= 1 OR $selected !== false) echo "style=\"display:none\""; ?>>
+						<td><label><?php echo T::_("Mandant"); ?>:</label></td>
+						<td>
+							<select style="width:285px;" onfocus="focusMe(this);" onblur="blurMe(this);" type="text" name="loginMandant" id="loginMandant" onkeydown="">
+								<?php $m = ""; foreach($mandanten AS $MID => $MN) $m .= "<option value=\"$MID\" ".($selected == $MID ? "selected=\"selected\"" : "").">".($MN == "*" ? "Standard" : $MN)."</option>"; echo $m; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><label><?php echo T::_("Benutzername"); ?>:</label></td>
+						<td><input style="width:285px;" onfocus="focusMe(this);" onblur="blurMe(this);" type="text" name="loginUsername" id="loginUsername" onkeydown="userControl.abortAutoCertificateLogin(); userControl.abortAutoLogin(); if(event.keyCode == 13) userControl.doLogin();" /></td>
+					</tr>
+					<tr>
+						<td><label><?php echo T::_("Passwort"); ?>:</label></td>
+						<td>
+							<img
+								style="float:right;margin-right:5px;"
+								class="mouseoverFade"
+								onclick="$j('#loginOptions, #altLogins').toggle();"
+								src="./images/i2/settings.png"
+								title="<?php echo T::_("Optionen anzeigen"); ?>"
+								alt="<?php echo T::_("Optionen anzeigen"); ?>"/>
+							
+							<input
+								style="width:240px;box-sizing:border-box;"
+								onfocus="focusMe(this);"
+								onblur="blurMe(this);"
+								type="password"
+								id="loginPassword"
+								onkeydown="userControl.abortAutoCertificateLogin(); userControl.abortAutoLogin(); if(event.keyCode == 13) userControl.doLogin();"
+							/>
+						</td>
+					</tr>
+					<tr class="changePassword" style="display:none;">
+						<td><label><?php echo T::_("Neues Passwort"); ?>:</label></td>
+						<td><input
+								style="width:240px;box-sizing:border-box;"
+								onfocus="focusMe(this);"
+								onblur="blurMe(this);"
+								type="password"
+								id="newPassword1"
+								onkeydown=""
+							/></td>
+					</tr>
+					<tr class="changePassword" style="display:none;">
+						<td><label><?php echo T::_("Neues Passwort"); ?>:</label></td>
+						<td>
+							<img
+								style="float:right;margin-right:5px;margin-top:4px;"
+								class="mouseoverFade"
+								onclick="userControl.changePassword();"
+								src="./images/i2/bestaetigung.png"
+								id="changePasswordButton"
+								title="<?php echo T::_("Passwort ändern"); ?>"
+								alt="<?php echo T::_("Passwort ändern?"); ?>"/>
+							
+							<input
+								style="width:240px;box-sizing:border-box;"
+								onfocus="focusMe(this);"
+								onblur="blurMe(this);"
+								type="password"
+								id="newPassword2"
+								onkeydown="if(event.keyCode == 13) userControl.changePassword();"
+							/></td>
+					</tr>
+					<tr id="loginOptions">
+						<td><label><?php echo T::_("Anwendung"); ?>:</label></td>
+						<td>
+							<img
+								style="float:right;margin-right:5px;margin-top:4px;"
+								class="mouseoverFade"
+								onclick="rmeP('Users', -1, 'lostPassword', [$('loginUsername').value], 'checkResponse(transport);');"
+								src="./images/i2/hilfe.png"
+								title="<?php echo T::_("Passwort vergessen?"); ?>"
+								alt="<?php echo T::_("Passwort vergessen?"); ?>"/>
+							
+							<img
+								style="float:right;margin-right:5px;margin-top:4px;"
+								class="mouseoverFade"
+								onclick="$j('.changePassword').toggle();"
+								src="./images/i2/refresh.png"
+								title="<?php echo T::_("Passwort ändern"); ?>"
+								alt="<?php echo T::_("Passwort ändern?"); ?>"/>
+							<?php
+							
+							if(Environment::getS("showApplicationsList", "1") == "1"){ ?>
+								<select
+									style="width:240px;box-sizing:border-box;"
+									id="anwendung"
+									name="anwendung"
+									onkeydown="if(event.keyCode == 13) userControl.doLogin();">
+									<?php echo $_SESSION["applications"]->getHTMLOptions(isset($_GET["application"]) ? $_GET["application"] : null); ?>
+								</select>
+							<?php }
+							
+							if(Environment::getS("showApplicationsList", "1") == "0"){ ?>
+								<input
+									type="hidden"
+									id="anwendung"
+									name="anwendung"
+									value="<?php echo Environment::getS("defaultApplication", ""); ?>"/>
+							<?php } ?>
+								
+							<input
+								type="hidden"
+								id="loginSprache"
+								name="loginSprache"
+								value="default"/>
+								
+							<!--<select
+								style="width:160px;margin-top:5px;"
+								id="loginSprache"
+								name="loginSprache"
+								onkeydown="if(event.keyCode == 13) userControl.doLogin();">
+								
+								<option value="default"><?php echo T::_("Sprache"); ?></option>
+								<option value="de_DE">deutsch</option>
+								<option value="en_US">english</option>
+								<option value="it_IT">italiano</option>
+							</select>-->
+								
+							</td>
+					</tr>
+					<tr>
+						<td colspan="2" style="background-color:#EEE;">
+							<input
+								class="bigButton"
+								type="button"
+								style="float:right;background-image:url(./images/navi/keys.png);background-color:#CCC;width: 150px;"
+								onclick="userControl.doLogin();"
+								value="<?php echo T::_("Anmelden"); ?>" />
+							
+							<div id="countdownCertificateLogin" style="float:right;margin-top:20px;width:20px;text-align:right;margin-right:5px;"></div>
+								
+							<div style="padding-top:3px;" id="saveLoginDataContainer">
+								<input
+									type="checkbox"
+									style="margin:0px;margin-right:5px;float:left;"
+									onclick="if($j(this).prop('checked')) $j('#doAutoLoginContainer').fadeIn(); else { $j('#doAutoLogin').prop('checked', false); $j('#doAutoLoginContainer').fadeOut(); }"
+									name="saveLoginData"
+									id="saveLoginData" />
+								<label
+									style="float:none;display:inline;font-weight:normal;color:grey;"
+									for="saveLoginData">
+									<?php echo T::_("Zugangsdaten speichern"); ?>
+								</label>
+							</div>
+							<div style="padding-top:5px;display:none;" id="doAutoLoginContainer">
+								<input
+									type="checkbox"
+									style="margin:0px;margin-right:5px;float:left"
+									name="doAutoLogin"
+									id="doAutoLogin"
+									onclick="userControl.abortAutoLogin();"/>
+								<label
+									style="float:none;display:inline;font-weight:normal;color:grey;"
+									for="doAutoLogin">
+									<?php echo T::_("Automatisch anmelden"); ?>
+								</label>
+							</div>
+							<input type="hidden" value="" name="loginSHAPassword" id="loginSHAPassword" />
+							<input type="hidden" value="1" name="loginPWEncrypted" id="loginPWEncrypted" />
+						</td>
+					</tr>
+					<?php if(strstr($_SERVER["SCRIPT_FILENAME"],"demo") OR $validUntil != null) { ?>
+						<tr>
+							<td colspan="2">
+								<?php echo ($validUntil != null ? "Bitte beachten Sie: Diese Version läuft noch bis ".date("d.m.Y", $validUntil) : "Für den Demo-Zugang verwenden Sie bitte Max//Max oder Admin//Admin"); ?>
+							</td>
+						</tr>
+					<?php } ?>
+					
+					<tr id="loginCertOptions" style="display:none;" class="backgroundColor3">
+						<td colspan="2">In diesem Browser wurde noch kein Zertifikat für die Ein-Klick-Anmeldung hinterlegt. Bitte bestellen Sie ein Zertifikat für Ihren Benutzer bei <a href="http://www.furtmeier.it/page-Kontakt" target="_blank">Furtmeier Hard- und Software</a> und kopieren Sie es anschließend in das Textfeld:
+							<br />
+							<br />
+							<textarea id="loginNewCertificate" class="backgroundColor2" style="width:99%;font-size:10px;height:100px;"></textarea>
+							<br />
+							<br />
+							<input type="button" class="bigButton backgroundColor2" style="background-image:url(./images/navi/bestaetigung.png);float:right;" onclick="userControl.saveCertificate();" value="speichern"/>
+						</td>
+					</tr>
+					
+					<?php if(Environment::getS("impressum", "") != "") { ?>
+						<tr>
+							<td colspan="2" style="text-align:right;font-size:10px;">
+								<a target="_blank" href="<?php echo Environment::getS("impressum", ""); ?>" onclick="window.open('<?php echo Environment::getS("impressum", ""); ?>','Impressum','height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes'); return false;">Impressum</a>
+								<?php
+								
+								if(Environment::getS("datenschutz", "") != "")
+									echo '
+									| <a target="_blank" href="'.Environment::getS("datenschutz", "").'" onclick="window.open(\''.Environment::getS("datenschutz", "").'\',\'Datenschutz\',\'height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes\'); return false;">Datenschutz</a>';
+								
+								if(Environment::getS("registrierung", "") != "")
+								echo '
+									| <a target="_blank" href="'.Environment::getS("registrierung", "").'" onclick="window.open(\''.Environment::getS("registrierung", "").'\',\'Datenschutz\',\'height=650,width=875,left=20,top=20,scrollbars=yes,resizable=yes\'); return false;">Registrieren</a>';
+								?>
+							</td>
+						</tr>
+					<?php }
+					
+					if(strstr($_SERVER["SCRIPT_FILENAME"],"demo_all")){ ?>
+						<tr>
+							<td colspan="2">
+								Dies ist die erweiterte Demoversion. Sie können sich auch als Mitarbeiter//Mitarbeiter einloggen, um eine für Mitarbeiter angepasste Version zu sehen.
+							</td>
+						</tr>
+					<?php } ?>
+				</table>
+			</form>
+			
+			<div style="float:right;margin-bottom:-70px;opacity:0.3;" id="altLogins">
+				<?php if(extension_loaded("openssl") AND Environment::getS("showCertificateLoginButton", "1") == "1") { ?>
+				<img
+					class="mouseoverFade"
+					src="./plugins/Users/certificateLogin.png"
+					style="margin-top:15px;margin-right:10px;"
+					onclick="userControl.doCertificateLogin();"
+					id="buttonCertificateLogin"
+					title="<?php echo T::_("Mit Zertifikat anmelden");?>"
+					alt="<?php echo T::_("Mit Zertifikat anmelden");?>"/>
+				<?php } ?>
+			</div>
+		</div>
+		
+		<div id="lightOverlay" style="display: none;<?php echo $backgroundStyle; ?>" class="backgroundColor0">
+			<?php 
+				if($background != "")
+					echo '<img src="./images/html5.png" style="position:fixed;bottom:20px;right:20px;" alt="HTML5" title="HTML5" />';
+				
+				echo $background;
+			?>
 		</div>
 		<div id="darkOverlay" style="display: none; background-color:black;"></div>
-		<div id="phim" style="display:none;"></div>
 
 		<div id="container" style="display:none;">
 			<div id="messenger" style="display:none;" class="backgroundColor3 borderColor1"></div>
 			<div id="navigation"></div>
 			<?php if(isset($_COOKIE["phynx_layout"]) AND $_COOKIE["phynx_layout"] == "desktop"){ ?>
 				<div id="desktopWrapper">
-					<div id="wrapperHandler" class="backgroundColor1 borderColor1"></div>
+					<div id="wrapperHandler" class=""></div>
 					<div id="wrapper">
 						<div id="contentScreen"></div>
 						<div id="wrapperTable" style="display:none;"></div><!-- Remove some time -->
@@ -580,8 +696,8 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 					<div id="contentBelow" style="display:none;"><div id="contentBelowContent"></div></div>
 				</div>
 			<?php } ?>
-			<div id="windowsPersistent"></div>
 			<div id="windows"></div>
+			<div id="windowsPersistent"></div>
 			<div id="stash"></div>
 			<div id="footer">
 				<p>
@@ -592,7 +708,7 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 						onclick="<?php echo Environment::getS("onLogout", "userControl.doLogout();"); ?>"></span>
 					
 					<span
-						style="cursor:pointer;margin-left:20px;margin-right:15px;float:left;"
+						style="cursor:pointer;margin-left:40px;margin-right:15px;float:left;"
 						class="iconic iconicL layers_alt"
 						title="Navigation"
 						id="buttonHideNavigation"></span>
@@ -658,6 +774,14 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 							class="iconic iconicL cursor"
 							id="buttonTouchReset"
 							title="Touch"></span>
+					<?php }
+					
+					if(Environment::getS("showMenuButton", "1") == "1"){ ?>
+						<span
+							style="cursor:pointer;float:right;margin-left:15px;margin-right:5px;"
+							class="iconic iconicL iphone"
+							id="buttonMenu"
+							title="Menü"></span>
 					<?php } ?>
 					<!--<xsl:if test="options/showDesktopButton/@value='true'">
 						<img
@@ -668,7 +792,7 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 							alt="Desktop"><xsl:attribute name="src"><xsl:value-of select="iconDesktop" /></xsl:attribute></img>
 					</xsl:if>-->
 					<?php if(Environment::getS("showCopyright", "1") == "1")
-						echo 'Copyright (C) 2007 - 2013 by <a href="http://www.Furtmeier.IT">Furtmeier Hard- und Software</a>. This program comes with ABSOLUTELY NO WARRANTY; this is free software, and you are welcome to redistribute it under certain conditions; see <a href="gpl.txt">gpl.txt</a> for details.<!--<br />Thanks to the authors of the libraries and icons used by this program. <a href="javascript:contentManager.loadFrame(\'contentRight\',\'Credits\');">View credits.</a>-->';
+						echo Environment::getS("contentCopyright", 'Copyright (C) 2007 - 2017 by <a href="http://www.Furtmeier.IT">Furtmeier Hard- und Software</a>. This program comes with ABSOLUTELY NO WARRANTY;<br>this is free software, and you are welcome to redistribute it under certain conditions; see <a href="gpl.txt">gpl.txt</a> for details.<!--<br />Thanks to the authors of the libraries and icons used by this program. <a href="javascript:contentManager.loadFrame(\'contentRight\',\'Credits\');">View credits.</a>-->');
 					?>
 				</p>
 			</div>
@@ -678,47 +802,53 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 				Ajax.physion = '<?php echo $physion; ?>';
 				<?php $build = Phynx::build(); if($build) echo "Ajax.build = '$build';\n"; ?>
 				$j(document).keydown(function(evt){
-					if(!(evt.keyCode == 83 && evt.ctrlKey))
-						return;
-					evt.preventDefault();
+					if(evt.keyCode == 27){
+						var last = $j('#windows .popup').last();
+						if(!last)
+							return;
+						
+						if(!last.prop("id"))
+							return;
+						
+						var ex = last.prop("id").match(/([a-zA-Z]+)Details([a-zA-Z]+)/);
+						
+						Popup.close(ex[2], ex[1]);
+					}
 					
-					var element = $j(evt.target).prop("tagName").toLowerCase();
+					if(evt.keyCode == 83 && evt.ctrlKey){
 					
-					if(element != "input" && element != "select" && element != "textarea")
-						return;
-					
-					
-					var button = $j(evt.target).parent().parent().parent().find("input[name=currentSaveButton]");
-					if(button.length != 1)
-						return;
-					
-					button.trigger("click");
+						evt.preventDefault();
+
+						var element = $j(evt.target).prop("tagName").toLowerCase();
+
+						if(element != "input" && element != "select" && element != "textarea")
+							return;
+
+
+						var button = $j(evt.target).parent().parent().parent().find("input[name=currentSaveButton]");
+						if(button.length != 1)
+							return;
+
+						button.trigger("click");
+					}
 				});
 
 				<?php
 				if(!$updateTitle)
 					echo "
 				contentManager.updateTitle = false;";
+				
+
+				echo "contentManager.init('".(isset($_COOKIE["phynx_layout"]) ? $_COOKIE["phynx_layout"] : "horizontal")."');";
+				
 				?>
-
-				contentManager.init();
-
+				
 				$j('#altLogins').hover(function(){
 					$j(this).fadeTo('fast', 1);
 				}, function(){
 					$j(this).fadeTo('slow', 0.3);
 				});
 
-
-				/*navigator.id.watch({
-					loggedInUser: <?php echo Session::currentUser() != null ? "'".Session::currentUser()->A("UserEmail")."'" : "null" ?>,
-					onlogin: function(assertion) {
-						userControl.doPersonaLogin(assertion);
-					},
-					onlogout: function() {
-						userControl.doLogout();
-					}
-				});*/
 				<?php 
 					if(Environment::getS("showApplicationsList", "1") == "0" OR count($_SESSION["applications"]->getApplicationsList()) <= 1)
 						echo "\$j('#loginOptions, #altLogins').hide();"
@@ -734,7 +864,7 @@ if($sephy AND isset($sephy[3]) AND $sephy[3])
 		</script>
 		
 		<div style="display:none;" id="messageSetup" title="Ersteinrichtung">
-			<?php echo T::_("Bitte verwenden Sie '<b>Admin</b>' als Benutzername und Passwort, um mit der Ersteinrichtung dieser Anwendung fortzufahren."); ?>
+			<?php echo T::_("Bitte verwenden Sie '<b>Admin</b>' als Benutzername und als Passwort, um mit der Ersteinrichtung dieser Anwendung fortzufahren."); ?>
 		</div>
 		
 		<div style="display:none;" id="messageTouch" title="Touch-Eingabe">

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class mKalenderGUI extends mKalender implements iGUIHTML2 {
 	function  __construct() {
@@ -54,19 +54,17 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		}
 		
 		
-		
-		
-		
 		// <editor-fold defaultstate="collapsed" desc="styles">
 		$html = "
 		
 		<style type=\"text/css\">
 		.Day {
 			-moz-user-select:none;
-			border-left:1px solid #EEE;
-			border-bottom:1px solid #EEE;
+			border-left:1px solid #DDD;
+			border-bottom:1px solid #DDD;
+			overflow:hidden;
 		}
-		
+
 		/*.Day:hover {
 			border-style:solid;
 			border-width:1px;
@@ -79,6 +77,14 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 
 		.Day:hover .dayOptions {
 			display:inline;
+		}
+
+		.Month {
+			border-bottom:1px solid #DDD;
+		}
+		
+		.MonthDay {
+			border-left:1px solid #DDD;
 		}
 
 		.Termin {
@@ -114,6 +120,10 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 			min-width:150px;
 		}
 		
+		#KalenderTable {
+			table-layout: fixed;
+		}
+
 		.cellHeight {
 		}
 		
@@ -199,7 +209,7 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		
 		$newWindow = new Button("Kalender in neuem Fenster öffnen", "new_window", "iconicL");
 		$newWindow->style("margin-right:10px;");
-		$newWindow->newSession("Mail", Applications::activeApplication(), "mKalender", "Kalender");
+		$newWindow->newSession("Kalender", Applications::activeApplication(), "mKalender", "Kalender");
 		if(Session::physion())
 			$newWindow = "";
 		
@@ -251,17 +261,18 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		$BShare->style("margin-right:10px;");
 			
 		
-		#$AWVButton = new Button("Müllabfuhr-Daten herunterladen", "trash_stroke", "iconicL");
-		#$AWVButton->popup("", "Müllabfuhr-Daten", "mKalender", "-1", "downloadTrashData");
-		$AWVButton = "";
 		
-		$ST->addRow($pCalButton.$GoogleButton.$GoogleDLButton);
+		$AWVButton = "";
+		if(Session::isPluginLoaded("mAWV"))
+			$AWVButton = mAWVGUI::getButton();
+		
+		$ST->addRow($pCalButton.$GoogleButton.$GoogleDLButton.$AWVButton);
 		
 		
 		$html .= "
 		<div style=\"width:205px;float:right;margin-right:40px;\">
 				<div style=\"padding-top:30px;padding-bottom:15px;padding-left:0px;\">
-					$newWindow$BShare$AWVButton$xCalButton$reminder
+					$newWindow$BShare$xCalButton$reminder
 				</div>
 		</div>
 		
@@ -292,15 +303,66 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 
 		$nextMonths = new Datum();
 		$nextMonths->setToMonth1st();
+		
 		$thisMonth = $nextMonths->time();
+		
 		$nextMonths->addMonth();
 		$nextMonth = $nextMonths->time();
+		
 		$html .= OnEvent::script("\$j(function() {
-		\$j('#calendar1stMonth').datepicker({ minDate: '".date("d.m.Y", $thisMonth)."'".($TC->getCurrent()->time() < $nextMonth ? ",defaultDate: '".date("d.m.Y",$TC->getCurrent()->time())."'" : "").", showWeek: true,  showOtherMonths: true, onSelect: function(dateText, inst) { var day = Math.round(+new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay, 0, 1, 0)/1000); ".OnEvent::rme($this, "setView", array("'tag'", "day"), "function(){ ".OnEvent::reload("Screen")." }")." } });
+		
+		
+		\$j('#calendar1stMonth').datepicker({ 
+			minDate: '".date("d.m.Y", $thisMonth)."'
+			".($TC->getCurrent()->time() < $nextMonth ? ",defaultDate: '".date("d.m.Y",$TC->getCurrent()->time())."'" : "").", 
+			showWeek: true,
+			showOtherMonths: true, 
+			beforeShowDay: function(date){ 
+				var month = (date.getMonth() + 1 < 10 ? '0' : '')+(date.getMonth() + 1); 
+				return [true, 'day1_'+date.getFullYear()+month+(date.getDate() < 10 ? '0' : '')+date.getDate(), ''] 
+			},
+			onSelect: function(dateText, inst) { 
+				var day = Math.round(+new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay, 0, 1, 0)/1000);
+				".OnEvent::rme($this, "setView", array("'tag'", "day"), "function(){ ".OnEvent::reload("Screen")." }")." 
+			}
+		});
+		
+		var terminTage = ".$this->getTerminDays(date("m"), date("Y")).";
+		\$j(function(){
+			for(var i = 0; i < terminTage.length; i++)
+				\$j('.day1_'+terminTage[i]+' a').css('font-weight', 'bold');
 			
+		});
+
 		\$j('.KalenderUser div[class!=backgroundColor1]').hover(function(){ \$j(this).addClass('backgroundColor2'); }, function(){ \$j(this).removeClass('backgroundColor2'); });
-		fitKalender();
+		\$j(function() {
+			fitKalender();
+			\$j('.movable').draggable({
+				helper: \"clone\"
+			});
 			
+			\$j('.Day').droppable({
+				over: function( event, ui ) {
+					\$j(this).addClass('highlight');
+				},
+				out: function( event, ui ) {
+					\$j(this).removeClass('highlight');
+				},
+				
+				drop: function( event, ui ) {
+					\$j(this).removeClass('highlight');
+					
+					if(!event.ctrlKey)
+						var obj = \$j(ui.draggable).data('movecallback').split('::');
+					else
+						var obj = \$j(ui.draggable).data('clonecallback').split('::');
+					
+					contentManager.rmePCR(obj[0], -1, obj[1], [\$j(ui.draggable).data('id'), \$j(this).data('day')], function(){ ".OnEvent::reload("Screen")." }); 
+				}
+
+			});
+		});
+		
 		\$j(window).resize(function() {
 			fitKalender();
 		});
@@ -310,7 +372,7 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		function fitKalender(){
 			if(!\$j('#KalenderTitle').length)
 				return;
-			
+
 			//console.log(\$j('#KalenderTitle').outerHeight());
 			//console.log(\$j('#KalenderAuswahl').outerHeight());
 			var height = (contentManager.maxHeight() - \$j('#KalenderAuswahl').outerHeight() - \$j('#KalenderTitle').outerHeight() - \$j('#KalenderHeader').outerHeight()) + 4;
@@ -349,10 +411,60 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		</style>";
 
 		$html .= OnEvent::script("\$j(function() {
-		\$j('#calendar2ndMonth').datepicker({ minDate: '".date("d.m.Y",$nextMonth)."'".($TC->getCurrent()->time() >= $nextMonth ? ", defaultDate: '".date("d.m.Y",$TC->getCurrent()->time())."'" : "").", showWeek: true, showOtherMonths: true,  onSelect: function(dateText, inst) { var day = Math.round(+new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay, 0, 1, 0)/1000); ".OnEvent::rme($this, "setView", array("'tag'", "day"), "function(){ ".OnEvent::reload("Screen")." }")." } });
+		\$j('#calendar2ndMonth').datepicker({ 
+			minDate: null ".($TC->getCurrent()->time() >= $nextMonth ? ", defaultDate: '".date("d.m.Y",$TC->getCurrent()->time())."'" : ", defaultDate: '".date("d.m.Y",$nextMonth)."'").", 
+			showWeek: true, 
+			showOtherMonths: true,  
+			onSelect: function(dateText, inst) { 
+				var day = Math.round(+new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay, 0, 1, 0)/1000); 
+				".OnEvent::rme($this, "setView", array("'tag'", "day"), "function(){ ".OnEvent::reload("Screen")." }")." 
+			},
+			beforeShowDay: function(date){ 
+				var month = (date.getMonth() + 1 < 10 ? '0' : '')+(date.getMonth() + 1); 
+				return [true, 'day2_'+date.getFullYear()+month+(date.getDate() < 10 ? '0' : '')+date.getDate(), ''] 
+			},
+			onChangeMonthYear: function (year, month) {
+				".OnEvent::rme($this, "getTerminDays", array("month", "year", "'1'"), "function(t){ 
+					
+				for(var i = 0; i < t.responseData.length; i++)
+					\$j('.day2_'+t.responseData[i]+' a').css('font-weight', 'bold');
+				}")."
+			}
+		});
+		
+		var terminTage2 = ".$this->getTerminDays(date("m", $TC->getCurrent()->time() >= $nextMonth ? $TC->getCurrent()->time() : $nextMonth), date("Y", $TC->getCurrent()->time() >= $nextMonth ? $TC->getCurrent()->time() : $nextMonth)).";
+		for(var i = 0; i < terminTage2.length; i++)
+			\$j('.day2_'+terminTage2[i]+' a').css('font-weight', 'bold');
+			
+		
 	});");
 		
 		return $html;
+	}
+	
+	function getTerminDays($month, $year, $echo = false){
+		
+		$month = new Datum(mktime(0, 1, 0, $month, 1, $year));
+		
+		$lastDay = clone $month;
+		$lastDay->addMonth(false);
+		$lastDay->subDay();
+		
+		$K = $this->getData($month->time(), $lastDay->time());
+		
+		$days = array();
+		while($month->time() <= $lastDay->time()){
+			$events = $K->getEventsOnDay(date("dmY", $month->time()));
+			if($events != null)
+				$days[] = "".date("Ymd", $month->time());
+			
+			$month->addDay();
+		}
+		
+		if($echo)
+			echo json_encode ($days);
+		
+		return json_encode($days);
 	}
 	
 	function setView($to, $spec = null){
@@ -384,7 +496,7 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		$U->setUserdata("KalenderDisplay".ucfirst($type),$to);
 	}
 
-	function getInfo($className, $classID, $day){
+	function getInfo($className, $classID, $day = null){
 		$C = new $className($classID);
 		echo $C->getCalendarDetails($className, $classID)->getInfo($day);
 	}
@@ -409,11 +521,14 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 	public function getOverviewContent($echo = true){
 		$time = mktime(0, 0, 1);
 		$Datum = new Datum($time);
-		$Datum->addMonth();
-		$lastTime = $Datum->time();
-		$Datum->subMonth();
+		$Datum->normalize();
+		#$Datum->printer();
+		$DC = clone $Datum;
+		$DC->addMonth();
+		$lastTime = $DC->time();
+		#$Datum->subMonth();
 		$Woche = date("W");
-		$K = $this->getData($time, $lastTime);
+		$K = $this->getData($time, $lastTime, null, array("mxCalGUI"));
 		
 		$hasEvent = array();
 		
@@ -473,13 +588,13 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 			if($events != null AND count($events) > 0)
 				foreach($events AS $ev)
 					foreach($ev AS $KE){
-						$hasEvent[date("d", $K->parseDay($KE->getDay()))] = true;
+						$hasEvent[date("d", $K->parseDay($KE->currentWhen()->day))] = true;
 						
 						$B = new Button("", $KE->icon(), "icon");
 						$B->style("float:left;margin-right:5px;margin-bottom:10px;");
 
-						$list->addItem("$B<b style=\"font-size:15px;\">".$KE->title()."</b><br /><small>".Datum::getGerWeekArray(date("w", $K->parseDay($KE->getDay()))).", ".Util::CLDateParser($K->parseDay($KE->getDay()))."</small>");
-						if(date("W", $K->parseDay($KE->getDay())) > $Woche + 1)
+						$list->addItem("$B<b style=\"font-size:15px;\">".$KE->title()."</b><br /><small>".Datum::getGerWeekArray(date("w", $K->parseDay($KE->currentWhen()->day))).", ".Util::CLDateParser($K->parseDay($KE->currentWhen()->day))."</small>");
+						if(date("W", $K->parseDay($KE->currentWhen()->day)) > $Woche + 1)
 							$list->addItemStyle ("color:grey;");
 						$c++;
 					}
@@ -520,9 +635,14 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 		echo $C->$targetClassMethod($targetClassID);
 	}
 	
-	public function getInviteForm($targetClass, $targetClassId, $targetClassMethod) {
+	public function getInvitees($targetClass, $targetClassId) {
 		$class = new $targetClass($targetClassId);
-		echo $class->$targetClassMethod($targetClassId);
+		echo $class->getInvitees($targetClassId);
+	}
+	
+	public function getClose($targetClass, $targetClassId) {
+		$class = new $targetClass($targetClassId);
+		echo $class->getClose($targetClassId);
 	}
 	
 	public function share(){
@@ -591,60 +711,6 @@ class mKalenderGUI extends mKalender implements iGUIHTML2 {
 	
 	public function saveShowCalendarOf($UserID, $value){
 		mUserdata::setUserdataS("showCalendarOf".$UserID, $value);
-	}
-	
-	public function downloadTrashData(){
-		$json = file_get_contents("http://www.awv-nordschwaben.de/WebService/AWVService.svc/getData/00000000-0000-0000-0000-000000001190");
-
-		echo "<pre style=\"font-size:10px;max-height:400px;overflow:auto;\">";
-		$data = json_decode($json);
-		foreach($data->calendar AS $day){
-			if($day->fr == "")
-				continue;
-			
-			if($day->dt < date("Ymd"))
-				continue;
-			
-			print_r($day);
-			
-			
-			$tag = Util::parseDate("de_DE", substr($day->dt, 6).".".substr($day->dt, 4, 2).".".substr($day->dt, 0, 4));
-
-			$name = "";
-			foreach($day->fr AS $T){
-				if($T == "PT")
-					$name .= ($name != "" ? ", " : "")."Papiertonne";
-				
-				if($T == "RM")
-					$name .= ($name != "" ? ", " : "")."Restmüll";
-				
-				if($T == "GS")
-					$name .= ($name != "" ? ", " : "")."Gelber Sack";
-				
-				if($T == "BT")
-					$name .= ($name != "" ? ", " : "")."Biotonne";
-			}
-			
-			if($name == "")
-				continue;
-			
-			$F = new Factory("Todo");
-			$F->sA("TodoName", $name);
-			$F->sA("TodoFromDay", $tag);
-			$F->sA("TodoFromTime", "32400");
-			$F->sA("TodoTillDay", $tag);
-			$F->sA("TodoTillTime", "36000");
-			$F->sA("TodoUserID", "-1");
-			$F->sA("TodoClass", "Kalender");
-			$F->sA("TodoClassID", "-1");
-			$F->sA("TodoType", "2");
-			$F->sA("TodoRemind", "-1");
-			if($F->exists())
-				continue;
-			
-			$F->store();
-		}
-		echo "</pre>";
 	}
 }
 ?>

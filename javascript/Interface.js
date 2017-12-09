@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 var Interface = {
@@ -23,17 +23,41 @@ var Interface = {
 	TabBarLast: null,
 	TabBarLastTab: null,
 	isLoading: false,
+	mobileMaxWidth: 1000,
+	
+	mobile: function(){
+		return $j(window).width() <= Interface.mobileMaxWidth;
+	},
 	
 	init: function(){
 		if($('wrapperHandler')){
 			Interface.isDesktop = true;
 			Interface.resizeWrapper();
-			Event.observe(window, 'resize', function() {
+			$j(window).on('resize', function() {
 				Interface.resizeWrapper();
 			});
 		}
+		
+		$j(window).on("online", function(){
+			Interface.online();
+		});
+		
+		$j(window).on("offline", function(){
+			Interface.offline();
+		});
 	},
 	
+	offline: function(){
+		Overlay.showDark();
+		$j('body').append("<div id='offlineMessage' style='z-index:100000;color:white;font-size:40px;width:400px;position:absolute;'>Sie sind offline</div>");
+		$j('#offlineMessage').css("top", ($j(window).height() - $j('#offlineMessage').outerHeight()) / 2);
+		$j('#offlineMessage').css("left", ($j(window).width() - 400) / 2);
+	},
+	
+	online: function(){
+		Overlay.hideDark();
+		$j('#offlineMessage').remove();
+	},
 	
 	/**
 	 * @deprecated text
@@ -90,29 +114,27 @@ var Interface = {
 	},
 
 	startLoading: function(){
-		if(Overlay.dark) return;
+		/*if(Overlay.dark) return;
 		
 		if(Interface.isLoading) return;
 
 		Interface.isLoading = true;
-		Interface.showLoading();
+		Interface.showLoading();*/
 	},
 
 	endLoading: function(){
-		Interface.isLoading = false;
+		//Interface.isLoading = false;
 	},
 
 	showLoading: function(){
-		if(!$('busyBox') || !Interface.isLoading) return;
+		/*if(!$('busyBox') || !Interface.isLoading) return;
 
-		//if(P2J)
-		//	$j('busyBox').fadeTo(300, 0.3);//.delay(100).fadeTo(300, 1);
 		else {
 			Effect.Fade('busyBox', {duration: 0.3, from: 1, to: 0.3});
 			Effect.Fade('busyBox', {duration: 0.3, from: 0.3, to: 1, delay: 0.1});
 		}
 		
-		window.setTimeout("Interface.showLoading()", 800);
+		window.setTimeout("Interface.showLoading()", 800);*/
 	},
 	
 	notifyPermission: function(){
@@ -181,7 +203,7 @@ var Interface = {
 		contentManager.currentPlugin = plugin;
 		
 		if($(plugin+'MenuEntry'))
-			setHighLight($(plugin+'MenuEntry'));
+			Menu.setHighLight($(plugin+'MenuEntry'));
 	}
 
 }

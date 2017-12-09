@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class KalenderViewMonat {
@@ -26,7 +26,7 @@ class KalenderViewMonat {
 	protected $date;
 	protected $cols;
 	protected $rows;
-	protected $colorBgSaturday = "#F4F4F4";
+	protected $colorBgSaturday = "#EBEBEB";
 	protected $colorBgSunday = "#EBEBEB";
 	
 	function __construct() {
@@ -324,7 +324,7 @@ class KalenderViewMonat {
 				if($j < $cols) $html .= "
 				<td
 					style=\"vertical-align:top;padding:0px;\"
-					class=\"".((date("d.m.Y",$D->time()) == date("d.m.Y") AND $ansicht != "tag")? "backgroundColor1" : "")." Day borderColor1\">
+					class=\"".((date("d.m.Y",$D->time()) == date("d.m.Y") AND $ansicht != "tag")? "backgroundColor1" : "")." Day borderColor1\" data-day=\"".$D->time()."\">
 					<div
 						style=\"".($ansicht == "tag" ? "display:none;" : "")."height:21px;padding-top:2px;padding-left:5px;text-align:right;padding-right:5px;\"
 						class=\"innerCellTitle\">
@@ -334,7 +334,7 @@ class KalenderViewMonat {
 							".($ansicht != "tag" ? date("d",$D->time()) : "&nbsp;")."
 						</span>
 					</div>
-					<div style=\"font-size:10px;overflow:auto;".($ansicht == "monat" ? "margin-top:0px;width:100%;" : "")."\" class=\"".($ansicht == "monat" ? "innerCellHeight" : "")."\">$entry</div>
+					<div style=\"overflow:auto;".($ansicht == "monat" ? "margin-top:0px;width:100%;" : "")."\" class=\"".($ansicht == "monat" ? "innerCellHeight" : "")."\">$entry</div>
 				</td>";
 				$D->addDay();
 			}

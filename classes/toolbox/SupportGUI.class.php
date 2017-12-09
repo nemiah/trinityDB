@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class SupportGUI {
 	
@@ -25,7 +25,10 @@ class SupportGUI {
 		return array("Furtmeier Hard- und Software", "Support@Furtmeier.IT");
 	}
 	
-	public function fatalError($error){
+	public function fatalError($error, $request = ""){
+		
+		$error = trim($error."\n\nZeit:\n".Util::CLDateTimeParser(time())."\n\nBrowser-Anfrage:\n".htmlentities($request));
+		
 		$B = new Button("Fehler", "./images/big/sad.png", "icon");
 		$B->style("float:left;margin-right:10px;margin-bottom:20px;");
 		
@@ -46,21 +49,34 @@ class SupportGUI {
 		echo "<div style=\"display:none;\" id=\"mailContainer\">".UtilGUI::EMailPopup("SupportGUI", "-1", null, "function(transport){ \$j('#messageContainer').html(transport.responseText); \$j('#mailContainer').slideUp(); \$j('#messageContainer').slideDown(); }", OnEvent::closePopup("Support"), true)."</div><div style=\"display:none;\" id=\"messageContainer\"></div>";
 	}
 	
-	public static function sendEmail($subject, $body, $recipient){
+	public static function sendEmail($subject, $body, $recipient, $callback, $files, $cc, $sender){
 		$S = new SupportGUI();
 		$data = $S->getEMailData();
 		
 		$mailfrom = $data["fromAddress"];
+		if(trim($mailfrom) == "" AND $sender == "")
+			Red::errorD("Bitte geben Sie eine Absender-Adresse ein!");
+		
+		if(trim($mailfrom) == "" AND $sender != "")
+			$mailfrom = $sender;
+		
 		$mailto = $data["recipients"][$recipient][1];
 		
 		$mimeMail2 = new PHPMailer(false, substr($mailfrom, stripos($mailfrom, "@") + 1));
+		$mimeMail2->SMTPOptions = array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peer_name' => false,
+				'allow_self_signed' => true
+			)
+		);
 		$mimeMail2->CharSet = "UTF-8";
 		$mimeMail2->Subject = $subject;
 		
 		$mimeMail2->From = $mailfrom;
 		$mimeMail2->Sender = $mailfrom;
 		$mimeMail2->FromName = $data["fromName"];
-		
+
 		$mimeMail2->Body = wordwrap($body, 80);
 		$mimeMail2->AddAddress($mailto);
 		
@@ -70,7 +86,7 @@ class SupportGUI {
 		$BOK = new Button("OK", "bestaetigung");
 		$BOK->onclick(OnEvent::closePopup("Support"));
 		$BOK->style("float:right;margin:10px;");
-		
+
 		if($mimeMail2->Send())
 			echo "<h1>$B Danke für Ihre Unterstützung!</h1><p>Sie erhalten in Kürze eine Antwort per E-Mail.</p>$BOK<div style=\"clear:both;\"></div>";
 		else
@@ -83,21 +99,27 @@ class SupportGUI {
 			"fromAddress" => Session::currentUser()->A("UserEmail"),
 			"recipients" => array(self::mailAddress()),
 			"subject" => "Fehlermeldung in ".Applications::activeApplication()." ".Applications::activeVersion(),
-			"body" => "Sehr geehrter Herr Furtmeier,
+			"body" => "Hallo Support-Team,
 
-bei der Nutzung von ".Applications::activeApplication()." ist ein Fehler aufgetreten, während ich folgendes getan habe:
-
-
+bei der Nutzung von ".Applications::activeApplication()." ".Applications::activeVersion()." ist ein Fehler aufgetreten, während ich folgendes getan habe:
 
 
 
-Weiter unten sende ich die Fehlermeldung sowie einige Informationen, die Ihnen beim finden des Problems helfen könnten.
+
+
+Weiter unten sende ich die Fehlermeldung sowie einige Informationen, die Ihnen beim Finden des Problems helfen könnten.
 
 Freundliche Grüße,
 ".Session::currentUser()->A("name")."
 
 
 ".self::$errorMessage."
+
+URL:
+".str_replace("interface/rme.php", "", $_SERVER["SCRIPT_URI"])."
+
+PHP-Version:
+". phpversion()."
 
 Alle geladenen Module:
 ".implode(", ", get_loaded_extensions())."

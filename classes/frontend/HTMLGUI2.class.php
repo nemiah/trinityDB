@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class HTMLGUI2 extends HTMLGUI {
 	private $displaySide = "default";
@@ -131,8 +131,10 @@ class HTMLGUI2 extends HTMLGUI {
 	}
 
 	function getBrowserHTML($lineWithId = -1){
-		$this->texts = $this->languageClass->getBrowserTexts();
-		$singularLanguageClass = $this->loadLanguageClass($this->singularClass);
+		T::load(Util::getRootPath()."libraries");
+		
+		#$this->texts = $this->languageClass->getBrowserTexts();
+		#$singularLanguageClass = $this->loadLanguageClass($this->singularClass);
 		$userCanDelete = mUserdata::isDisallowedTo("cantDelete".$this->singularClass);
 		$userCanCreate = mUserdata::isDisallowedTo("cantCreate".$this->singularClass);
 		$userHiddenFields = mUserdata::getHides($this->singularClass);
@@ -154,13 +156,17 @@ class HTMLGUI2 extends HTMLGUI {
 		 */
 	
 		$errorTab = new HTMLTable(1);
-		if(isset($_SESSION["phynx_errors"]) AND $lineWithId == -1 AND ($_SERVER["HTTP_HOST"] == "dev.furtmeier.lan" OR strpos(__FILE__, "nemiah") !== false))
+		if(isset($_SESSION["phynx_errors"]) AND $lineWithId == -1 AND ($_SERVER["HTTP_HOST"] == "dev.furtmeier.lan" OR strpos(__FILE__, "nemiah") !== false)){
+			
+			$B = new Button("", "warning", "icon");
+			$B->style("float:left;margin-right:10px;");
+		
 			$errorTab->addRow("
-					<img style=\"float:left;margin-right:10px;\" src=\"./images/navi/warning.png\" />
+					$B
 					<b>Es ".(count($_SESSION["phynx_errors"]) != 1 ? "liegen" : "liegt")." ".count($_SESSION["phynx_errors"])." PHP-Fehler vor:</b><br />
-					<a href=\"javascript:windowWithRme('Util','','showPHPErrors','');\">Fehler anzeigen</a>,<br />
-					<a href=\"javascript:rme('Util','','deletePHPErrors','','contentManager.reloadFrameRight();');\">Fehler löschen</a>");
-
+					<a href=\"#\" onclick=\"windowWithRme('Util','','showPHPErrors',''); return false;\">Fehler anzeigen</a>,<br />
+					<a href=\"#\" onclick=\"rme('Util','','deletePHPErrors','','contentManager.reloadFrameRight();'); return false;\">Fehler löschen</a>");
+		}
 
 		/**
 		 * RETURN-BUTTON
@@ -179,7 +185,7 @@ class HTMLGUI2 extends HTMLGUI {
 		 * DELETE-BUTTON
 		 */
 		if((!$this->onlyDisplayMode OR $this->deleteInDisplayMode) AND $userCanDelete AND !$this->isSelection AND $this->showDeleteButton)  $this->newColsRight["delete"]  = "
-			<span class=\"iconic trash_stroke\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "contentManager.reloadFrameLeft();" : "contentManager.reloadFrameRight(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".str_replace("%1",$this->singularName, $this->texts["%1 wirklich löschen?"])."');\"></span>";
+			<span class=\"iconic trash_stroke\" onclick=\"deleteClass('".$this->singularClass."','%%VALUE%%', ".($this->JSOnDelete == null ? "function() { ".($this->displaySide == "left" ? "contentManager.reloadFrameLeft();" : "contentManager.reloadFrameRight(); if(typeof lastLoadedLeft != 'undefined' && lastLoadedLeft == '%%VALUE%%') $('contentLeft').update('');")." }" : $this->JSOnDelete).",'".T::_("%1 wirklich löschen?", $this->singularName)."');\"></span>";
 		elseif(!$userCanDelete) $this->newColsRight["delete"] = "<img src=\"./images/i2/empty.png\" />";
 
 
@@ -296,7 +302,7 @@ class HTMLGUI2 extends HTMLGUI {
 				#$IPage = $this->getPageSelectionField();
 				#$IPage->style("width:30px;float:right;text-align:right;");
 
-				$pageOptions = $this->multiPageMode[0]." ".($this->multiPageMode[0] == 1 ? $this->texts["Eintrag"] : $this->texts["Einträge"]).", $pageLinks";
+				$pageOptions = $this->multiPageMode[0]." ".($this->multiPageMode[0] == 1 ? T::_("Eintrag") : T::_("Einträge")).", $pageLinks";
 
 				if(!$userDefinedEntriesPerPage){
 					$valuesTab->addRow(array($pageOptions));
@@ -335,7 +341,7 @@ class HTMLGUI2 extends HTMLGUI {
 
 		$filteredCol = null;
 		if($lineWithId == -1 AND $this->showFilteredCategoriesWarning != null AND $this->showFilteredCategoriesWarning[0]) {
-			$dB = new Button($this->texts["Filter löschen"],"./images/i2/delete.gif");
+			$dB = new Button("Filter löschen","./images/i2/delete.gif");
 			$dB->style("float:right;");
 			$dB->type("icon");
 			$dB->rme("HTML","","saveContextMenu",array("'deleteFilters'","'{$this->showFilteredCategoriesWarning[1]}'"), "if(checkResponse(transport)) contentManager.reloadFrameRight();");
@@ -344,17 +350,17 @@ class HTMLGUI2 extends HTMLGUI {
 				<td class=\"backgroundColor0\"".((isset($this->showFilteredCategoriesWarning[0]) AND $this->showFilteredCategoriesWarning[0] == true) ? "<img src=\"./images/i2/note.png\" /></td><td class=\"backgroundColor0\" colspan=\"".($determinedNumberofCols - 2)."\" style=\"color:grey;\" >".$this->texts["Anzeige wurde gefiltert"]."</td><td class=\"backgroundColor0\">$dB</td>" : " >")."</td>
 			</tr>";*/
 
-			$filteredCol = array("<img src=\"./images/i2/note.png\" />",$dB.$this->texts["Anzeige wurde gefiltert"]);
+			$filteredCol = array("<img src=\"./images/i2/note.png\" />",$dB.T::_("Anzeige wurde gefiltert"));
 			$valuesTab->addRow($filteredCol);
 			$valuesTab->addRowColspan(2, $cols-1);
-			$valuesTab->addRowClass("backgroundColor0");
-			$valuesTab->addRowStyle("color:grey;");
+			$valuesTab->addRowClass("highlight");
+			#$valuesTab->addRowStyle("color:grey;");
 		}
 		
 		/**
 		 * NEW-BUTTON
 		 */
-		if(!$this->onlyDisplayMode /*AND $this->selectionRow == ""*/ AND $userCanCreate AND $this->showNewButton AND $lineWithId == -1){
+		if(!$this->onlyDisplayMode AND !$this->isSelection/*AND $this->selectionRow == ""*/ AND $userCanCreate AND $this->showNewButton AND $lineWithId == -1){
 			$BNew = new Button("","./images/i2/new.gif");
 			$BNew->type("icon");
 			$BNew->id("buttonNewEntry$this->singularClass");
@@ -368,6 +374,8 @@ class HTMLGUI2 extends HTMLGUI {
 				$valuesTab->addRowColspan(2, $cols-1);
 				$valuesTab->addRowEvent("click", $this->JSOnNew == null ? "contentManager.newClassButton('$this->singularClass','');" : $this->JSOnNew);
 				$valuesTab->addRowStyle("cursor:pointer;");
+				$valuesTab->addRowClass(" backgroundColor0");
+				$valuesTab->addCellStyle(2, "padding-top:10px;padding-bottom:10px;");
 			}
 
 			#$valuesTab->addRowColspan(2, $cols-1);
@@ -461,8 +469,8 @@ class HTMLGUI2 extends HTMLGUI {
 		if($filteredCol !== null){
 			$valuesTab->addRow($filteredCol);
 			$valuesTab->addRowColspan(2, $cols-1);
-			$valuesTab->addRowClass("backgroundColor0");
-			$valuesTab->addRowStyle("color:grey;");
+			$valuesTab->addRowClass("highlight");
+			#$valuesTab->addRowStyle("color:grey;");
 		}
 		
 		if($lineWithId == -1 AND $isMultiPageMode) {

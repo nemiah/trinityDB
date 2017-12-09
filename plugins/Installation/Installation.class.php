@@ -15,10 +15,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class Installation extends PersistentObject {
 	private $folder = "./system/DBData/";
+	
+	public static function getDBFolder($folder = null){
+		$external = false;
+		
+		if(file_exists(Util::getRootPath()."../../phynxConfig")){
+			$folder = Util::getRootPath()."../../phynxConfig/";
+			$external = true;
+		}
+		
+		if(file_exists(Util::getRootPath()."../phynxConfig")){
+			$folder = Util::getRootPath()."../phynxConfig/";
+			$external = true;
+		}
+		
+		if($folder == null)
+			$folder = Util::getRootPath()."system/DBData/";
+		
+		return array($folder, $external);
+	}
 	
 	public function getA(){
 		if($this->A == null) $this->loadMe();
@@ -75,6 +94,12 @@ class Installation extends PersistentObject {
 	}
 
 	function makeNewInstallation(){
+		if(trim($_SERVER["HTTP_HOST"]) == "")
+			return;
+		
+		#$e = new Exception();
+		#file_put_contents("/var/www/phynxConfig/log.txt", file_get_contents("/var/www/phynxConfig/log.txt")."\n\n".$e->getTraceAsString());
+		
 		$this->A = $this->newAttributes();
 		$this->A->httpHost = $_SERVER["HTTP_HOST"];
 		$_SESSION["messages"]->addMessage("Setting up new Installation on host ".$_SERVER["HTTP_HOST"]);

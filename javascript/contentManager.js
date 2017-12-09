@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 var lastLoadedLeft        = -1;
@@ -37,22 +37,39 @@ var contentManager = {
 	isAltUser: false,
 	updateTitle: true,
 	currentPlugin: null,
+	historyLeft: [],
+	historyRight: [],
+	layout: "",
 	
 	maxHeight: function(){
-		if($j('#desktopWrapper').length > 0)
+		var footerHeight = $j('#footer').outerHeight();
+		if(Interface.mobile())
+			footerHeight = 0;
+		
+		if(contentManager.layout == "desktop")
 			return $j('#wrapper').height() - $j('#wrapperTable').height() - 20; // 20 px padding on contentLeft and contentRight
 		
-		return ($j(window).height() - $j('#navTabsWrapper').height() - $j('#footer').height() - 30);
+		if(contentManager.layout == "vertical")
+			return $j(window).height() - footerHeight - 20; // 20 px padding on contentLeft and contentRight
+		
+		if(contentManager.layout == "fixed")
+			return ($j(window).height() - ($j('#navTabsWrapper').outerHeight() > 60 ? $j('#navTabsWrapper').outerHeight() : 60) - footerHeight - 20);
+		
+		return ($j(window).height() - $j('#navTabsWrapper').outerHeight() - footerHeight - 20);
 	},
 			
 	maxWidth: function(getWindow){
 		if(!getWindow && $j('#desktopWrapper').length > 0)
 			return $j('#wrapper').width();
 		
+		
+		if(contentManager.layout == "vertical")
+			return ($j(window).width() -$j('#navigation').outerWidth() - 1 - $j('#phim:visible').outerWidth());
+	
 		return ($j(window).width() - $j('#phim:visible').outerWidth());
 	},
 			
-	scrollTable: function(tableID){
+	scrollTable: function(tableID, maxPage){
 		var header_table = $j( '<table aria-hidden="true" id=\"head'+tableID+'\"><thead><tr><td></td></tr></thead></table>' );
 		
 		var scroll_div = '<div id=\"body'+tableID+'\" style="height: 120px;overflow-y: auto;"></div>';
@@ -68,7 +85,21 @@ var contentManager = {
 		});
 
 		$j('div#body'+tableID).prepend($targetDataTable);
-		$j('div#body'+tableID).css("width", $j($targetDataTable).width());
+		$j('div#body'+tableID).css("width", "100%");//$j($targetDataTable).width());
+		$j('div#body'+tableID).scroll(function(event){
+			if(lastLoadedRightPage >= maxPage)
+				return;
+			
+			//console.log(event);
+			var maxScroll = $j(this).children(":first").height() - $j(this).height();
+			//if(maxScroll < 0)
+			//	return;
+			
+			var percent = 100 / maxScroll * $j(this).scrollTop();
+			if(percent > 90)
+				contentManager.appendNextPage('contentRight', $j(this).children(":first").find('tbody').get(0));
+			//var scrollPercent = 100 *  / ($(containeD).height() - $(containeR).height());
+		});
 		//.width($j($targetDataTable).width());
 			
 		$j($targetDataTable).css('width', '100%');
@@ -84,7 +115,8 @@ var contentManager = {
 
 		$j('div#body'+tableID).css('height', height);
 		
-		$j($targetHeaderTable).closest('.browserContainer').css("position", "fixed");
+		var container = $j($targetHeaderTable).closest('.browserContainer');
+		container.css("position", "fixed").css("width", container.parent().width());
 		
 		if($j('#contentRight').find("#"+tableID).length)
 			$j('#contentRight').append("<div style=\"height:"+contentManager.maxHeight()+"px\"></div>");
@@ -93,14 +125,16 @@ var contentManager = {
 			$j('#contentLeft').append("<div style=\"height:"+contentManager.maxHeight()+"px\"></div>");
 	},
 	
-	init: function(){
+	init: function(layout){
 		Interface.init();
 		Overlay.init();
-		loadMenu();
+		contentManager.layout = layout;
+		
+		Menu.loadMenu();
 		$('contentLeft').update();
 		//if (document.cookie == "") document.cookie = "CookieTest = Erfolgreich"
 		if (!navigator.cookieEnabled) alert("In Ihrem Browser sind Cookies deaktiviert.\nBitte aktivieren Sie Cookies, damit diese Anwendung funktioniert.");
-		DesktopLink.init();
+		//DesktopLink.init();
 		
 		if($j.jStorage.get('phynxHideNavigation', false))
 			$j('#navigation').hide();
@@ -180,6 +214,12 @@ var contentManager = {
 		contentManager.loadDesktop();
 		contentManager.loadJS();
 		contentManager.loadTitle();
+		contentManager.clearHistory();
+	},
+
+	clearHistory: function(){
+		contentManager.historyLeft = [];
+		contentManager.historyRight = []
 	},
 
 	selectRow: function(currentElement, group){
@@ -197,34 +237,52 @@ var contentManager = {
 		contentManager.emptyFrame('contentLeft');
 		contentManager.emptyFrame('contentRight');
 		contentManager.loadFrame("contentScreen", "Desktop", 1, 0, "");
-		/*
-		new Ajax.Request('./interface/loadFrame.php?p=Desktop&id=1', {
-		method: 'get',
-		onSuccess: function(transport) {
-			if(transport.responseText.search(/^error:/) == -1){
-				lastLoadedRightPlugin = "Desktop";
-				lastLoadedRight = 1;
-				$('contentRight').update(transport.responseText);
-
-				if($('DesktopMenuEntry')) setHighLight($('DesktopMenuEntry'));
-
-				if(!$('morePluginsMenuEntry')) {
-					new Ajax.Request('./interface/loadFrame.php?p=Desktop&id=2', {
-						onSuccess: function(transport){
-							$('contentLeft').update(transport.responseText);
-						}
-					});
-					lastLoadedLeftPlugin = "Desktop";
-					lastLoadedLeft = 2;
-				}
-			}
-		}});*/
 	},
 	
 	loadPlugin: function(targetFrame, targetPlugin, bps, withId, options){
+		var page = 0;
+		if(contentManager.historyRight[targetPlugin])
+			page = contentManager.historyRight[targetPlugin][0];
 		
-		contentManager.loadFrame(targetFrame, targetPlugin, -1, 0, bps, function(){
-			if(typeof withId != "undefined" && withId != null) contentManager.loadFrame("contentLeft", targetPlugin.substr(1), withId);
+		contentManager.loadFrame(targetFrame, targetPlugin, -1, page, bps, function(){
+			if(typeof withId != "undefined" && withId != null){
+				contentManager.loadFrame("contentLeft", (typeof options != "undefined" && options.single) ? options.single : targetPlugin.substr(1), withId);
+				return;
+			}
+			
+			if(targetFrame == "contentRight"){
+				var historyPlugin = targetPlugin;
+				if(historyPlugin == "Auftraege")
+					historyPlugin = "mAuftrag";
+
+				if(historyPlugin == "Adressen")
+					historyPlugin = "mAdresse";
+
+				if(historyPlugin == "Kategorien")
+					historyPlugin = "mKategorie";
+
+				if(historyPlugin == "Textbausteine")
+					historyPlugin = "mTextbaustein";
+
+				if(historyPlugin == "ObjekteL")
+					historyPlugin = "mObjektL";
+
+				if(contentManager.historyLeft[historyPlugin] && contentManager.historyLeft[historyPlugin][1] != -1){
+					var found = false;
+					if($j('#Browser'+historyPlugin+contentManager.historyLeft[historyPlugin][1]).length)
+						found = true;
+
+					if($j('#BrowserMain'+contentManager.historyLeft[historyPlugin][1]).length)
+						found = true;
+
+					if(found && !Interface.mobile())
+						contentManager.loadFrame("contentLeft", contentManager.historyLeft[historyPlugin][0], contentManager.historyLeft[historyPlugin][1], 0, "", function(){
+							$j('#Browser'+historyPlugin+contentManager.historyLeft[historyPlugin][1]).addClass("lastSelected");
+							$j('#BrowserMain'+contentManager.historyLeft[historyPlugin][1]).addClass("lastSelected");
+						});
+
+				}
+			}
 		},
 		false,
 		{
@@ -247,7 +305,7 @@ var contentManager = {
 		Popup.closeNonPersistent();
 		
 		if($(targetPlugin+'MenuEntry'))
-			setHighLight($(targetPlugin+'MenuEntry'));
+			Menu.setHighLight($(targetPlugin+'MenuEntry'));
 	},
 
 	loadJS: function(){
@@ -283,7 +341,6 @@ var contentManager = {
 			else $("wrapperHandler").update(transport.responseText);
     	});
 		
-    	//new Ajax.Request("./interface/rme.php?class=Menu&method=getActiveApplicationName&constructor=&parameters=",{onSuccess: });
 	},
 
 	setRoot: function(path){
@@ -330,8 +387,8 @@ var contentManager = {
 		}
 	},
 
-	rightSelection: function(isMultiSelection, selectPlugin, callingPlugin, callingPluginID, callingPluginFunction){
-		contentManager.loadFrame('contentRight', selectPlugin, -1, 0, selectPlugin+'GUI;selectionMode:'+(isMultiSelection ? "multi" : "single")+'Selection,'+callingPlugin+','+callingPluginID+','+callingPluginFunction+','+lastLoadedRightPlugin);
+	rightSelection: function(isMultiSelection, selectPlugin, callingPlugin, callingPluginID, callingPluginFunction, addBPS){
+		contentManager.loadFrame('contentRight', selectPlugin, -1, 0, selectPlugin+'GUI;selectionMode:'+(isMultiSelection ? "multi" : "single")+'Selection,'+callingPlugin+','+callingPluginID+','+callingPluginFunction+','+lastLoadedRightPlugin+(addBPS ? ";"+addBPS : ""));
 		/*loadFrameV2(
 			'contentRight',
 			pluginRight,
@@ -433,6 +490,8 @@ var contentManager = {
 	},
 
 	emptyFrame: function(targetFrame){
+		Popup.closeLinked(targetFrame);
+		
 		if(targetFrame == "contentLeft"){
 			lastLoadedLeft        = -1;
 			lastLoadedLeftPlugin  = "";
@@ -458,6 +517,18 @@ var contentManager = {
 		}
 		
 		$(targetFrame).update("");
+	},
+
+	appendNextPageLoading: false,
+	appendNextPage: function(targetFrame, appendTo){
+		if(contentManager.appendNextPageLoading)
+			return;
+		
+		if(targetFrame == "contentRight"){
+			contentManager.appendNextPageLoading = true;
+			contentManager.loadFrame(targetFrame, lastLoadedRightPlugin, lastLoadedRight, (lastLoadedRightPage * 1) + 1, "", function(){ contentManager.appendNextPageLoading = false; }, false, {'appendTo': appendTo});
+		//target, plugin, withId, page, bps, onSuccessFunction, hideError, options
+		}
 	},
 
 	forwardOnePage: function(targetFrame){
@@ -503,15 +574,22 @@ var contentManager = {
 	},
 
 	saveSelection: function(classe, classId, saveFunction, idToSave, targetFrame, bps){
-		contentManager.rmePCR(classe, classId, saveFunction, idToSave, function() {contentManager.reloadFrame(targetFrame);}, bps)
+		contentManager.rmePCR(classe, classId, saveFunction, idToSave, function() {
+			contentManager.reloadFrame(targetFrame);
+		}, bps)
 	},
 
 	editInPopup: function(plugin, withId, title, bps, options){
-		contentManager.loadContent(plugin, withId, 0, bps, function(transport) {Popup.create(plugin, 'edit', title, options);Popup.update(transport, plugin, 'edit');});
+		contentManager.loadContent(plugin, withId, 0, bps, function(transport) { 
+			Popup.create(plugin, 'edit', title, options);
+			Popup.update(transport, plugin, 'edit');
+		});
 	},
 
 	loadInPopup: function(title, plugin, withId, page, bps){
-		contentManager.loadContent(plugin, withId, page, bps, function(transport) {Popup.displayNamed(plugin, title, transport);});
+		contentManager.loadContent(plugin, withId, page, bps, function(transport) { 
+			Popup.displayNamed(plugin, title, transport);
+		});
 	},
 
 	loadContent: function(plugin, withId, page, bps, onSuccessFunction, hideError){
@@ -530,11 +608,14 @@ var contentManager = {
 		if(typeof page == "undefined") page = 0;
 		var arg = arguments;
 
+		Popup.closeLinked(target);
+		
 		if(target == "contentRight"){
 			lastLoadedRightPlugin = plugin;
 			lastLoadedRightPage = page;
 			lastLoadedRight = withId;
 			contentManager.currentPlugin = plugin;
+			contentManager.historyRight[plugin] = [page];
 		}
 
 		if(target == "contentLeft"){
@@ -542,6 +623,7 @@ var contentManager = {
 			lastLoadedLeftPage = page;
 			lastLoadedLeft = withId;
 			contentManager.currentPlugin = plugin;
+			contentManager.historyLeft["m"+plugin] = [plugin, withId];
 		}
 
 		if(target == "contentScreen"){
@@ -557,6 +639,10 @@ var contentManager = {
 		if(typeof bps != "undefined")
 			bps = bps.replace(/;/, "&bpsPar[]=");
 		
+		var appendable = false;
+		if(typeof options == "object" && options.appendTo)
+			appendable = true;
+		
 		new Ajax.Request('./interface/loadFrame.php?r='+Math.random(), {
 			onSuccess: function(transport, textStatus, request){
 				if(checkResponse(transport, hideError)) {
@@ -565,10 +651,23 @@ var contentManager = {
 						if(typeof options.doBefore == "function")
 							options.doBefore();
 					}
-
-					$j("#"+target).html(transport.responseText);
-
-					if(typeof onSuccessFunction != "undefined" && onSuccessFunction != "") onSuccessFunction(transport);
+					
+					var close = "";
+					if(target == "contentLeft" && Interface.mobile()){
+						close = "<div style=\"height:50px;\"></div><span title=\"Schließen\" style=\"z-index:110;position:absolute;padding:15px;top:5px;right:5px;\" onclick=\"contentManager.emptyFrame('contentLeft'); contentManager.clearHistory(); $j('#contentLeft').css('min-height', '');\" class=\"iconic iconicG iconicL x\" alt=\"Schließen\"></span>";
+					}
+					
+					if(typeof options == "object" && options.appendTo)
+						$j(options.appendTo).append(transport.responseText);
+					else
+						$j("#"+target).html(close+transport.responseText);
+					
+					if(target == "contentLeft" && Interface.mobile() && $j(document).height() > $j("#contentLeft").outerHeight()){
+						$j("#contentLeft").css("min-height", $j(document).height());
+					}
+					
+					if(typeof onSuccessFunction != "undefined" && onSuccessFunction != "")
+						onSuccessFunction(transport);
 
 					Aspect.joinPoint("loaded", "contentManager.loadFrame", arg, transport.responseText);
 
@@ -576,7 +675,7 @@ var contentManager = {
 			},
 				
 			method: "POST",
-			parameters: 'p='+plugin+(typeof withId != "undefined" ? '&id='+withId : "")+((typeof bps != "undefined" && bps != "") ? '&bps='+bps : "")+((typeof page != "undefined" && page != "") ? '&page='+page : "")+"&frame="+target});
+			parameters: 'p='+plugin+(typeof withId != "undefined" ? '&id='+withId : "")+((typeof bps != "undefined" && bps != "") ? '&bps='+bps : "")+((typeof page != "undefined" && page != "") ? '&page='+page : "")+"&frame="+target+"&appendable="+(appendable ? "1" : "0")});
 
 	},
 
@@ -595,10 +694,16 @@ var contentManager = {
 
 		new Ajax.Request(contentManager.getRoot()+"interface/rme.php?rand="+Math.random(), {
 		method: 'post',
-		parameters: "class="+targetClass+"&construct="+targetClassId+"&method="+targetMethod+"&parameters="+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : ""),
+		parameters: "class="+targetClass+"&construct="+encodeURIComponent(targetClassId)+"&method="+targetMethod+"&parameters="+targetMethodParameters+((bps != "" && typeof bps != "undefined") ? "&bps="+bps : ""),
 		onSuccess: function(transport) {
 			var check = checkResponse(transport);
 			if(!responseCheck || check) {
+				
+				if(transport.responseText.charAt(0) == "{" && transport.responseText.charAt(transport.responseText.length - 1) == "}")
+					transport.responseData = jQuery.parseJSON(transport.responseText);
+				
+				if(transport.responseText.charAt(0) == "[" && transport.responseText.charAt(transport.responseText.length - 1) == "]")
+					transport.responseData = jQuery.parseJSON(transport.responseText);
 				
 				if(typeof onSuccessFunction == "string")
 					eval(onSuccessFunction);
@@ -626,14 +731,30 @@ var contentManager = {
 
 	},
 
-	startAutoLogoutInhibitor: function(){
-		if(contentManager.autoLogoutInhibitor) return;
+	startAutoLogoutInhibitor: function(hasZentrale){
+		if(contentManager.autoLogoutInhibitor) 
+			return;
 
 		contentManager.autoLogoutInhibitor = true;
 
-		new PeriodicalExecuter(function(pe) {
+		window.setInterval(function(){
 			contentManager.rmePCR('Menu','','autoLogoutInhibitor','');
-		}, 300);
+			
+			if(hasZentrale)
+				$j.ajax({
+					url: contentManager.getRoot()+"plugins/AppServer/index.php?action=keepAlive",
+
+					beforeSend: function(){
+					},
+
+					success: function(transport, textStatus, request){
+
+					},
+					type: "GET",
+					data: null,
+					cache : false
+				});
+		}, 300 * 1000);
 	},
 
 	newClassButton: function(newClass, onSuccessFunction, targetFrame, bps){
@@ -641,19 +762,6 @@ var contentManager = {
 		if(typeof targetFrame == "undefined") targetFrame = "contentLeft";
 
 		contentManager.loadFrame(targetFrame, newClass, -1, 0, bps, onSuccessFunction);
-/*
-		new Ajax.Request('./interface/loadFrame.php?p='+newClass+'&id=-1'+(typeof bps != "undefined" ? "&bps="+bps : ""), {
-		method: 'get',
-		onSuccess: function(transport) {
-			if(checkResponse(transport)) {
-				if(typeof targetFrame == "undefined") targetFrame = "contentLeft";
-				$(targetFrame).update(transport.responseText);
-				//lastLoadedLeft = -1;
-				//lastLoadedLeftPlugin = newClass;
-
-				if(typeof onsuccessFunction != "undefined" && onsuccessFunction != "") onsuccessFunction();
-			}
-		}});*/
 	},
 
 	/*toggleFormFields: function(mode, fields, formID){
@@ -693,7 +801,7 @@ var contentManager = {
 
 		if(mode == "hide")
 			for (var f = 0; f < fields.length; f++) {
-				var fieldS = $j(formID+'select[name='+fields[f]+'],'+formID+'input[name='+fields[f]+'],'+formID+'textarea[name='+fields[f]+']').parent().parent();
+				var fieldS = $j(formID+'select[name='+fields[f]+'],'+formID+'input[name='+fields[f]+'],'+formID+'textarea[name='+fields[f]+'],'+formID+'span[name='+fields[f]+']').parent().parent();
 				fieldS.css("display", "none");
 				if(fieldS.prev().hasClass("FormSeparatorWithLabel") || fieldS.prev().hasClass("FormSeparatorWithoutLabel"))
 					fieldS.prev().css("display", "none");
@@ -701,7 +809,7 @@ var contentManager = {
 
 		if(mode == "show")
 			for (var f = 0; f < fields.length; f++) {
-				var fieldS = $j(formID+'select[name='+fields[f]+'],'+formID+'input[name='+fields[f]+'],'+formID+'textarea[name='+fields[f]+']').parent().parent();
+				var fieldS = $j(formID+'select[name='+fields[f]+'],'+formID+'input[name='+fields[f]+'],'+formID+'textarea[name='+fields[f]+'],'+formID+'span[name='+fields[f]+']').parent().parent();
 				fieldS.css("display", "");
 				
 				if(fieldS.prev().hasClass("FormSeparatorWithLabel") || fieldS.prev().hasClass("FormSeparatorWithoutLabel"))
@@ -742,6 +850,9 @@ var contentManager = {
 		if(event.keyCode == 8)
 			return;
 		
+		if(event.keyCode == 9)
+			return;
+		
 		
 		
 		if($j('#'+timeInputID).val().length == 2 && $j('#'+timeInputID).val().lastIndexOf(':') == -1){
@@ -758,6 +869,9 @@ var contentManager = {
 		if(event.keyCode == 8)
 			return;
 		
+		if(event.keyCode == 9)
+			return;
+
 		contentManager.timeInput(event, timeInput1ID);
 		
 		if($j('#'+timeInput1ID).val().lastIndexOf(':') == -1)
@@ -786,6 +900,10 @@ var contentManager = {
 			minutes = "0"+minutes;
 		
 		$j('#'+timeInput2ID).val(hour+":"+minutes);
+	},
+	
+	tinyMCEAddImage: function(src){
+		tinymce.activeEditor.selection.setContent('<img src="'+src+'">');
 	}
 	/*,
 	tinyMCEFileBrowser: function(field_name, url, type, win) {

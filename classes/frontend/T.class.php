@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class T {
@@ -25,13 +25,26 @@ class T {
 	private static $localeSet = false;
 	private static $currentDomain = "";
 	public static $domainPaths = array();
+	private static $domains = array();
 	
 	public static function D($domain){
 		self::$currentDomain = $domain;
+		self::$domains[] = $domain;
 	}
 	
 	public static function _($text){
-		if(!function_exists("bindtextdomain"))
+		if(!function_exists("bindtextdomain")){
+			$args = func_get_args();
+			if(count($args) > 1){
+				for($i = count($args); $i > 1; $i--)
+					$text = str_replace("%".($i - 1), $args[$i - 1], $text);
+
+			}
+			
+			return $text;
+		}
+		
+		if(!function_exists("bind_textdomain_codeset"))
 			return $text;
 		
 		if(trim($text) == "" OR trim($text) == "&nbsp;")
@@ -53,12 +66,33 @@ class T {
 			}
 		}
 		
-		$text = dgettext("messages".self::$currentDomain, $text);
+		$text2 = dgettext("messages".self::$currentDomain, $text);
+		
+		if($text2 == $text AND count(self::$domains) > 1){
+			$search = array_reverse(self::$domains);
+			$found = false;
+			foreach($search AS $domain){
+				if(self::$currentDomain == $domain)
+					continue;
+				
+				$text3 = dgettext("messages".$domain, $text);
+				if($text3 != $text){
+					$text = $text3;
+					$found = true;
+					break;
+				}
+			}
+			
+			if(!$found)
+				$text = $text2;
+		} else
+			$text = $text2;
+		
 		
 		$args = func_get_args();
 		if(count($args) > 1){
 			for($i = count($args); $i > 1; $i--)
-				$text = str_replace ("%".($i - 1), $args[$i - 1], $text);
+				$text = str_replace("%".($i - 1), $args[$i - 1], $text);
 			
 		}
 		
@@ -69,6 +103,9 @@ class T {
 	
 	public static function load($pluginPath, $domain = ""){
 		if(!function_exists("bindtextdomain") OR strpos($_SERVER["SERVER_SOFTWARE"], "BitWebServer") !== false)
+			return;
+		
+		if(!function_exists("bind_textdomain_codeset"))
 			return;
 		
 		self::$domainPaths[$domain] = $pluginPath."/locale";

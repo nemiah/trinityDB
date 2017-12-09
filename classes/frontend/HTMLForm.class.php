@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class HTMLForm {
 	protected $id;
@@ -28,7 +28,7 @@ class HTMLForm {
 	private $action;
 	private $method;
 	private $enctype;
-
+	private $appendJs = "";
 	private $descriptionField = array();
 
 	private $inputStyle = array();
@@ -44,7 +44,9 @@ class HTMLForm {
 	protected $saveAction;
 	protected $saveButtonCustom;
 
-	protected $onSubmit;
+	protected $abortButton;
+	
+	protected $onSubmit = "return false;";
 	protected $onChange = array();
 	protected $onBlur = array();
 	protected $onKeyup = array();
@@ -74,6 +76,7 @@ class HTMLForm {
 	private $autocomplete = array();
 	private $printColon = true;
 	private $callbacks = "";
+	private $placeholders = array();
 	
 	public function printColon($b){
 		$this->printColon = $b;
@@ -83,29 +86,44 @@ class HTMLForm {
 		switch($event){
 			case "onChange":
 			case "onchange":
-				if(!isset($this->onChange[$fieldName])) $this->onChange[$fieldName] = "";
+				if(!isset($this->onChange[$fieldName]))
+					$this->onChange[$fieldName] = "";
+				
 				$this->onChange[$fieldName] .= $function;
 			break;
 			case "onBlur":
 			case "onblur":
-				if(!isset($this->onBlur[$fieldName])) $this->onBlur[$fieldName] = "";
+				if(!isset($this->onBlur[$fieldName]))
+					$this->onBlur[$fieldName] = "";
+				
 				$this->onBlur[$fieldName] .= $function;
 			break;
 			case "onFocus":
 			case "onfocus":
-				if(!isset($this->onFocus[$fieldName])) $this->onFocus[$fieldName] = "";
+				if(!isset($this->onFocus[$fieldName]))
+					$this->onFocus[$fieldName] = "";
+				
 				$this->onFocus[$fieldName] .= $function;
 			break;
 			case "onKeyup":
 			case "onkeyup":
-				if(!isset($this->onKeyup[$fieldName])) $this->onKeyup[$fieldName] = "";
+				if(!isset($this->onKeyup[$fieldName]))
+					$this->onKeyup[$fieldName] = "";
+				
 				$this->onKeyup[$fieldName] .= $function;
+			break;
+			case "onEnter":
+			case "onenter":
+				if(!isset($this->onKeyup[$fieldName]))
+					$this->onKeyup[$fieldName] = "";
+				
+				$this->onKeyup[$fieldName] .= "if(event.keyCode == 13) { ".$function." }";;
 			break;
 		}
 	}
 
-	public function setAutoComplete($fieldName, $targetClass, $onSelectionFunction = ""){
-		$this->autocomplete[$fieldName] = array($targetClass, $onSelectionFunction);
+	public function setAutoComplete($fieldName, $targetClass, $onSelectionFunction = "", $thirdParameter = null){
+		$this->autocomplete[$fieldName] = array($targetClass, $onSelectionFunction, $thirdParameter);
 	}
 	
 	public function setAction($action){
@@ -170,8 +188,11 @@ class HTMLForm {
 		if($this->types[$fieldName] == "checkbox")
 			$this->addJSEvent($fieldName, $event, "if(".($value == "1" ? "" : "!")."this.checked) contentManager.toggleFormFields('hide', ['".implode("','", $fieldsToHide)."'], '$this->id'); else contentManager.toggleFormFields('show', ['".implode("','", $fieldsToHide)."'], '$this->id');");
 
-		if($this->types[$fieldName] == "select")
+		if($this->types[$fieldName] == "select"){
 			$this->addJSEvent($fieldName, $event, "if(\$j(this).val() $operator '$value') contentManager.toggleFormFields('hide', ['".implode("','", $fieldsToHide)."'], '$this->id'); else contentManager.toggleFormFields('show', ['".implode("','", $fieldsToHide)."'], '$this->id');");
+		
+			$this->appendJs .= "\$j('#$this->id [name=$fieldName]').trigger('change');";
+		}
 	}
 
 	public function inputLineStyle($fieldName, $style){
@@ -181,8 +202,16 @@ class HTMLForm {
 	public function setInputStyle($fieldName, $style){
 		$this->inputStyle[$fieldName] = $style;
 	}
+	
+	public function setFields(array $fields){
+		$this->fields = $fields;
+	}
 
-	public function __construct($formID, $fields, $title = null){
+	public function setPlaceholder($fieldName, $style){
+		$this->placeholders[$fieldName] = $style;
+	}
+
+	public function __construct($formID, $fields, $title = null, $virtualFields = array()){
 		$this->id = $formID;
 
 		if(is_array($fields))
@@ -192,6 +221,7 @@ class HTMLForm {
 			$this->fields = PMReflector::getAttributesArrayAnyObject($fields->getA());
 		}
 
+		$this->virtualFields = $virtualFields;
 		$this->types = array();
 		$this->labels = array();
 		$this->options = array();
@@ -204,7 +234,7 @@ class HTMLForm {
 		$this->table->setColClass(2, "backgroundColor2");
 		$this->title = $title;
 		$this->saveMode = null;
-		$this->onSubmit = null;
+		#$this->onSubmit = null;
 		$this->buttons = array();
 	}
 	
@@ -285,7 +315,13 @@ class HTMLForm {
 		$this->saveMode = "rmeP";
 		$this->saveButtonLabel = $saveButtonLabel;
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
-		$this->saveButtonSubmit = ($checkIfValid ? "if($('#$this->id').valid()) " : "")."CustomerPage.rme('handleForm', $('#$this->id').serialize(), $onSuccessFunction)";
+		$this->saveButtonSubmit = ($checkIfValid ? "if($('#$this->id').valid()) " : "")."CustomerPage.rme('handleForm', $('#$this->id').serialize(), $onSuccessFunction);";
+		
+		$this->onSubmit = $this->saveButtonSubmit." return false;";
+	}
+	
+	public function setAbortCustomerPage($label, $onclick, $icon = null){
+		$this->abortButton = array($label, $onclick, $icon);
 	}
 	
 	public function setSaveCustom($saveButtonLabel, $saveButtonBGIcon = null, $onClick = ""){
@@ -318,7 +354,7 @@ class HTMLForm {
 		$this->onSubmit = $this->saveButtonSubmit."return false;";
 	}
 	
-	public function setSaveRMEPCR($saveButtonLabel, $saveButtonBGIcon, $targetClass, $targetClassId, $targetMethod, $onSuccessFunction = ""){
+	public function setSaveRMEPCR($saveButtonLabel, $saveButtonBGIcon, $targetClass, $targetClassId, $targetMethod, $onSuccessFunction = "", $onFailureFunction = "function(){}"){
 		$this->saveMode = "rmeP";
 		$this->saveButtonLabel = $saveButtonLabel;
 		$this->saveButtonBGIcon = $saveButtonBGIcon;
@@ -343,7 +379,15 @@ class HTMLForm {
 			else
 				$values .= ($values != "" ? ", " : "")."\$('$this->id').$f.checked ? '1' : '0'";
 		}
-		$this->saveButtonSubmit = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', [$values]".($onSuccessFunction != "" ? ", $onSuccessFunction" : "").");";
+		
+		foreach($this->virtualFields AS $f){
+			if(!isset($this->types[$f]) OR $this->types[$f] != "checkbox")
+				$values .= ($values != "" ? ", " : "")."\$('$this->id').$f.value";
+			else
+				$values .= ($values != "" ? ", " : "")."\$('$this->id').$f.checked ? '1' : '0'";
+		}
+		
+		$this->saveButtonSubmit = "contentManager.rmePCR('$targetClass', '$targetClassId', '$targetMethod', [$values]".($onSuccessFunction != "" ? ", $onSuccessFunction" : "function(){}").", '', true, $onFailureFunction);";
 		$this->onSubmit = $this->saveButtonSubmit."return false;";
 	}
 	
@@ -354,10 +398,10 @@ class HTMLForm {
 		$this->onSubmit = str_replace("contentManager.rmePCR", "windowWithRme", $this->onSubmit);
 	}
 
-	public function setSaveContextMenu(PersistentObject $class, $targetMethod){
+	public function setSaveContextMenu($class, $targetMethod, $onSuccessFunction = ""){
 		$targetClass = str_replace("GUI", "", get_class($class));
 		
-		$this->setSaveRMEPCR("speichern", "./images/i2/save.gif", $targetClass, -1, $targetMethod, "function(){phynxContextMenu.stop();}");
+		$this->setSaveRMEPCR("speichern", "./images/i2/save.gif", $targetClass, $class->getID(), $targetMethod, "function(){ phynxContextMenu.stop(); $onSuccessFunction }");
 	}
 
 	public function setSaveConfirmation($question){
@@ -433,6 +477,14 @@ class HTMLForm {
 		$this->saveAction = "";
 		$this->saveButtonOnclick = "saveBericht('".get_class($berichtClass)."', '$this->id');";
 	}
+	public function setSaveBericht2($berichtClass){
+		$this->saveMode = "Bericht";
+		$this->saveButtonLabel = "Einstellungen speichern";
+		$this->saveButtonBGIcon = "";
+		$this->saveClass = "";
+		$this->saveAction = "";
+		$this->saveButtonOnclick = "Bericht.save('".get_class($berichtClass)."', '$this->id');";
+	}
 
 	public function isEditable($editable){
 		$this->editable = $editable;
@@ -440,7 +492,7 @@ class HTMLForm {
 
 	public function setSaveClass($className, $classID, $onSuccessFunction = '', $label = ''){
 		$this->saveMode = "class";
-		$this->saveButtonLabel = "$label speichern";
+		$this->saveButtonLabel = T::_("%1 speichern", $label);
 		$this->saveButtonBGIcon = "./images/i2/save.gif";
 		$this->saveClass = "";
 		$this->saveAction = "";
@@ -459,6 +511,27 @@ class HTMLForm {
 		$this->spaceLines[$fieldName] = $label;
 	}
 
+
+	public function insertField($where, $fieldName, $insertedFieldName){
+		if($where == "after")
+			$add = 1;
+
+		if($where == "before")
+			$add = 0;
+
+		$resetKeys = array();
+		foreach($this->fields AS $v)
+			$resetKeys[] = $v;
+		
+		$this->fields = $resetKeys;
+		
+		$first = array_splice($this->fields, 0, array_search($fieldName, $this->fields) + $add);
+		$last = array_splice($this->fields, array_search($fieldName, $this->fields));
+
+		$this->fields = array_merge($first, array($insertedFieldName), $last);
+		
+	}
+	
 	public function setDescriptionField($fieldName, $description){
 		$this->descriptionField[$fieldName] = $description;
 	}
@@ -481,11 +554,12 @@ class HTMLForm {
 			if(isset($this->types[$v]) AND ($this->types[$v] == "tinyMCE" OR $this->types[$v] == "TextEditor" OR $this->types[$v] == "nicEdit")){
 				$options = array($this->id, $v);
 				if(isset($this->options[$v]))
-					$options[] = $this->options[$v][0];
+					foreach($this->options[$v] AS $ov)
+						$options[] = $ov;
 				
 				$this->options[$v] = $options;
 			}
-			
+
 			$Input = new HTMLInput(
 				$v,
 				isset($this->types[$v]) ? $this->types[$v] : "text",
@@ -508,7 +582,10 @@ class HTMLForm {
 				$Input->style($this->inputStyle[$v]);
 
 			if(isset($this->autocomplete[$v]))
-				$Input->autocomplete($this->autocomplete[$v][0], $this->autocomplete[$v][1]);
+				$Input->autocomplete($this->autocomplete[$v][0], $this->autocomplete[$v][1], false, $this->autocomplete[$v][2]);
+			
+			if(isset($this->placeholders[$v]))
+				$Input->placeholder($this->placeholders[$v]);
 			
 			$Input->isDisplayMode(!$this->editable);
 		} else {
@@ -528,7 +605,12 @@ class HTMLForm {
 		if(!isset($this->types[$v]) OR $this->types[$v] != "parser"){
 			if(isset($this->buttons[$v])) {
 				$B = $this->buttons[$v];
-				if(!isset($this->types[$v]) OR $this->types[$v] == "text" OR $this->types[$v] == "select" OR $this->types[$v] == "readonly")
+				if(
+					(!isset($this->types[$v]) 
+						OR $this->types[$v] == "text" 
+						OR $this->types[$v] == "select" 
+						OR $this->types[$v] == "readonly") 
+					AND (isset($this->inputStyle[$v]) AND strpos($this->inputStyle[$v], "width") === false))
 					$Input->style("width:87%;");
 			}
 		}
@@ -599,15 +681,25 @@ class HTMLForm {
 
 					if($this->cols == 2) $this->table->addLV(
 						(isset($this->labels[$v]) ? $this->labels[$v] : ucfirst($v)).($this->printColon ? ":" : ""),
-						$B.$InputS.(isset($this->descriptionField[$v]) ? "<br /><small style=\"color:grey;\">".$this->descriptionField[$v]."</small>" : ""));
+						$B.$InputS.(isset($this->descriptionField[$v]) ? "<br><small style=\"color:grey;\">".$this->descriptionField[$v]."</small>" : ""));
 
 					if($this->cols == 1) {
+						
+						if(isset($this->labels[$v]) AND $this->labels[$v] != ""){
+							$this->table->addRow(
+							"<label ".($this->cols == 1 ? "style=\"width:100%;\"" : "").">".$this->labels[$v].":</label>");
+							$this->table->addRowClass("backgroundColor3");
+						}
+						
+						if(!isset($this->labels[$v])){
+							$this->table->addRow(
+							"<label ".($this->cols == 1 ? "style=\"width:100%;\"" : "").">".ucfirst($v).":</label>");
+							$this->table->addRowClass("backgroundColor3");
+						}
+						
+						
 						$this->table->addRow(
-						"<label>".(isset($this->labels[$v]) ? $this->labels[$v] : ucfirst($v)).":</label>");
-						$this->table->addRowClass("backgroundColor3");
-
-						$this->table->addRow(
-						$B.$InputS.(isset($this->descriptionField[$v]) ? "<br /><small style=\"color:grey;\">".$this->descriptionField[$v]."</small>" : ""));
+						$B.$InputS.(isset($this->descriptionField[$v]) ? "<br><small style=\"color:grey;\">".$this->descriptionField[$v]."</small>" : ""));
 						$this->table->addRowClass("backgroundColor0");
 					}
 
@@ -733,7 +825,18 @@ class HTMLForm {
 					$S->onclick(($this->saveButtonConfirm != null ? "if(confirm('".$this->saveButtonConfirm."')) " : "").$this->saveButtonSubmit);
 					$S->setClass("submitFormButton borderColor1");
 					
-					$this->table->addRow(array($S));
+					$C = "";
+					if($this->abortButton != null){
+						$C = new HTMLInput("abortForm", "button", $this->abortButton[0]);
+						if($this->abortButton[2] != null)
+							$C->style("background-image:url({$this->abortButton[2]});background-position:98% 50%;background-repeat:no-repeat;");
+
+						$C->onclick($this->abortButton[1]);
+							
+						$C->setClass("abortFormButton borderColor1");
+					}
+					
+					$this->table->addRow(array($S.$C));
 					$this->table->addRowColspan(1, 2);
 				break;
 
@@ -768,7 +871,7 @@ class HTMLForm {
 		if($this->formTag) $html .= "
 	</form>";
 
-		return $html.($this->useRecentlyChanged ? GUIFactory::editFormOnchangeTest($this->id) : "");
+		return $html.($this->appendJs != "" ? OnEvent::script($this->appendJs) : "").($this->useRecentlyChanged ? GUIFactory::editFormOnchangeTest($this->id) : "");
 	}
 
 	public function getHTML(){

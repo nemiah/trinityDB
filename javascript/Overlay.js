@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
  
 var Overlay = {
@@ -51,7 +51,10 @@ var Overlay = {
 				$j('#loginPassword').val(";;cookieData;;");
 				$j('#loginSHAPassword').val(data.password);
 				$j('#saveLoginData').prop("checked", true);
-				$j('#anwendung').val(data.application);
+				
+				if(typeof Util.querySt('application') == 'undefined')
+					$j('#anwendung').val(data.application);
+				
 				$j('#doAutoLogin').prop("checked", data.autologin);
 				
 				$j('#doAutoLoginContainer').fadeIn();

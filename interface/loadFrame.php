@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 require_once '../libraries/Timer.class.php';
 
@@ -58,12 +58,25 @@ if(!PMReflector::implementsInterface($n,"iGUIHTMLMP2")
 try {
 	ob_start();
 	Timer::now("init", __FILE__, __LINE__);
+	
+	if(method_exists($b, "appendable"))
+		$b->appendable(isset($_GET["appendable"]) ? $_GET["appendable"] : false);
+	
+	if(method_exists($b, "targetFrame"))
+		$b->targetFrame(isset($_GET["frame"]) ? $_GET["frame"] : null);
+	
 	echo $b->getHTML((isset($_GET["id"]) ? $_GET["id"] : "-1"), isset($_GET["page"]) ? $_GET["page"] : 0, isset($_GET["frame"]) ? $_GET["frame"] : null);
 	Timer::now("done", __FILE__, __LINE__);
 	
 	$timers = Timer::getLogged();
 	if(count($timers) > 0)
 		header("X-Timers: ".json_encode($timers));
+	
+	if(isset($_SESSION["phynx_Achievements"]) AND is_array($_SESSION["phynx_Achievements"]) AND count($_SESSION["phynx_Achievements"]) > 0){
+		header("X-Achievements: ".json_encode($_SESSION["phynx_Achievements"]));
+		$_SESSION["phynx_Achievements"] = array();
+	}
+	
 	ob_end_flush();
 } catch (TableDoesNotExistException $e) {
 	Red::errorD("Die Datenbank-Tabelle (".$e->getTable().") dieses Plugins wurde noch nicht angelegt. Bitte verwenden Sie das Installations-Plugin im Administrationsbereich.");
@@ -72,7 +85,7 @@ try {
 } catch (NoDBUserDataException $e) {
 	Red::errorD("Die Datenbank-Zugangsdaten sind falsch. Bitte verwenden Sie das Installations-Plugin im Administrationsbereich.");
 } catch (FieldDoesNotExistException $e) {
-	Red::errorUpdate();
+	Red::errorUpdate($e);
 } catch (DatabaseNotFoundException  $e) {
 	Red::errorD("Keine Datenbank ausgewählt. Bitte verwenden Sie das Installations-Plugin im Administrationsbereich.");
 }

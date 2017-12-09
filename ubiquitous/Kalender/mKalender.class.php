@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class mKalender extends UnpersistentClass {
 	public function getEMailData($parameters){
@@ -30,16 +30,23 @@ class mKalender extends UnpersistentClass {
 		$adresse = $data->getAdresse();
 		$emailData = $adresse->getEMailData();
 		
-		$emailData["body"] = "{Anrede},
+		
+		$sum = $data->summary();
+		if(strpos($sum, "<p") !== false)
+			$sum = "</p>$sum<p>";
+		else
+			$sum = nl2br ($sum);
+		
+		$emailData["body"] = "<p>{Anrede},<br>
+<br>
+hiermit bestätige ich Ihnen unseren Termin:<br>
+<br>
+Start: ".Util::CLDateParser(Kalender::parseDay($data->getDay()))." um ".Util::CLTimeParser(Kalender::parseTime($data->getTime()))." Uhr".($data->getEndDay() > 0 ? "<br>
+Ende:  ".Util::CLDateParser(Kalender::parseDay($data->getEndDay()))." um ".Util::CLTimeParser(Kalender::parseTime($data->getEndTime()))." Uhr" :"")."<br>
+<br>
+Beschreibung: ".$sum."
 
-hiermit bestätige ich Ihnen unseren Termin:
-
-Start: ".Util::CLDateParser(Kalender::parseDay($data->getDay()))." um ".Util::CLTimeParser(Kalender::parseTime($data->getTime()))." Uhr".($data->getEndDay() > 0 ? "
-Ende:  ".Util::CLDateParser(Kalender::parseDay($data->getEndDay()))." um ".Util::CLTimeParser(Kalender::parseTime($data->getEndTime()))." Uhr" :"")."
-
-Beschreibung: ".str_replace("<br />\n", "\n", $data->summary())."
-
-Freundliche Grüße
+Freundliche Grüße<br>
 ".Session::currentUser()->A("name");
 		
 		$emailData["subject"] = "Termininformation";
@@ -156,18 +163,20 @@ END:VCALENDAR";
 		$C->setNotified($className, $classID);
 	}
 	
-	public function getData($firstDay, $lastDay, $UserID = null){
+	public function getData($firstDay, $lastDay, $UserID = null, $skip = array()){
 		if($UserID === null)
-			$UserID = Session::currentUser();
+			$UserID = Session::currentUser()->getID();
 		
 		Registry::reset("Kalender");
 		
 		$K = new Kalender();
 		$K->timeRange($firstDay, $lastDay);
-		while($return = Registry::callNext("Kalender", "events", array($firstDay, $lastDay, $UserID)))
+		while($return = Registry::callNext("Kalender", "events", array($firstDay, $lastDay, $UserID), $skip))
 			$K->merge($return);
 
-		while($return = Registry::callNext("Kalender", "holidays", array($firstDay, $lastDay, $UserID)))
+		Registry::reset("Kalender");
+		
+		while($return = Registry::callNext("Kalender", "holidays", array($firstDay, $lastDay, $UserID), $skip))
 			$K->merge($return);
 		
 		$K->exceptions();

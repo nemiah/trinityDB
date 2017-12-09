@@ -60,12 +60,14 @@ td { /*vertical-align: top; */padding:3px; }
 
 h1 { font-family:Roboto; padding-top:30px;padding-bottom:15px; }
 h2 { font-family:Roboto; padding-top:20px;padding-bottom:10px; }
+h3 { font-family:Roboto; padding-top:10px;padding-bottom:5px; }
 
-label { text-align:right; width:120px; display:block; font-weight:bold; }
+label { text-align:right; width:120px; display:block; /*font-weight:bold;*/ }
 .submitFormButton { float:right; padding:4px; width:auto; padding-left:10px; padding-right:10px; }
+.abortFormButton { padding:4px; width:auto; padding-left:10px; padding-right:10px; }
 
-input, select, textarea { border:0px; border-bottom:1px solid grey; padding:2px; border-color: #97a652;background-color:#EFEFEF; width:250px; }
-
+input, select, textarea { border:0px; border-bottom:1px solid grey; padding:2px; border-color: #97a652;background-color:#EFEFEF; width:100%;max-width:250px; }
+input[type="checkbox"], input[type="radio"] { width:auto; }
 .borderColor1 { border-color: #97a652; }
 .backgroundColor1 { background-color: #F5FFC5; }
 
@@ -77,10 +79,13 @@ input, select, textarea { border:0px; border-bottom:1px solid grey; padding:2px;
 	background-color: #F5FFC5;
 }
 
-form table { width:370px; }
+form table { width:100%; max-width:370px; }
 form table td { width:120px; }
 form table td+td { width:250px; }
-form { border:1px dashed #BBB; padding:10px; width:390px; }
+form { border:1px dashed #BBB; padding:10px; box-sizing:border-box;width:100%;max-width:390px; }
+.ui-dialog form {
+	border:0px; padding:0px; width:100%;
+}
 p { padding:10px; }
 
 input[disabled="disabled"]{
@@ -100,7 +105,7 @@ label.error {
 	margin-top:3px;
 }
 
-.submitFormButton {
+.submitFormButton, .abortFormButton {
 	border: medium none;
 	cursor: pointer;
 	display: inline-block;
@@ -111,7 +116,7 @@ label.error {
 	margin-top:10px;
 	text-transform: uppercase;
 }
-.submitFormButton:active {
+.submitFormButton:active, .abortFormButton:active {
 	box-shadow: 0 0 0 transparent, 0 0 0 black;
 }
 
@@ -124,6 +129,17 @@ label.error {
 .submitFormButton:focus, .submitFormButton:hover {
 	background-color: #aacc00;
 	color: #374301;
+}
+
+.abortFormButton:focus, .abortFormButton:hover {
+	background-color:#BBB;
+}
+
+.abortFormButton {
+	background-color:#DDD;
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 black;
+	color:grey;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .Tab {
@@ -154,7 +170,7 @@ tr.selectable:hover {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 300;
-  src: local('Roboto Light'), local('Roboto-Light'), url('Roboto-Light.woff') format('woff'), url('Roboto-Light.ttf') format('truetype');
+  src: local('Roboto Light'), local('Roboto-Light'), url(Roboto-Light.woff) format('woff');
 }
 
 @font-face { 
@@ -393,12 +409,17 @@ tr:hover .iconic.reverse {
 	opacity:0.5;
 }
 
-.ui-dialog form {
+/*WHY? 20140725*/
+/*.ui-dialog form { 
 	width:95%;
-}
+}*/
 
 .ui-dialog form table {
 	width:100%;
+}
+
+.ui-dialog p {
+	padding-left:0px;
 }
 
 .ui-dialog form table td {
@@ -412,6 +433,14 @@ tr:hover .iconic.reverse {
 
 .highlight {
 	background-color:rgba(255,204,0,0.3);
+}
+
+.confirm {
+	background-color:#d1e769;
+}
+
+.error {
+	background-color:rgba(220, 50, 0, 0.5);
 }
 
 .overlay {
@@ -440,3 +469,17 @@ tr:hover .iconic.reverse {
 .touchButton .iconicL {
 	margin-right:5px;
 }
+
+.iconicL {
+	font-size:30px;
+	width:32px;
+	height:32px;
+	color:#AAA;
+}
+/*
+@media (min-resolution: 200dpi){
+	html {
+		transform-origin: top left;
+		transform: scale(1.5);
+	}
+}*/

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class FileStorage {
 	protected $instance;
@@ -72,7 +72,7 @@ class FileStorage {
 		else {
 			$A = $F->newAttributes();
 
-			$ex = explode(DIRECTORY_SEPARATOR, $file);
+			$ex = explode("/", $file);
 			
 			$A->FileDir = dirname(realpath($file));
 			$A->FileName = $ex[count($ex) - 1];
@@ -89,10 +89,23 @@ class FileStorage {
 	}
 	
 	public static function getFilesDir(){
-		$path = realpath(Util::getRootPath()."specifics")."/";
+		// <editor-fold defaultstate="collapsed" desc="Aspect:jP">
+		try {
+			return Aspect::joinPoint("around", __CLASS__, __METHOD__);
+		} catch (AOPNoAdviceException $e) {}
+		// </editor-fold>
+
+		$path = realpath(Util::getRootPath())."/specifics/";
 		
 		if(!file_exists($path.".htaccess") AND is_writable($path))
-			file_put_contents($path.".htaccess", "deny from all");
+			file_put_contents($path.".htaccess", "<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order Allow,Deny
+    Deny from all
+</IfModule>");
 		
 		$CH = Util::getCloudHost();
 		if($CH != null){
@@ -102,13 +115,27 @@ class FileStorage {
 			
 			if(!file_exists($dir)){
 				#mkdir($CH->scientiaDir."/".strtolower(Environment::$currentEnvironment->cloudUser())."/");
-				mkdir($CH->scientiaDir."/".($cloudUser != "" ? "$cloudUser/" : "")."specifics/", 0777, true);
+				mkdir($dir, 0777, true);
+				chmod($dir, 0777);
 			}
 			
-			return $dir;
+			return realpath($dir)."/";
+		}
+		
+		if(Session::isPluginLoaded("multiInstall") AND isset($_SESSION["DBData"]) AND isset($_SESSION["DBData"]["httpHost"])){# AND $_SESSION["DBData"]["httpHost"] != "*"){
+			$path .= "Mandant_".$_SESSION["DBData"]["InstallationID"]."/";
+			
+			if(!file_exists($path)){
+				mkdir($path, 0777, true);
+				chmod($path, 0777);
+			}
 		}
 		
 		return $path;
+	}
+	
+	public static function getElementDir($class, $id){
+		return FileStorage::getFilesDir().$class."ID".str_pad($id, 4, "0", STR_PAD_LEFT);
 	}
 	
 	function loadMultipleV4(SelectStatement $statement){
@@ -117,7 +144,10 @@ class FileStorage {
 		$dir = realpath($this->dir);
 		$dir .= "/";
 		
-		if(strpos($dir,"specifics") === false AND !$this->forceDir) $dir = self::getFilesDir();#realpath("../specifics")."/";
+		$checkSpecifics = Aspect::joinPoint("check", $this, __METHOD__, array(), true);
+		
+		if($checkSpecifics AND strpos($dir,"specifics") === false AND !$this->forceDir) 
+			$dir = self::getFilesDir();
 		
 		$dirs = array();
 		$files = array();
@@ -145,6 +175,15 @@ class FileStorage {
 				continue;
 
 			if(strpos(basename($file), "GRLBMID") === 0)
+				continue;
+
+			if(strpos(basename($file), "LieferantID") === 0)
+				continue;
+
+			if(strpos(basename($file), "DBMailVorlageID") === 0)
+				continue;
+
+			if(strpos(basename($file), "VertragBelegEinmalID") === 0)
 				continue;
 
 			if(strpos(basename($file), "MailArchive") === 0)

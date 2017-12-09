@@ -15,17 +15,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class IBANCalcGUI {
-	public static function getButton($ibanField, $bicField){
+	public static function getButton($ibanField, $bicField, $ktoField = null, $blzField = null){
+		$attr = array("'$ibanField'", "'$bicField'");
+		if($ktoField != null AND $blzField != null){
+			$attr[] = "\$j('[name=$ktoField]').val()";
+			$attr[] = "\$j('[name=$blzField]').val()";
+		}
+		
 		$B = new Button("IBAN-Rechner", "./images/i2/calc.png", "icon");
-		$B->popup("", "IBAN-Rechner", "IBANCalc", "-1", "popup", array("'$ibanField'", "'$bicField'"));
+		$B->popup("", "IBAN-Rechner", "IBANCalc", "-1", "popup", $attr);
 		
 		return $B;
 	}
 	
-	function popup($ibanField, $bicField){
+	function popup($ibanField, $bicField, $kto = "", $blz = ""){
 		$F = new HTMLForm("ibanCalc", array("land", "kontonummer", "bankleitzahl", "ibanField", "bicField"));
 		$F->getTable()->setColWidth(1, 120);
 		
@@ -46,7 +52,8 @@ class IBANCalcGUI {
 		$F->setType("ibanField", "hidden");
 		$F->setType("bicField", "hidden");
 		
-		
+		$F->setValue("kontonummer", $kto);
+		$F->setValue("bankleitzahl", $blz);
 		$F->setValue("ibanField", $ibanField);
 		$F->setValue("bicField", $bicField);
 		
@@ -99,6 +106,7 @@ class IBANCalcGUI {
 		
 		$T = new HTMLTable(3, "Gefundene Ergebnisse");
 		$T->weight("light");
+		$T->maxHeight(400);
 		$T->useForSelection(false);
 		$T->setColWidth(1, 20);
 		$T->addHeaderRow(array("", "BIC", "IBAN"));

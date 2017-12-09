@@ -177,13 +177,19 @@ class htmlMimeMail5 {
 		try {
 			$MailServerSet = false;
 			$MailServer = LoginData::get("MailServerUserPass");
-			if ($MailServer != null AND $MailServer->A("server") != "") {
+			if ($MailServer != null AND $MailServer->A("server") != "" AND !$skipOwnServer) {
 				$this->default_method = "smtp";
 
 				$MailServerSet = true;
 				
-				$this->smtp_params['host'] = $MailServer->A("server");
-				$this->smtp_params['port'] = 25;
+				$host = $MailServer->A("server");
+				$url = parse_url($host);
+				if(isset($url["port"])){
+					$this->smtp_params['port'] = $url["port"];
+					$host = str_replace(":".$url["port"], "", $host);
+				}
+				$this->smtp_params['host'] = $host;
+				
 				#if(isset($xml->Mail->options->helo)) $this->smtp_params['helo'] = $xml->Mail->options->helo["value"]."";
 				$this->smtp_params['helo'] = "localhost";
 				$this->smtp_params['auth'] = $MailServer->A("benutzername") != "";
@@ -193,6 +199,9 @@ class htmlMimeMail5 {
 				
 			$MailServer = null;
 			for($i = 2; $i <= 5; $i++){
+				if($skipOwnServer)
+					break;
+				
 				if($MailServer == null AND $i > 2)
 					break;
 
@@ -202,7 +211,15 @@ class htmlMimeMail5 {
 				
 				$MailServerSet = true;
 				
-				$this->smtp_params['host'] = $MailServer->A("server");
+				$host = $MailServer->A("server");
+				$url = parse_url($host);
+				if(isset($url["port"])){
+					$this->smtp_params['port'] = $url["port"];
+					$host = str_replace(":".$url["port"], "", $host);
+				}
+				$this->smtp_params['host'] = $host;
+				
+				#$this->smtp_params['host'] = $MailServer->A("server");
 				
 				$this->smtp_params['auth'] = $MailServer->A("benutzername") != "";
 				$this->smtp_params['user'] = $MailServer->A("benutzername");
@@ -291,6 +308,10 @@ class htmlMimeMail5 {
 			$this->smtp_params['pass'] = $pass;
 	}
 
+	public function getSMTPParams(){
+		return $this->smtp_params;
+	}
+	
 	/**
 	 * Sets sendmail path and options (optionally) (when directly piping to sendmail)
 	 * 
@@ -815,7 +836,16 @@ class htmlMimeMail5 {
 	private function encodeHeader($input, $charset = 'ISO-8859-1') {
 		preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $input, $matches);
 		foreach ($matches[1] as $value) {
-			$replacement = preg_replace('/([\x80-\xFF])/e', '"=" . strtoupper(dechex(ord("\1")))', $value);
+			if(!defined("PHP_VERSION_ID") OR PHP_VERSION_ID < 50500)
+				$replacement = preg_replace('/([\x80-\xFF])/e', '"=" . strtoupper(dechex(ord("\1")))', $value);
+			else
+				$replacement = preg_replace_callback(
+					'/([\x80-\xFF])/',
+					function ($m) {
+						return "=".strtoupper(dechex(ord($m[1])));
+					},
+					$value);
+					
 			$input = str_replace($value, '=?' . $charset . '?Q?' . $replacement . '?=', $input);
 		}
 
@@ -897,11 +927,10 @@ class htmlMimeMail5 {
 				break;
 
 			case 'smtp':
-				require_once(dirname(__FILE__) . '/smtp.php');
+				require_once(dirname(__FILE__) . '/hmmsmtp.php');
 				require_once(dirname(__FILE__) . '/RFC822.php');
 				if($this->smtp_conn == null){
-					$this->smtp_conn = new smtp();
-				
+					$this->smtp_conn = new hmmsmtp();
 				
 					$this->smtp_conn->connect($this->smtp_params);
 					if($this->dsn !== null)
@@ -948,7 +977,8 @@ class htmlMimeMail5 {
 				if (isset($this->return_path)) {
 					$send_params['from'] = $this->return_path;
 				} elseif (!empty($this->headers['From'])) {
-					$from = Mail_RFC822::parseAddressList($this->headers['From']);
+					$Mail_RFC822 = new Mail_RFC822();
+					$from = $Mail_RFC822->parseAddressList($this->headers['From']);
 					$send_params['from'] = sprintf('%s@%s', $from[0]->mailbox, $from[0]->host);
 				} else {
 					$send_params['from'] = 'postmaster@' . $this->smtp_params['helo'];

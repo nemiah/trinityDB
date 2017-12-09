@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class ExtConn {
 	protected $absolutePath;
@@ -41,6 +41,7 @@ class ExtConn {
 		$this->absolutePath = $absolutePathToPhynx;
 		
 		$this->paths[] = $this->absolutePath."libraries/PhpFileDB.class.php";
+		$this->paths[] = $this->absolutePath."libraries/Timer.class.php";
 
 		if(!defined("PHYNX_LOW_FOOTPRINT")){
 			$this->paths[] = $this->absolutePath."classes/backend/Collection.class.php";
@@ -59,12 +60,14 @@ class ExtConn {
 			$this->paths[] = $this->absolutePath."classes/backend/PluginV2.class.php";
 			$this->paths[] = $this->absolutePath."classes/backend/XMLPlugin.class.php";
 			$this->paths[] = $this->absolutePath."classes/backend/FileStorage.class.php";
+			$this->paths[] = $this->absolutePath."classes/backend/SpeedCache.class.php";
 
 			$this->paths[] = $this->absolutePath."classes/exceptions/o3AException.class.php";
 			$this->paths[] = $this->absolutePath."classes/exceptions/StorageException.class.php";
 			$this->paths[] = $this->absolutePath."classes/exceptions/NoDBUserDataException.class.php";
 			$this->paths[] = $this->absolutePath."classes/exceptions/AOPNoAdviceException.class.php";
 			$this->paths[] = $this->absolutePath."classes/exceptions/ClassNotFoundException.class.php";
+			$this->paths[] = $this->absolutePath."classes/exceptions/BrainSplitException.class.php";
 
 			$this->paths[] = $this->absolutePath."classes/toolbox/SysMessages.class.php";
 			$this->paths[] = $this->absolutePath."classes/toolbox/SystemCommand.class.php";
@@ -77,10 +80,11 @@ class ExtConn {
 			$this->paths[] = $this->absolutePath."classes/toolbox/Aspect.class.php";
 			$this->paths[] = $this->absolutePath."classes/toolbox/EUCountries.class.php";
 			$this->paths[] = $this->absolutePath."classes/toolbox/Registry.class.php";
+			$this->paths[] = $this->absolutePath."classes/toolbox/LoginAD.class.php";
 
 			$this->paths[] = $this->absolutePath."classes/interfaces/iFileBrowser.class.php";
 			$this->paths[] = $this->absolutePath."classes/interfaces/iLDAPExport.class.php";
-			$this->paths[] = $this->absolutePath."classes/interfaces/iDesktopLink.class.php";
+			#$this->paths[] = $this->absolutePath."classes/interfaces/iDesktopLink.class.php";
 			$this->paths[] = $this->absolutePath."classes/interfaces/icontextMenu.class.php";
 			$this->paths[] = $this->absolutePath."classes/interfaces/iCloneable.class.php";
 			$this->paths[] = $this->absolutePath."classes/interfaces/iDeletable.class.php";
@@ -102,6 +106,8 @@ class ExtConn {
 			$this->paths[] = $this->absolutePath."classes/frontend/Applications.class.php";
 			$this->paths[] = $this->absolutePath."classes/frontend/HTMLGUI.class.php";
 			$this->paths[] = $this->absolutePath."classes/frontend/HTMLGUI2.class.php";
+			$this->paths[] = $this->absolutePath."classes/frontend/HTMLGUIX.class.php";
+			$this->paths[] = $this->absolutePath."classes/frontend/GUIFactory.class.php";
 			$this->paths[] = $this->absolutePath."classes/frontend/HTML_de_DE.class.php";
 			$this->paths[] = $this->absolutePath."classes/frontend/HTML_en_US.class.php";
 			$this->paths[] = $this->absolutePath."classes/frontend/UnifiedTable.class.php";
@@ -209,7 +215,7 @@ class ExtConn {
 		if($httpHost != "*"){
 			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '$httpHost'");
 			$Data = $PFDB->pfdbFetchAssoc($q);
-		} else {
+		} elseif(isset($_SERVER["HTTP_HOST"])) {
 			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '".$_SERVER["HTTP_HOST"]."'");
 			$Data = $PFDB->pfdbFetchAssoc($q);
 		}
@@ -217,11 +223,9 @@ class ExtConn {
 		if($Data === false){
 			$q = $PFDB->pfdbQuery("SELECT * FROM Installation WHERE httpHost = '*'");
 			$Data = $PFDB->pfdbFetchAssoc($q);
-		
-		
 		}
 		
-		$this->setMySQLData($Data["host"], $Data["user"], $Data["password"], $Data["datab"]);
+		$this->setMySQLData($Data["host"], $Data["user"], $Data["password"], $Data["datab"], $Data["httpHost"], $Data["ID"]);
 	}
 
 	public function useAdminUser(){
@@ -263,13 +267,15 @@ class ExtConn {
 		return $this->currentUser;
 	}
 
-	function setMySQLData($host, $username, $password, $database){
+	function setMySQLData($host, $username, $password, $database, $httpHost = "*", $ID = ""){
 
 		$_SESSION["DBData"] = array();
-		$_SESSION["DBData"]["host"]		= $host;
-		$_SESSION["DBData"]["user"]		= $username;
-		$_SESSION["DBData"]["password"] = $password;
-		$_SESSION["DBData"]["datab"]	= $database;
+		$_SESSION["DBData"]["host"]				= $host;
+		$_SESSION["DBData"]["user"]				= $username;
+		$_SESSION["DBData"]["password"]			= $password;
+		$_SESSION["DBData"]["datab"]			= $database;
+		$_SESSION["DBData"]["InstallationID"]	= $ID;
+		$_SESSION["DBData"]["httpHost"]			= $httpHost;
 	}
 	
 	function setPaths(){

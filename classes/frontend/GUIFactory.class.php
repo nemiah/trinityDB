@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class GUIFactory {
 
@@ -219,7 +219,7 @@ class GUIFactory {
 
 	private function getSettingsButton(){
 		$B = $this->getButton("Einstellungen anzeigen", "wrench", "iconic");
-		$B->onclick("phynxContextMenu.start(this, 'HTML','multiPageSettings:$this->collectionName','Einstellungen:');");
+		$B->onclick("phynxContextMenu.start(this, 'HTML','multiPageSettings:$this->collectionName".($this->targetFrame != null ? ":$this->targetFrame" : "")."','".T::_("Einstellungen").":');");
 
 		return $B;
 	}
@@ -244,7 +244,7 @@ class GUIFactory {
 		
 		$pages = ceil($this->multiPageDetails["total"] / $this->multiPageDetails["perPage"]);
 
-		$pageLinks = $pages." Seite".($pages != 1 ? "n" : "").": ";
+		$pageLinks = $pages." ".T::_("Seite".($pages != 1 ? "n" : "")).": ";
 		
 		if($this->multiPageDetails["page"] != 0)
 			$pageLinks .= "<a href=\"javascript:".str_replace(array("%TARGET","%PAGE"), array($this->multiPageDetails["target"], 0), $this->functionPageFirst)."\"><span class=\"iconic arrow_left\" style=\"border-left-width:2px;\"></span></a> ";
@@ -305,11 +305,16 @@ class GUIFactory {
 		$I->placeholder("Suche");
 		
 		$B = "";
+		$D = "";
 		$showSF = PMReflector::implementsInterface($this->collectionName."GUI","iSearchFilter");
 		if($showSF){
+			$action = "contentManager.reloadFrame('contentRight', '', 0);";
+			if($this->targetFrame != null)
+				$action = "contentManager.loadFrame('$this->targetFrame', '$this->collectionName', -1, 0);";
+			
 			$B = new Button("Suche als Filter anwenden","./images/i2/searchFilter.png", "icon");
 			$B->style("float:right;");
-			$B->rme("HTML","","saveContextMenu", array("'searchFilter'","'$this->collectionName;:;'+$('quickSearch$this->collectionName').value"),"if(checkResponse(transport)) contentManager.reloadFrameRight();");
+			$B->rmePCR("HTML","","saveContextMenu", array("'searchFilter'","'$this->collectionName;:;'+$('quickSearch$this->collectionName').value"),"if(checkResponse(transport)) $action");
 
 			$mU = new mUserdata();
 			$K = $mU->getUDValue("searchFilterInHTMLGUI".$this->collectionName);
@@ -317,7 +322,24 @@ class GUIFactory {
 			$I->style("width:90%;");
 		}
 		
-		return $B.$I;
+		$showSFM = PMReflector::implementsInterface($this->collectionName."GUI","iSearchFilterMulti");
+		if($showSFM){
+			$B = new Button("Als Filter hinzufügen","./images/i2/searchFilter.png", "icon");
+			$B->style("float:right;");
+			$B->rmePCR("HTML","","searchFilterMultiAdd", array("'$this->collectionName'", "\$j('#quickSearch$this->collectionName').val()"),"if(checkResponse(transport)) contentManager.reloadFrame('contentRight', '', 0);");
+
+			$mU = new mUserdata();
+			$Q = $mU->getUDValue("searchFilterMulti".$this->collectionName);
+			if($Q != ""){
+				$Qs = explode(";;", trim($Q, ";"));
+
+				foreach($Qs AS $S){
+					$D .= "<span onclick=\"".OnEvent::rme(new HTMLGUI(), "searchFilterMultiRemove", array("'$this->collectionName'", "'$S'"), OnEvent::reload("Right"))."\" style=\"cursor:pointer;padding:3px;display:inline-block;margin-right:5px;\" class=\"backgroundColor2\">$S ✕</span>";
+				}
+			}
+		}
+		
+		return $B.$I.$D;
 	}
 
 	/**
@@ -339,7 +361,7 @@ class GUIFactory {
 			$this->table = $T;
 			
 			if($this->tableMode == "CRMSubframeContainer")
-				$T->setTableStyle("width:100%;margin-left:0px;");
+				$T->setTableStyle("width:100%;max-width:100%;margin-left:0px;");
 
 			if($this->tableMode == "screen")
 				$T->setTableStyle("font-size:10px;");
@@ -357,7 +379,7 @@ class GUIFactory {
 		}
 	}
 
-	public function getContainer($Table, $caption){
+	public function getContainer($Table, $caption, $appended = "", $prepended = ""){
 		$widths = Aspect::joinPoint("changeWidths", $this, __METHOD__);
 		if($widths == null) $widths = array(700);
 
@@ -372,27 +394,35 @@ class GUIFactory {
 			$pageBrowser = $this->getPageBrowser();
 
 			return "
-			<div id=\"subFrameContainer$this->collectionName\" style=\"margin-top:20px;\">
+			<div id=\"subFrameContainer$this->collectionName\" style=\"min-height:500px;\">
+				$prepended
 				<div style=\"width:$widths[0]px;\" class=\"backgroundColor1 Tab\">
 					<p>$newButton<span style=\"float:right;font-weight:normal;\">$pageBrowser</span>$caption</p><div style=\"clear:both;\"></div>
 				</div>
 				<div id=\"subFrameEdit$this->collectionName\" style=\"display:none;width:$widths[0]px;padding-bottom:15px;\"></div>
 				<div id=\"subFrame$this->collectionName\" style=\"width:$widths[0]px;margin-left:10px;\">
 				".Aspect::joinPoint("aboveList", $this, __METHOD__)."
-					<div style=\"overflow:auto;max-height:252px;\">
+					<div style=\"\">
 					$Table
 					</div>
 				".Aspect::joinPoint("belowList", $this, __METHOD__)."</div>
+				$appended
 			</div>";
 		}
 
 		if($this->tableMode == "BrowserRight" OR $this->tableMode == "BrowserLeft" OR $this->tableMode == "popup" OR $this->tableMode == "screen"){
-			$abort = "";
-			if($this->isSelection)
-				$abort = $this->getAbortButton();
 
-			return $abort.Aspect::joinPoint("aboveList", $this, __METHOD__).$Table;
+			return $prepended.Aspect::joinPoint("aboveList", $this, __METHOD__).$Table.$appended;
 		}
+	}
+	
+	public function getSideButtons(){
+		$r = array();
+		
+		if($this->isSelection)
+			$r[] = $this->getAbortButton();
+		
+		return $r;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="getLeftButtons">
@@ -520,6 +550,8 @@ class GUIFactory {
 
 	// <editor-fold defaultstate="collapsed" desc="buildFlipPageLine">
 	public function buildFlipPageLine($where = "top"){
+		T::D("");
+		
 		if($this->multiPageDetails["total"] == null) return;
 		if(!$this->showFlipPage) return;
 
@@ -538,18 +570,19 @@ class GUIFactory {
 		
 		#if($where == "top"){# OR $where == "bottom") {
 			if($this->tableMode == "BrowserRight"){
-				$wholeLine1 = array($this->getSettingsButton(), "".$this->multiPageDetails["total"]." ".($this->multiPageDetails["total"] != 1 ? "Einträge" : "Eintrag").", $wholeLine2");
+				$wholeLine1 = array($this->getSettingsButton(), "".$this->multiPageDetails["total"]." ".($this->multiPageDetails["total"] != 1 ? T::_("Einträge") : T::_("Eintrag")).", $wholeLine2");
 
 				$this->table->addRow($wholeLine1);
-				$this->table->addRowColspan(2, count($this->referenceLine) -1);
+				$this->table->addRowColspan(2, count($this->referenceLine) -1 == 1 ? 2 : count($this->referenceLine) -1); //or it will look quite bad with no entries
 				$this->table->addRowClass("backgroundColorHeader");
 				$this->table->setRowPart($where == "top" ? "thead" : "tfoot");
+				$this->table->addCellStyle(2, "text-align:left;");
 			}
 			
 			$this->table->addRowClass("backgroundColorHeader");
 			
 			if($this->tableMode == "BrowserLeft" OR $this->tableMode == "screen" OR $this->tableMode == "popup"){
-				$wholeLine1 = array($this->multiPageDetails["total"]." ".($this->multiPageDetails["total"] != 1 ? "Einträge" : "Eintrag").", $wholeLine2");
+				$wholeLine1 = array($this->multiPageDetails["total"]." ".($this->multiPageDetails["total"] != 1 ? T::_("Einträge") : T::_("Eintrag")).", $wholeLine2");
 				$wholeLine1 = array_pad($wholeLine1, count($this->referenceLine) - 1, "");
 				if($this->multiPageDetails["perPage"] === "0")
 					$wholeLine1[] = $this->getSettingsButton();
@@ -557,7 +590,7 @@ class GUIFactory {
 					$wholeLine1[] = "";
 				
 				$this->table->addRow($wholeLine1);
-				$this->table->addRowColspan(1, count($this->referenceLine) -1);
+				$this->table->addRowColspan(1, count($this->referenceLine) -1 == 1 ? 2 : count($this->referenceLine) -1); //or it will look quite bad with no entries
 				$this->table->addRowClass("backgroundColorHeader");
 				$this->table->addCellStyle(count($wholeLine1), "text-align:right;");
 				$this->table->setRowPart($where == "top" ? "thead" : "tfoot");
@@ -580,12 +613,21 @@ class GUIFactory {
 			$this->table->addRowClass("backgroundColor0 browserSeparatorTop");
 			$this->table->setRowPart("thead");
 		}
+		T::D("");
 	}
 	// </editor-fold>
 
-	public function buildNoEntriesLine(){
-		$this->table->addRow(array("Keine Einträge"));
+	public function buildPageCaption($page){
+		$this->table->addRow(array(T::_("Seite $page")));
 		$this->table->addRowColspan(1, count($this->referenceLine));
+		$this->table->addCellStyle(1, "text-align:left;padding-top:15px;font-weight:bold;");
+		$this->table->addRowClass("backgroundColor0");
+	}
+	
+	public function buildNoEntriesLine(){
+		$this->table->addRow(array(T::_("Keine Einträge")));
+		$this->table->addRowColspan(1, count($this->referenceLine));
+		$this->table->addCellStyle(1, "text-align:left;");
 	}
 	
 	// <editor-fold defaultstate="collapsed" desc="buildNewEntryLine">
@@ -628,6 +670,7 @@ class GUIFactory {
 			$this->table->addRowColspan(2, count($this->referenceLine) - 1);
 			$this->table->addRowClass("backgroundColorHeader");
 			$this->table->setRowPart("thead");
+			$this->table->addCellStyle(2, "text-align:left;");
 			
 			$this->setColStyle(1, "width:20px;");
 		}
@@ -662,9 +705,13 @@ class GUIFactory {
 
 	// <editor-fold defaultstate="collapsed" desc="buildFilteredWarningLine">
 	public function buildFilteredWarningLine($label = null){
+		$action = "contentManager.reloadFrame('contentRight');";
+		if($this->targetFrame != null)
+			$action = "contentManager.loadFrame('$this->targetFrame', '$this->collectionName', -1, 0);";
+			
 		$dB = new Button("Filter löschen", "./images/i2/delete.gif", "icon");
 		$dB->style("float:right;");
-		$dB->rmePCR("HTML","","saveContextMenu", array("'deleteFilters'","'$this->collectionName'"), "if(checkResponse(transport)) contentManager.reloadFrame('contentRight');");
+		$dB->rmePCR("HTML","","saveContextMenu", array("'deleteFilters'","'$this->collectionName'"), "if(checkResponse(transport)) $action");
 
 		$BW = new Button("", "./images/i2/note.png", "icon");
 
@@ -674,7 +721,7 @@ class GUIFactory {
 			
 			$BW->style("margin-right:5px;float:left;");
 			
-			$wholeLine2 = array("$BW<span style=\"color:grey;\">Die Anzeige wurde gefiltert ".($label != null ? "nach $label" : "")."</span>");
+			$wholeLine2 = array("$BW<span>Die Anzeige wurde gefiltert ".($label != null ? "nach $label" : "")."</span>");
 			for($i = 1; $i < count($this->referenceLine) - 1; $i++)
 				$wholeLine2[] = "";
 			
@@ -682,13 +729,13 @@ class GUIFactory {
 
 			$this->table->addRow($wholeLine2);
 			$this->table->addRowColspan(1, count($this->referenceLine) - 1);
-			$this->table->addRowClass("backgroundColor0");
+			$this->table->addRowClass("highlight");
 		} else {
-			$wholeLine2 = array($BW, $dB."<span style=\"color:grey;\">Die Anzeige wurde gefiltert ".($label != null ? "nach $label" : "")."</span>");
+			$wholeLine2 = array($BW, $dB."<span>Die Anzeige wurde gefiltert ".($label != null ? "nach $label" : "")."</span>");
 
 			$this->table->addRow($wholeLine2);
 			$this->table->addRowColspan(2, count($this->referenceLine) - 1);
-			$this->table->addRowClass("backgroundColor0");
+			$this->table->addRowClass("highlight");
 		}
 	}
 	// </editor-fold>
@@ -816,6 +863,12 @@ class GUIFactory {
 				\$j('#$FormID input[type=checkbox]').change(function(event){ 
 						
 					\$j(event.currentTarget).addClass('recentlyChanged'); 
+					\$j('#$FormID input[name=currentSaveButton], #$FormID input[name=submitForm]').closest('tr').addClass('recentlyChanged');
+				});
+
+				\$j('#$FormID input[type=hidden]').change(function(event){ 
+						
+					\$j(event.currentTarget).closest('td').addClass('recentlyChanged'); 
 					\$j('#$FormID input[name=currentSaveButton], #$FormID input[name=submitForm]').closest('tr').addClass('recentlyChanged');
 				});
 

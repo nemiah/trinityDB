@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class Aspect {
 
@@ -27,6 +27,9 @@ class Aspect {
 	public static function joinPoint($mode, $class, $method, $args = null, $defaultValue = null){
 		$value = Aspect::findPointCut($mode, $class, $method, $args);
 
+		if(Session::isPluginLoaded("mAchievement") AND $mode == "after")
+			Achievement::findPointCut($class, $method, $args);
+		
 		if($value === null)
 			return $defaultValue;
 
@@ -34,15 +37,15 @@ class Aspect {
 	}
 
 	public static function findPointCut($mode, $class, $method, $args = null){
+		if(isset($_SESSION[self::$sessionVariable]) AND count($_SESSION[self::$sessionVariable]) > 0)
+			foreach($_SESSION[self::$sessionVariable] AS $PA)
+				self::registerPointCut($PA[0], $PA[1], $PA[2]);
+		
 		if($mode == "around" AND !isset(Aspect::$pointCuts[$mode][$method]))
 			throw new AOPNoAdviceException();
 
 		if($mode == "after" AND !isset(self::$pointCuts[$mode][$method]))
 			return $args;
-
-		if(isset($_SESSION[self::$sessionVariable]) AND count($_SESSION[self::$sessionVariable]) > 0)
-			foreach($_SESSION[self::$sessionVariable] AS $PA)
-				self::registerPointCut($PA[0], $PA[1], $PA[2]);
 			
 		
 		if(isset(Aspect::$pointCuts[$mode][$method]) AND count(Aspect::$pointCuts[$mode][$method]) > 0){
@@ -55,7 +58,10 @@ class Aspect {
 					unset(Aspect::$pointCuts[$mode][$method][$k]);
 				}
 			}
-			if(count($values) > 1 AND $mode != "after") return $values;
+			
+			if(count($values) > 1 AND $mode != "after") 
+				return $values;
+			
 			return $values[0];
 		}
 

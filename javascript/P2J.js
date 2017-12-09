@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 /*
@@ -227,23 +227,28 @@ function $$(something){
 	return $j(something);
 }
 
-function PeriodicalExecuter(callback, delayInSeconds) {
+/*function PeriodicalExecuter(callback, delayInSeconds) {
 	window.setInterval(function(){
 		callback();
 	}, delayInSeconds * 1000);
-}
+}*/
 
 var Ajax = {
 	physion: "default",
 	build: null,
 	counter: 0,
+	lastRequest: null,
+	lastRequestTime: Date.now(),
 	
 	Request: function(anurl, options){
 		Ajax.counter++;
+		Ajax.lastRequest = options.parameters;
+		Ajax.lastRequestTime = Date.now();
 		var counter = Ajax.counter;
 		var start;
 		$j.ajax({
-			url: anurl+(Ajax.physion != "default" ? (anurl.indexOf("?") > -1 ? "&": "?")+"physion="+Ajax.physion : ""), 
+			url: anurl+(Ajax.physion != "default" ? (anurl.indexOf("?") > -1 ? "&": "?")+"physion="+Ajax.physion : ""),
+			//timeout: 10000,
 			beforeSend: function(){
 				start = new Date().getTime();
 			},
@@ -264,6 +269,14 @@ var Ajax = {
 						console.log("%c "+v[0]+" "+v[1]+" ("+v[2]+":"+v[3]+")", "color:grey;");
 					});
 					console.log(" total:    "+duration+"ms");
+				}
+				
+				if(window.console && request.getResponseHeader('X-Achievements')){
+					var obj = jQuery.parseJSON(request.getResponseHeader('X-Achievements'));
+					
+					$j.each(obj, function(k, v){
+						Achievement.display(v);
+					});
 				}
 				//if(request.getResponseHeader("X-Build") && Ajax.build && Ajax.build != request.getResponseHeader("X-Build"))
 				//	console.log("Update required!");
@@ -458,9 +471,11 @@ var qTipSharedYellow = $j.extend({}, qTipSharedRed, {
 	alert("touch dragdown release!");
 });*/
 	
-var useTouch = $j.jStorage.get('phynxUseTouch', null);
+var useTouch = null;
+if(typeof $j.jStorage != "undefined")
+	useTouch = $j.jStorage.get('phynxUseTouch', null);
 
-if(Modernizr.touch && useTouch == null){
+if(typeof Modernizr != "undefined" && Modernizr.touch && useTouch == null){
 	$j(function(){
 		$j("#messageTouch").dialog({
 			modal: true,
@@ -480,10 +495,14 @@ if(Modernizr.touch && useTouch == null){
 	});
 };
 
-
+var iconic = IconicJS();
 var Touch = {
 	trigger: "click",
-	use:false,
+	use: false,
+	startPos: null,
+	cancelNext: false,
+	inAction: false,
+	
 	propagateCSS: function(){
 		if(!Touch.use)
 			$j("html").addClass("phynxNoTouch");
@@ -496,7 +515,8 @@ var Touch = {
 		jQuery.fn.html = function(){
 			var r = currentHTMLMethod.apply(this, arguments);
 			Touch.make();
-		
+			
+			iconic.inject('img.iconic');
 			Aspect.joinPoint("after", "jQuery.html", arguments);
 			return r;
 		};
@@ -506,6 +526,7 @@ var Touch = {
 			var r = currentPrependMethod.apply(this, arguments);
 			Touch.make();
 		
+			iconic.inject('img.iconic');
 			Aspect.joinPoint("after", "jQuery.prepend", arguments);
 			return r;
 		};
@@ -515,6 +536,7 @@ var Touch = {
 			var r = currentAppendMethod.apply(this, arguments);
 			Touch.make();
 			
+			iconic.inject('img.iconic');
 			Aspect.joinPoint("after", "jQuery.append", arguments);
 			return r;
 		};
@@ -525,7 +547,7 @@ var Touch = {
 			return;
 		
 		$j("[onclick]").each(function(k, e){
-			$j(e).attr("ontouchend", $j(e).attr("onclick")).removeAttr("onclick");
+			$j(e).attr("ontouchend", "Touch.inAction = false; if(Touch.cancelNext) return; "+$j(e).attr("onclick")).removeAttr("onclick");
 		});
 		
 		/**$j("[onclick]").hammer().on("tap", function(ev){
@@ -543,27 +565,57 @@ if(useTouch){
 	
 	$j(document).on("touchend", ".contentBrowser td", function(ev){
 		$j(this).parent().removeClass("highlight");
+		Touch.inAction = false;
+		
+		if(Touch.cancelNext)
+			return;
 		
 		if(ev.target != this)
 			return;
 
-		if($j(ev.target).hasClass("editButton"))
+		if($j(ev.target).hasClass("editButton") || $j(ev.target).hasClass("selectionButton"))
 			return;
 
-		$j(this).parent().find("td").first().find(".editButton").triggerHandler("touchend");
+		if($j(this).parent().find("td").first().find(".editButton").length)
+			$j(this).parent().find("td").first().find(".editButton").triggerHandler("touchend");
+		else if($j(this).parent().find("td").first().find(".selectionButton").length)
+			$j(this).parent().find("td").first().find(".selectionButton").triggerHandler("touchend");
 	});
 
 	$j(document).on("touchend mouseup", "[ontouchend]", function(ev){
 		$j(this).removeClass("highlight");
+		Touch.inAction = false;
 	});
 	
-
 	$j(document).on("touchstart mousedown", "[ontouchend]", function(ev){
 		$j(this).addClass("highlight");
+		
+		Touch.startPos = [ev.clientX, ev.clientY];
+		Touch.cancelNext = false;
+		Touch.inAction = this;
 	});
 
 	$j(document).on("touchstart", ".contentBrowser td", function(ev){
 		$j(this).parent().addClass("highlight");
+		
+		Touch.startPos = [ev.clientX, ev.clientY];
+		Touch.cancelNext = false;
+		Touch.inAction = this;
+	});
+	
+	
+	$j(document).on("touchmove mousemove", "[ontouchend], .contentBrowser td", function(ev){
+		if(!Touch.inAction)
+			return;
+		
+		if(Math.abs(ev.clientX - Touch.startPos[0]) < 15 && Math.abs(ev.clientY - Touch.startPos[1]) < 15)
+			return;
+		
+		//console.log("CANCEL!");
+		Touch.cancelNext = true;
+		
+		$j(ev.target).trigger("touchend");
+		
 	});
 	
 	$j(document).on("focus", 'input[type=text]', function(){
@@ -572,11 +624,13 @@ if(useTouch){
 }
 Touch.propagateCSS();
 
-Touchy.jQuery = $j;
-Touchy.trigger = Touch.trigger;
+if(typeof Touchy != "undefined"){
+	Touchy.jQuery = $j;
+	Touchy.trigger = Touch.trigger;
+}
 
 $j(function(){
-	if(Modernizr.touch || useTouch != null){
+	if(typeof Modernizr != "undefined" && Modernizr.touch || useTouch != null){
 		$j('#buttonTouchReset').click(function(){
 			$j.jStorage.deleteKey('phynxUseTouch');
 			//$j(this).dialog("close");
@@ -600,6 +654,11 @@ $j(function(){
 	} else {
 		$j('#buttonTouchReset').hide();
 	}
+	
+	if(typeof alex == "undefined")
+		$j('#buttonMenu').hide();
+	else
+		$j('#buttonMenu').on(Touch.trigger, function(){ alex.menu(); });
 });
 
 if(!useTouch){
@@ -639,10 +698,13 @@ if(!useTouch){
 		if(ev.target != this)
 			return;
 
-		if($j(ev.target).hasClass("editButton"))
+		if($j(ev.target).hasClass("editButton") || $j(ev.target).hasClass("selectionButton"))
 			return;
 
-		$j(this).parent().find("td").first().find(".editButton").triggerHandler("click");
+		if($j(this).parent().find("td").first().find(".editButton").length)
+			$j(this).parent().find("td").first().find(".editButton").triggerHandler("click");
+		else if($j(this).parent().find("td").first().find(".selectionButton").length)
+			$j(this).parent().find("td").first().find(".selectionButton").triggerHandler("click");
 	});
 }
 
@@ -659,7 +721,7 @@ $j(document).on('mouseover', '.bigButton', function(event) {
 		},
 		content: {
 			text: function() {
-				return $j(this).html();
+				return $j(this).html() == '' ? $j(this).attr("oldtitle") : $j(this).html();
 			}
 		},
 		position: {
@@ -675,4 +737,9 @@ $j(document).on('mouseover', '.bigButton', function(event) {
 		}
 		
 	}, event);
+});
+
+$j(document).on("keyup", function(){
+	if(Date.now() - Ajax.lastRequestTime > 5 * 60 * 1000)
+		contentManager.rmePCR('Menu','','autoLogoutInhibitor','');
 });

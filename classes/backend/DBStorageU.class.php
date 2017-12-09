@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class DBStorageU {
 	protected $instance;
@@ -50,7 +50,7 @@ class DBStorageU {
 	
 	public function renewConnection(){
 		$this->connection = @mysql_pconnect($_SESSION["DBData"]["host"],$_SESSION["DBData"]["user"],$_SESSION["DBData"]["password"]);# or die ("MySQL-DB nicht erreichbar");
-		if(mysql_error() AND (mysql_errno() == 1045 OR mysql_errno() == 2002 OR mysql_errno() == 2003 OR mysql_errno() == 2005)) throw new NoDBUserDataException();
+		if(mysql_error() AND (mysql_errno() == 1045 OR mysql_errno() == 2002 OR mysql_errno() == 2003 OR mysql_errno() == 2005 OR mysql_errno() == 1698)) throw new NoDBUserDataException();
 		if(mysql_error() AND mysql_errno() == 1049) throw new DatabaseNotFoundException();
 		#echo mysql_error();
 		@mysql_select_db($_SESSION["DBData"]["datab"], $this->connection);
@@ -150,16 +150,27 @@ class DBStorageU {
 		$changes = 0;
 		foreach($unterschied2 as $key => $value){
 			$newSQL = strstr($CIA->MySQL,"`$value`");
-			$ex = explode(",\n",$newSQL);
+			$ex = preg_split("/,\s/", $newSQL);
 			$newSQL = $ex[0];
-			mysql_query("ALTER TABLE `$regs[1]` ADD $newSQL");
-			echo mysql_error();
+			$lastSQL = "ALTER TABLE `$regs[1]` ADD $newSQL";
+			mysql_query($lastSQL);
+			if(mysql_error())
+				echo mysql_error().":<pre>".$lastSQL."</pre>";
+				
 			$_SESSION["messages"]->addMessage("Added field $value in table $regs[1]");
 			
 			$changes++;
 		}
 		
 		return $changes;
+	}
+	
+	public function lockTable($table){
+		
+	}
+	
+	public function unlockTable($table){
+		
 	}
 	
 	public function alterTable($CIA){
@@ -303,7 +314,10 @@ class DBStorageU {
 			$currentWhereValue = $statement->whereValues[$key];
 			if($currentWhereValue != "NULL" 
 				AND $currentWhereValue != "NOT NULL"
-				AND substr($currentWhereValue, 0, 3) != "t1.") 
+				AND $statement->whereOperators[$key] != "IN"
+				AND $statement->whereOperators[$key] != "NOT IN"
+				AND substr($currentWhereValue, 0, 3) != "t1."
+				AND substr($currentWhereValue, 0, 3) != "t2.") 
 				$currentWhereValue = "'".mysql_real_escape_string($currentWhereValue)."'";
 				
 			$where .= ($where != "(" ? " ".$statement->whereLogOp[$key]." ".($addOpenBracket ? "(" : "") : "")./*(in_array($statement->whereFields[$key], $nJAs) ? "t1." : "").*/"".$statement->whereFields[$key]." ".$statement->whereOperators[$key]." ".$currentWhereValue."";
@@ -542,10 +556,10 @@ class DBStorageU {
 	    mysql_query($sql);
 	
 		if(mysql_error() AND mysql_errno() == 1054) {
-			preg_match("/[a-zA-Z0-9 ]*\'([a-zA-Z0-9\.]*)\'[a-zA-Z ]*\'([a-zA-Z ]*)\'.*/", $this->c->error, $regs);
+			preg_match("/[a-zA-Z0-9 ]*\'([a-zA-Z0-9\.]*)\'[a-zA-Z ]*\'([a-zA-Z ]*)\'.*/", mysql_error(), $regs);
 			throw new FieldDoesNotExistException($regs[1],$regs[2]);
 		}
-		if(mysql_error() AND mysql_errno() == 1062) throw new DuplicateEntryException($this->c->error);
+		if(mysql_error() AND mysql_errno() == 1062) throw new DuplicateEntryException(mysql_error());
 		
 		if(mysql_error()) throw new StorageException();
 		

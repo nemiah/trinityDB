@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class XML {
 	
@@ -60,7 +60,7 @@ class XML {
 		
 		while($t = $this->getNextEntry()){
 			$xml .= "
-	<entry class=\"".$this->collectionOf."\">
+	<entry class=\"".($this->collectionOf != "" ? $this->collectionOf : get_class($t))."\">
 		<id>".$t->getID()."</id>";
 			
 			$A = $t->getA();

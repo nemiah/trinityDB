@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class LoginData extends Userdata {
 	public function loadMe(){
@@ -37,6 +37,7 @@ class LoginData extends Userdata {
 		$this->A->benutzername = "".isset($values[0]) ? $values[0] : "";
 		$this->A->passwort = "".isset($values[1]) ? $values[1] : "";
 		$this->A->optionen = "";
+		$this->A->optionen2 = "";
 
 
 		foreach($values AS $va){
@@ -45,6 +46,9 @@ class LoginData extends Userdata {
 
 			if(strpos($va, "s:") === 0)
 				$this->A->server = preg_replace("/^s:/","",$va);
+
+			if(strpos($va, "2:") === 0)
+				$this->A->optionen2 = preg_replace("/^2:/","",$va);
 		}
 	}
 
@@ -94,7 +98,8 @@ class LoginData extends Userdata {
 		$UD->addAssocV3("name", "=", $name);
 
 		$e = $UD->getNextEntry();
-		if($e == null) return null;
+		if($e == null) 
+			return null;
 
 		$LD = new LoginData($e->getID());
 		$LD->loadMe();
@@ -132,6 +137,8 @@ class LoginData extends Userdata {
 		unset($this->A->passwort);
 		unset($this->A->optionen);
 		unset($this->A->benutzername);
+		if(isset($this->A->optionen2))
+			unset($this->A->optionen2);
 
 		parent::saveMe($checkUserData, $output);
 	}
@@ -145,11 +152,21 @@ class LoginData extends Userdata {
 			"PLuserAndPass" => "PixelLetter",
 			"SPuserAndPass" => "signaturportal",
 			"LDAPServerUserPass" => "LDAP-Server",
+			"ADServerUserPass" => "ActiveDirectory-Server",
 			"MailServerUserPass" => "Mail-Server",
+			"MailServer2UserPass" => "Mail-Server2",
+			"MailServer3UserPass" => "Mail-Server3",
+			"MailServer4UserPass" => "Mail-Server4",
 			"GoogleAccountUserPass" => "Google",
 			"AmazonAPIKey" => "Amazon API key",
 			"klickTelAPIKey" => "klickTel API key",
-			"GemeinschaftServerUserPass" => "Gemeinschaft-Server");
+			"GemeinschaftServerUserPass" => "Gemeinschaft-Server",
+			"BackupFTPServerUserPass" => "Backup FTP",
+			"RegIDUserPass" => "RegID",
+			"AnySMSUserPass" => "AnySMS",
+			"JabberServerUserPass" => "Jabber-Server",
+			"AWSUserPass" => "AWS",
+			"BackupSFTPServerUserPass" => "Backup sFTP");
 
 		if($w == "") return $n;
 		else return $n[$w];

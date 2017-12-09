@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class SysMessages {
 	private $messages = array();
@@ -46,7 +46,7 @@ class SysMessages {
 	}
 
 	public static function log($m, $category = "all", $level = 10){
-		if(!isset($_SESSION[self::$variable]))
+		if(!isset($_SESSION[self::$variable]) OR !is_a($_SESSION[self::$variable], "SysMessages"))
 			$_SESSION[self::$variable] = new SysMessages ();
 		
 		$_SESSION[self::$variable]->addMessage($m, $category, $level);

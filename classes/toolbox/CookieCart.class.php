@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class CookieCart {
@@ -62,11 +62,14 @@ class CookieCart {
 
 	private $couponCallback;
 	private $currentCouponCode;
+	private $callbackOrdered;
 
 	private $CCHSessionVariable = "Customer";
-
+	private $PostenID = 0;
+	
 	function __construct($cookieName = "", $lifeTime = ""){
-		if($cookieName != "") $this->cookieName = $cookieName;
+		if($cookieName != "") 
+			$this->cookieName = $cookieName;
 		
 		$this->cookie = isset($_COOKIE[$this->cookieName]) ? $_COOKIE[$this->cookieName] : "";
 		
@@ -96,6 +99,33 @@ class CookieCart {
 		$this->couponCallback = $callback;
 	}
 
+	public function A($value){
+		
+		if($this->PostenID == 1010 OR $this->PostenID == 2020){
+			$values = $this->getA();
+
+			if($value == "CookieCartPreis")
+				return $values->preis;
+			
+			if($value == "CookieCartName")
+				return $values->artikelname;
+			
+			if($value == "CookieCartMwSt")
+				return $values->mwst;
+			
+			if($value == "CookieCartArtikelNummer")
+				return $values->artikelnummer;
+		}
+	}
+	
+	public function setID($ID){
+		$this->PostenID = $ID;
+	}
+	
+	public function getID(){
+		return $this->PostenID;
+	}
+	
 	public function getCouponCallback(){
 		return $this->couponCallback;
 	}
@@ -107,7 +137,23 @@ class CookieCart {
 	public function getCCHSessionVariable(){
 		return $this->CCHSessionVariable;
 	}
+	
+	public function setCallbackOrdered($function){
+		$this->callbackOrdered = $function;
+	}
 
+	public function callbackOrdered(){
+		if($this->callbackOrdered == "")
+			return;
+		
+		$ex = explode("::", $this->callbackOrdered);
+		$class = $ex[0];
+		$method = $ex[1];
+		
+		$R = new ReflectionMethod($class, $method);
+		return $R->invokeArgs(null, array());
+	}
+	
 	public function invalidateCoupon(){
 		if($this->couponCallback != null)
 			$this->invokeParser($this->couponCallback, "invalidateCoupon", null);
@@ -115,19 +161,36 @@ class CookieCart {
 
 	function getA(){
 		$A = new stdClass();
+		$values = array(
+			1010 => array("mwst" => "19.00", "preis" => 0, "artikelnummer" => "10%", "name" => "10% Rabatt"),
+			2020 => array("mwst" => "19.00", "preis" => -16.8067, "artikelnummer" => "20€", "name" => "20€ Rabatt")
+		);
 		
 		switch($this->PostenID){
 			case "1":
 				$values = $this->invokeParser($this->couponCallback, "getPostenValues", $this->currentCouponCode);
-
 
 				$A->mwst = $values["mwst"];
 				$A->artikelname = $values["name"];
 				$A->preis = $values["preis"];
 				$A->artikelnummer = $values["artikelnummer"];
 			break;
+		
+			case "1010":
+				$A->mwst = $values[$this->PostenID]["mwst"];
+				$A->artikelname = $values[$this->PostenID]["name"];
+				$A->preis = $this->getSum("netto", true) * -0.1;
+				$A->artikelnummer = $values[$this->PostenID]["artikelnummer"];
+			break;
+		
+			case "2020":
+				$A->mwst = $values[$this->PostenID]["mwst"];
+				$A->artikelname = $values[$this->PostenID]["name"];
+				$A->preis = $values[$this->PostenID]["preis"];
+				$A->artikelnummer = $values[$this->PostenID]["artikelnummer"];
+			break;
 		}
-
+		
 		return $A;
 	}
 
@@ -233,9 +296,13 @@ class CookieCart {
 	}
 	
 	public function exists($artikelID, $type = null){
-		if($type == null) $type = $this->useClass[0];
-		if(strpos($this->cookie, "--$artikelID:__:") !== false AND strpos($this->cookie, ":__:$type--") !== false) return true;
-		else return false;
+		if($type == null) 
+			$type = $this->useClass[0];
+		
+		return preg_match("/--$artikelID:__:[0-9]+:__:$type--/", $this->cookie);
+		
+		#if(strpos($this->cookie, "--$artikelID:__:") !== false AND strpos($this->cookie, ":__:$type--") !== false) return true;
+		#else return false;
 	}
 	
 	protected function setCookie(){
@@ -383,7 +450,7 @@ class CookieCart {
 
 								new Ajax.Request('/index.php', {
 									method:'post',
-									parameters: 'r=".mt_rand(0, 10000)."&formID=nix&HandlerName=CookieCartHandler&action=insertCoupon&couponCode='+$('CouponCode').value,
+									parameters: 'r=".mt_rand(0, 10000)."&formID=nix&HandlerName=CookieCartHandler&action=insertCoupon&couponCode='+encodeURIComponent($('CouponCode').value),
 									onSuccess: function(transport){
 										if(multiCMS.checkResponse(transport))
 											document.location.reload();}});
@@ -408,7 +475,7 @@ class CookieCart {
 				$tab = $this->table;
 
 				$tab->addHeaderRow(array("","Menge","Artikel","Einzelpreis", "Gesamtpreis",""));
-				$tab->addColStyle(2, "text-align:right;");
+				#$tab->addColStyle(2, "text-align:right;");
 				$tab->addColStyle(4, "text-align:right;");
 				$tab->addColStyle(5, "text-align:right;");
 				$tab->addColStyle(6, "text-align:right;");
@@ -423,7 +490,7 @@ class CookieCart {
 				
 				if($t[2] != "CookieCart"){
 					$c = $this->useClass[$num];
-					$A = new $c($t[0]);
+					$A = new $c($t[0], false);
 					$A->loadMe();
 
 					$mwst = $this->mwstField[$num];
@@ -459,15 +526,21 @@ class CookieCart {
 					}
 				} catch(Exception $e) { }
 				
-				if(!isset($steuern[$A->getA()->$mwst])) $steuern[$A->getA()->$mwst] = 0;
+				if(!isset($steuern[$A->getA()->$mwst])) 
+					$steuern[$A->getA()->$mwst] = 0;
+				
+				$steuern[$A->getA()->$mwst] += $A->getA()->$preis * 1 * ($A->getA()->$mwst / 100) * $t[1];
+				
 				$gesamt += $A->getA()->$preis * 1 * (($A->getA()->$mwst / 100) + 1) * $t[1];
 				$netto += $A->getA()->$preis * 1 * $t[1];
-				$steuern[$A->getA()->$mwst] += $A->getA()->$preis * 1 * ($A->getA()->$mwst / 100) * $t[1];
 				
 				$image = $this->invokeParser($this->imagePathCallback[$num], $t[0], $A);
 				
-				if($image != "") $parsedImage = "<img src=\"$image\" />";
-				else $parsedImage = "";
+				if($image != "") 
+					$parsedImage = "<img src=\"$image\" />";
+				else 
+					$parsedImage = "";
+				
 				if($this->imageParser != null) 
 					$parsedImage = $this->invokeParser($this->imageParser[$num], $t[0], $A);
 					
@@ -489,6 +562,8 @@ class CookieCart {
 					!$previewMode ? "<img style=\"cursor:pointer;\" onclick=\"CookieCart.deleteMe('{$t[0]}','$t[2]');\" alt=\"Artikel aus Warenkorb löschen\" title=\"Artikel aus Warenkorb löschen\" src=\"$this->trashImage\" />" : ""));
 				
 				$tab->addCellStyle(1, "vertical-align:top;");
+				$tab->addCellStyle(2, "vertical-align:middle;");
+				$tab->addCellStyle(3, "vertical-align:middle;");
 				$i++;
 			}
 		
@@ -510,12 +585,12 @@ class CookieCart {
 				$s .= ($s != "" ? "<br />" : "")."".Util::formatNumber("de_DE", $key*1, 2, true, false)."%: ".Util::formatCurrency("de_DE",$value,true);
 			
 			
-			$tab->addRow(array("",!$previewMode ? "
+			$tab->addRow(array(!$previewMode ? "
 							<input
 								type=\"button\"
 								value=\"Mengen speichern\"
 								onclick=\"CookieCart.updateAmounts();\"
-							/>" : "","","Gesamt Netto",Util::formatCurrency("de_DE",$netto,true),""));
+							/>" : "","", "","Gesamt Netto",Util::formatCurrency("de_DE",$netto,true),""));
 			$tab->addCellStyle(1, "border-top-width:1px;border-top-style:solid;");
 			$tab->addCellStyle(2, "border-top-width:1px;border-top-style:solid;");
 			$tab->addCellStyle(3, "border-top-width:1px;border-top-style:solid;");
@@ -523,7 +598,7 @@ class CookieCart {
 			$tab->addCellStyle(5, "border-top-width:1px;border-top-style:solid;");
 			$tab->addCellStyle(6, "border-top-width:1px;border-top-style:solid;");
 			$tab->addRowClass("CookieCartBorderColor");
-			$tab->addRowColspan(2, 2);
+			$tab->addRowColspan(1, 3);
 			
 			$tab->addRow(array("","","","Gesamt MwSt",$s,""));
 			
@@ -544,14 +619,14 @@ class CookieCart {
 						$CI->onEnter("CookieCart.insertCoupon();");
 
 						$CB = new HTMLInput("CouponInsert","button","Gutschein einlösen");
-						$CB->style("margin-left:10px;");
+						$CB->style("margin-top:5px;");
 						$CB->onclick("CookieCart.insertCoupon();");
 					} else {
 						$CI = "";
 						$CB = $showCouponField;
 					}
 
-					$coupon = "<div class=\"CookieCartCoupon\"><p><b>Gutschein einlösen</b><br />$CI$CB</p></div>";
+					$coupon = "<div class=\"CookieCartCoupon\"><p><b>Gutschein-Code:</b><br />$CI<br>$CB</p></div>";
 				}
 
 				$tab->addRow(array($coupon,"",""));
@@ -624,10 +699,45 @@ class CookieCart {
 		return "<div id=\"CookieCart\">".$html."</div>";
 	}
 	
-	public function getSum(){
-		$this->sum = 0;
-		if($this->sum == null) $this->getCartText();
-		return $this->sum;
+	public function getSum($mode = "brutto", $ignoreCC = false){
+		#if($this->sum == null)
+		#	$this->getCartText();
+		
+		$temp = $this->elementPointer;
+		$this->resetPointer();
+		$summe = 0;
+		while($t = $this->getNextElement()){
+			$num = array_search($t[2], $this->useClass);
+			
+			if($ignoreCC AND $t[2] == "CookieCart")
+				continue;
+			
+			if($t[2] != "CookieCart"){
+				$c = $this->useClass[$num];
+				$A = new $c($t[0], false);
+				$A->loadMe();
+
+				$mwst = $this->mwstField[$num];
+				$preis = $this->preisField[$num];
+				
+			} else {
+				$A = $this;
+				$this->PostenID = $t[0];
+
+				$mwst = "mwst";
+				$preis = "preis";
+			}
+
+			$AA = $A->getA();
+
+			if($mode == "brutto")
+				$summe += $AA->$preis * 1 * (($AA->$mwst / 100) + 1) * $t[1];
+			if($mode == "netto")
+				$summe += $AA->$preis * 1 * $t[1];
+		}
+		$this->elementPointer = $temp;
+		
+		return Util::kRound($summe);
 	}
 	
 	public function getCount(){
@@ -661,6 +771,7 @@ class CookieCart {
 		$name = $this->nameField;
 		$preis = $this->preisField;*/
 		$i = 0;
+		
 		if($this->cookie != ""){
 			$text .= "
         ".str_pad("Artikel",40," ")." MwSt      Preis            Gesamt
@@ -671,7 +782,7 @@ class CookieCart {
 
 				if($t[2] != "CookieCart"){
 					$c = $this->useClass[$num];
-					$A = new $c($t[0]);
+					$A = new $c($t[0], false);
 					$A->loadMe();
 
 					$mwst = $this->mwstField[$num];
@@ -736,7 +847,7 @@ class CookieCart {
 				
 				$ppName = str_replace(array("Ä", "Ö", "Ü", "ß", "ä" , "ö", "ü"), array("Ae", "Oe", "Ue", "ss", "ae", "oe", "ue"), $tName);
 
-				if($t[2] == "CookieCart" AND $t[0] == "1")
+				if($t[2] == "CookieCart" AND ($t[0] == "1" OR $t[0] == "1010" OR $t[0] == "2020"))
 					$paypalHTML .= '<input type="hidden" name="discount_amount_cart" value="'.abs($brutto).'" />';
 				else $paypalHTML .= '
 	<input type="hidden" name="item_name_'.$i.'" value="'.trim($ppName).'"/ >
@@ -811,14 +922,18 @@ $s
 	
 	public function getNextElement(){
 		if($this->elements == null) {
-			$this->elements = split("----",$this->cookie);
+			$this->elements = explode("----",$this->cookie);
 			$this->elements[0] = ereg_replace("^--","",$this->elements[0]);
 			$this->elements[count($this->elements)-1] = ereg_replace("--$","",$this->elements[count($this->elements)-1]);
 		}
 		
 		if(!isset($this->elements[$this->elementPointer])) return null;
-		$s = split(":__:",$this->elements[$this->elementPointer++]);
+		$s = explode(":__:",$this->elements[$this->elementPointer++]);
 		return $s;
+	}
+	
+	public function resetPointer(){
+		$this->elementPointer = 0;
 	}
 	
 	public static function imagePathCallback($t, $A){

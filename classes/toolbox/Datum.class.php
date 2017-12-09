@@ -15,16 +15,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class Datum {
 
 	private $timestamp;
 
-	function __construct($timestamp = null) {
-		if($timestamp == null) $timestamp = time();
+	function __construct($date = null) {
+		$timestamp = time();
 		
+		if($date !== null){
+			if(is_numeric($date))
+				$timestamp = $date;
+			else
+				$timestamp = Util::CLDateParser($date, "store");
+		}
+
 		$this->timestamp = $timestamp;
+	}
+	
+	function normalize(){
+		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp), date("d", $this->timestamp), date("Y", $this->timestamp));
 	}
 	
 	function getNthDayOfMonth(){
@@ -57,8 +68,12 @@ class Datum {
 		return date("w", $this->time());
 	}
 	
-	function setToJan1st($jahr){
-		$this->timestamp = $this->parseGerDate("01.01.$jahr");
+	function setToDayThisYear(){
+		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)  , date("d", $this->timestamp), date("Y"));
+	}
+	
+	function setToJan1st($jahr = null){
+		$this->timestamp = $this->parseGerDate("01.01.".($jahr == null ? date("Y", $this->timestamp) : $jahr));
 	}
 	
 	function setToMonth1st(){
@@ -89,26 +104,62 @@ class Datum {
 			$this->timestamp += 3600 * (!date("I", $this->timestamp) ? 1 : -1);
 	}
 	
-	function subWeek(){
+	function subWeek($fixDST = false){
+		$oldTime = $this->timestamp;
 		$this->timestamp -= 7 * 24 * 3600;
+		
+		if($fixDST AND date("I", $oldTime) != date("I", $this->timestamp))
+			$this->timestamp -= 3600 * (!date("I", $oldTime) ? 1 : -1);
 	}
 	
 	function addMonth($dontSkipMonth = false){
 		$date = new DateTime();
-		$date->setTimestamp($this->timestamp);
-		if($dontSkipMonth AND date("d", $this->timestamp) > 28){
-			$date->modify("last day of next month");
-		} else
-			$date->add(new DateInterval('P1M'));
 		
-		$this->timestamp  = $date->getTimestamp();
+		if(method_exists($date, "setTimestamp")){//at least 5.3 required!
+			$date->setTimestamp($this->timestamp);
+			if($dontSkipMonth AND date("d", $this->timestamp) > 28){
+				$date->modify("last day of next month");
+			} else
+				$date->add(new DateInterval('P1M'));
 		
+			$this->timestamp  = $date->getTimestamp();
+		} else {
+			$date = new DateTime("@".$this->timestamp);
+				
+			if($dontSkipMonth AND date("d", $this->timestamp) > 28){
+				$date->modify("last day of next month");
+			} else
+				$date->modify('+1 month');
+			
+			$this->timestamp  = $date->format("U");
+		}
 		#$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)+1, date("d", $this->timestamp), date("Y", $this->timestamp));
 		return $this;
 	}
 	
-	function subMonth(){
-		$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)-1, date("d", $this->timestamp), date("Y", $this->timestamp));
+	function subMonth($dontSkipMonth = false){
+		$date = new DateTime();
+		
+		if(method_exists($date, "setTimestamp")){//at least 5.3 required!
+			$date->setTimestamp($this->timestamp);
+			if($dontSkipMonth AND date("d", $this->timestamp) >= 28){
+				$date->modify("last day of previous month");
+			} else
+				$date->sub(new DateInterval('P1M'));
+		
+			$this->timestamp  = $date->getTimestamp();
+		} else {
+			$date = new DateTime("@".$this->timestamp);
+				
+			if($dontSkipMonth AND date("d", $this->timestamp) >= 28){
+				$date->modify("last day of previous month");
+			} else
+				$date->modify('-1 month');
+			
+			$this->timestamp  = $date->format("U");
+		}
+		
+		#$this->timestamp = mktime(0, 1, 0, date("m", $this->timestamp)-1, date("d", $this->timestamp), date("Y", $this->timestamp));
 		return $this;
 	}
 
@@ -117,7 +168,7 @@ class Datum {
 	}
 	
 	function printer(){
-		echo date("d m Y H i s",$this->timestamp)."<br />";
+		echo date("d m Y H i s",$this->timestamp)."<br>";
 	}
 	function time(){
 		return $this->timestamp;

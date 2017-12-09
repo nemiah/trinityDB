@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 abstract class Collection {
 	protected $A = null;
@@ -430,6 +430,11 @@ abstract class Collection {
 		$this->Adapter->setSelectStatement("searchFields",$fields);
 	}
 	
+	function addSearchCustom($field, $op, $value, $bracketGroup){
+		if($this->Adapter == null) $this->loadAdapter();
+		$this->Adapter->addSelectStatement("searchCustom", array($field, $op, $value, $bracketGroup));
+	}
+	
 	/**
 	 * Sets the string to search for.
 	 * 
@@ -468,10 +473,17 @@ abstract class Collection {
 	 * 
 	 * @return persistentObject Next entry of Collector
 	 */
-	function getNextEntry(){
-		if($this->collector === null) $this->lCV3();
-		if(isset($this->collector[$this->i])) return $this->collector[$this->i++];
-		else return null;
+	function getNextEntry($lazyLoad = false){
+		if($lazyLoad)
+			return $this->lCV3(-1, false, $lazyLoad);
+					
+		if(!$lazyLoad AND $this->collector === null) 
+			$this->lCV3(-1, true, $lazyLoad);
+		
+		if(isset($this->collector[$this->i]))
+			return $this->collector[$this->i++];
+		
+		return null;
 	}
 	
 	/**
@@ -491,7 +503,9 @@ abstract class Collection {
 			return "m".$this->collectionOf;
 			
 		$n = get_class($this);
-		if(strstr($n,"GUI")) $n = get_parent_class($this);
+		if(strstr($n,"GUI")) 
+			$n = get_parent_class($this);
+		
 		return $n;
 	}
 
@@ -542,18 +556,21 @@ abstract class Collection {
 	 * @param $id[optional](Integer) Only select object with specified ID
 	 * @param $returnCollector[optional](Boolean) If true, result is saved in collector-variable, otherwise the result is returned
 	 */
-	public function lCV3($id = -1, $returnCollector = true){
-		
-		if($this->Adapter == null) $this->loadAdapter();
-		
+	public function lCV3($id = -1, $returnCollector = true, $lazyload = false){
+		if($this->Adapter == null) 
+			$this->loadAdapter();
+
 		$gT = $this->Adapter->getSelectStatement("table");
-		if(count($gT) == 0) $this->Adapter->setSelectStatement("table",$this->collectionOf);
+		if(count($gT) == 0) 
+			$this->Adapter->setSelectStatement("table", $this->collectionOf);
 		
 		if($id != -1)
 			$this->setAssocV3((count($gT) == 0 ? $this->collectionOf : $gT[0])."ID","=",$id);
 		
-		if($returnCollector) $this->collector = $this->Adapter->lCV3();
-		else return $this->Adapter->lCV3();
+		if($returnCollector) 
+			$this->collector = $this->Adapter->lCV4();
+		else 
+			return $this->Adapter->lCV4($lazyload);
 	}
 	
 	/**
@@ -572,13 +589,27 @@ abstract class Collection {
 			$entriesPerPage = $mU->getUDValue("entriesPerPage$c");
 			if($entriesPerPage == null) $entriesPerPage = 20;
 		}
+		if($page == "")
+			$page = 0;
 		$num = $this->getAffectedRows($id);
-		$this->setLimitV3($page * $entriesPerPage.",".$entriesPerPage);
+		$this->setLimitV3(($page * $entriesPerPage).",".$entriesPerPage);
 		
 		if(PMReflector::implementsInterface(get_class($this),"iOrderByField")){
 			$sort = new mUserdata();
 			$sort = $sort->getUDValue("OrderByFieldInHTMLGUI".$this->getClearClass());
-			if($sort != null) $this->setOrderV3(substr($sort,0,strpos($sort,";")),substr($sort,strpos($sort,";")+1));
+			if($sort != null) {
+				$field = substr($sort, 0, strpos($sort, ";"));
+				if(($field * 1)."" === $field){
+					$o = $this->getOrderByFields();
+					foreach($o[$field]->orderBy AS $k => $n){
+						if($k == 0)
+							$this->setOrderV3($n, substr($sort, strpos($sort, ";") + 1));
+						else
+							$this->addOrderV3($n, substr($sort, strpos($sort, ";") + 1));
+					}
+				} else
+					$this->setOrderV3($field, substr($sort, strpos($sort, ";") + 1));
+			}
 		}
 			
 		$this->lCV3($id);
@@ -611,11 +642,15 @@ abstract class Collection {
 		$this->addDataType("anyField","I");
 		$this->addDataType("totalNum","I");
 		$this->lCV3();
+		
 		$e = $this->getNextEntry();
 		$this->resetPointer();
 		$this->collector = null;
 		$this->Adapter->newSelectStatement();
-		if($e == null) return 0;
+		
+		if($e == null) 
+			return 0;
+		
 		return $e->getA()->totalNum;
 	}
 	
@@ -667,11 +702,20 @@ abstract class Collection {
 		}
 		$this->isFiltered = $fC;
 
+		if(!PMReflector::implementsInterface(get_class($this),"iSearchFilterMulti") AND !PMReflector::implementsInterface(get_class($this),"iSearchFilter"))
+			return $fC;
+		
+		
+		$K = mUserdata::getUDValueS("searchFilterMulti".$this->getClearClass(), "");
+		if($K != ""){
+			$this->searchFilterMulti(explode(";;", trim($K, ";")));
+			$this->isFiltered = true;
+			$fC = true;
+		}
+		
 		if(!PMReflector::implementsInterface(get_class($this),"iSearchFilter"))
 			return $fC;
 		
-		$mU = new mUserdata();
-
 		$K = mUserdata::getUDValueS("searchFilterInHTMLGUI".$this->getClearClass());
 		$F = $this->getSearchedFields();
 		
@@ -680,9 +724,14 @@ abstract class Collection {
 		 
 		foreach($F as $k => $v)
 			$this->addAssocV3("$v","LIKE",'%'.$K.'%',($k == 0 ? "AND" : "OR"),"sfs");
-			
+		
 		$this->isFiltered = true;
+		
 		return true;
+	}
+	
+	public function searchFilterMulti(array $query){
+		
 	}
 	
 	/**
@@ -736,7 +785,7 @@ abstract class Collection {
 		return $xml->getXML();
 	}
 	
-	public function asJSON(){
+	public function asJSON($append = null){
 		#$this->lCV3();
 		
 		$array = array();
@@ -748,13 +797,34 @@ abstract class Collection {
 			$array[] = $subArray;
 		}
 		
-		#$array[] = array("label" => "Test", "value" => "1");
-		#$array[] = array("label" => "Test2", "value" => "2");
-		return json_encode($array);
+		if($append)
+			$array[] = $append;
+		
+		return json_encode($array, defined("JSON_UNESCAPED_UNICODE") ? JSON_UNESCAPED_UNICODE : 0);
 	}
 	
 	public function getCategoryFieldLabel(array $KIDs){
 		return null;
+	}
+	
+	/**
+	 * Returns the next entry of the associated Collector.
+	 * 
+	 * @return persistentObject Next entry of Collector
+	 */
+	function n($lazyLoad = false){
+		return $this->getNextEntry($lazyLoad);
+	}
+	
+	public function setTableLock(string $table, boolean $lock){
+		if($this->Adapter == null)
+			$this->loadAdapter();
+		
+		if($lock)
+			$this->Adapter->lockTable($table);
+		
+		if(!$lock)
+			$this->Adapter->unlockTable($table);
 	}
 }
 ?>

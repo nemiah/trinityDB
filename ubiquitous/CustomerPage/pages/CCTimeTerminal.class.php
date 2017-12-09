@@ -15,11 +15,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class CCTimeTerminal implements iCustomContent {
 	protected $switch = false;
-
+	
 	function getLabel(){
 		return "Zeiterfassungs-Terminal";
 	}
@@ -79,6 +79,10 @@ class CCTimeTerminal implements iCustomContent {
 				background-color:#c90021;
 			}
 			
+			.orange {
+				background-color:orange;
+			}
+			
 			.touchField {
 				background-color:#CCC;
 				margin-top:40px;
@@ -87,12 +91,26 @@ class CCTimeTerminal implements iCustomContent {
 			.currentAction {
 				background-color:#c5ffab;
 			}
+			
+			.overlay ul {
+				list-style-type:none;
+			}
+
+			.overlay li {
+				font-size:30px;
+				font-weight:normal;
+				padding-top:14px;
+				padding-bottom:14px;
+			}
 		</style>
 		<script type=\"text/javascript\">
 			var months = new Array('".implode("', '", Datum::getGerMonthArray())."');
 			var days = new Array('".  implode("', '", Datum::getGerWeekArray())."');
-			var action = 'K';
-
+			var action = '".($this->switch ? "G" : "K")."';
+			var inOverlay = false;
+			var learnPersonalID = 0;
+			var learnChipID = 0;
+			
 			$(function(){
 				window.setInterval(function(){
 					clokk();
@@ -101,6 +119,13 @@ class CCTimeTerminal implements iCustomContent {
 				clokk();
 				
 				$('#chipCode').focus();
+				
+				window.setInterval(function(){
+					if(inOverlay || document.activeElement.id == 'chipCode')
+						return;
+					
+					$('#chipCode').focus();
+				}, 1000);
 			});
 			
 			function clokk(){
@@ -109,44 +134,143 @@ class CCTimeTerminal implements iCustomContent {
 				$('#day').html(days[jetzt.getDay()]+', '+jetzt.getDate()+'. '+months[jetzt.getMonth()]+' '+jetzt.getFullYear());
 			}
 			
+			function heightContent(){
+				var max = \$j(window).height() / 100 * 88;
+				
+				\$j.each(\$j('.overlayContentSub'), function(k, v){
+					max -= \$j(v).outerHeight();
+				});
+
+				return max;
+			}
+
 			function stampp(){
-				if(typeof alex != 'undefined')
+				inOverlay = true;
+				if(typeof alex != 'undefined' && typeof alex.takePhoto == 'function')
 					alex.takePhoto();
-					
-				CustomerPage.rme('stamp', [\$('#chipCode').val(), ".$_GET["terminalID"].", action], function(t){
+				
+				learnChipID = \$('#chipCode').val();
+
+				CustomerPage.rme('stamp', [\$('#chipCode').val(), ".$_GET["terminalID"].", action, ".(isset($_GET["learn"]) ? "1" : "0").", learnPersonalID], function(t){
 					if(t == '')
 						return;
 						
 					var r = jQuery.parseJSON(t);
 					\$('#chipCode').val('');
+					learnPersonalID = 0;
 					if(r.status == 'command' && r.action =='reload'){
 						document.location.reload();
 						return;
 					}
+					
 
+					var message = r.message;
 					var color = 'green';
+					var list = '';
 					if(r.status == 'error')
 						color = 'red';
+					if(r.status == 'learn')
+						color = 'orange';
 
-					\$j('.overlayText').html(r.message);
+					if(r.status == 'learn'){
+						
+						list = '<p class=\"overlayContentSub\" style=\"font-size:70px;font-weight:bold;background-color:white;margin-top:-20;\">Bitte wählen Sie:</p>';
+						list += '<ul class=\"overlayContentHeight\" style=\"padding-left:0px;padding-top:0px;padding-bottom:0px;margin-top:0;margin-bottom:0;overflow:auto;\">';
+						for(var i = 0;i < r.message.length; i++){
+							list += '<li data-personalid=\"'+r.message[i].PersonalID+'\" class=\"selectionName\" style=\"padding-left:40px;\">'+r.message[i].name+'</li>';
+						}
+						list += '</ul>';
+						
+						list += '<div class=\"overlayContentSub\" id=\"buttonCancel\" style=\"background-color: rgb(204, 204, 204);padding-top:20px;padding-bottom:20px;font-size:30px;width:50%;display:inline-block;\"><div style=\"padding-left:10px;\"><span style=\"font-size:40px;margin-right:20px;\" class=\"iconic x\"></span> Abbrechen</div></div>';
+						list += '<div id=\"buttonSave\" style=\"background-color: rgb(204, 204, 204);padding-top:20px;padding-bottom:20px;width:50%;display:inline-block;font-size:30px;color:grey;\"><div style=\"padding-left:10px;\"><span style=\"font-size:40px;margin-right:20px;\" class=\"iconic check\"></span> Speichern</div></div>';
+						//return;
+					}
+
+					
+					\$j('.overlayText').html(message);
 					\$j('.overlayDetails').html('');
+					\$j('.overlayList').html(list);
+					\$j('.overlayCenter').scrollTop(0);
+					
 					if(r.details)
 						\$j('.overlayDetails').html(r.details);
 
-					\$('.overlay').addClass(color).show();
+					\$('.overlay').removeClass().addClass('overlay '+color).show();
 					
-					window.setTimeout(function(){
-						\$('.overlay').hide().removeClass(color);
-					}, 2000);
+					if(\$j('.overlayContentHeight').length)
+						\$j('.overlayContentHeight').css('height', heightContent());
+
+					if(r.status == 'learn'){
+						$('.selectionName').hammer().on('tap', function(ev){
+							\$j('.selectionName').css('background-color', '');
+							\$j(ev.target).css('background-color', 'rgba(255,204,0,0.3)');
+							\$j('#buttonSave').css('background-color', '#c5ffab').css('color', '');
+							learnPersonalID = \$j(ev.target).data('personalid');
+						});
+						
+						$('#buttonSave').hammer().on('touch release', function(ev){
+							switch(ev.type){
+								case 'touch':
+									$(ev.target).closest('#buttonSave').css('background-color', 'rgba(255,204,0,0.3)');
+								break;
+
+								case 'release':
+									$(ev.target).closest('#buttonSave').css('background-color', 'rgb(204, 204, 204)');
+									
+									if(learnPersonalID == 0)
+										return;
+										
+									\$('.overlay').hide();
+									inOverlay = false;
+									\$('#chipCode').val(learnChipID);
+									stampp();
+								break;
+							}
+						});
+
+						$('#buttonCancel').hammer().on('touch release', function(ev){
+							switch(ev.type){
+								case 'touch':
+									$(ev.target).closest('#buttonCancel').css('background-color', 'rgba(255,204,0,0.3)');
+								break;
+
+								case 'release':
+									$(ev.target).closest('#buttonCancel').css('background-color', 'rgb(204, 204, 204)');
+									\$('.overlay').hide();
+									inOverlay = false;
+									learnPersonalID = 0;
+								break;
+							}
+						});
+					}
+
+					if(r.status != 'learn')
+						window.setTimeout(function(){
+							\$('.overlay').hide();
+							\$('#chipCode').focus();
+							inOverlay = false;
+						}, 1500);
 					
 					if(r.status == 'OK')
 						moep();
 
+
+					var stack = $.jStorage.get('pKTimeStack', [])
+					if(stack.length > 0)
+						CustomerPage.rme('stampStack', [JSON.stringify(stack)], function(t){
+							$.jStorage.set('pKTimeStack', []);
+						});
+					
 				}, function(){
-					var color = 'red';
+					var stack = $.jStorage.get('pKTimeStack', []);
+					//console.log(stack);
+					stack.push({'chip': \$('#chipCode').val(), 'terminal': ".$_GET["terminalID"].", 'action': action, 'time': Math.round(Date.now() / 1000)});
+					$.jStorage.set('pKTimeStack', stack);
+					
+					var color = 'orange';
 					\$('#chipCode').val('');
-					\$j('.overlayText').html('Server nicht erreichbar!');
-					\$j('.overlayDetails').html('');
+					\$j('.overlayText').html('Zeit erfasst');
+					\$j('.overlayDetails').html('Der Server ist nicht erreichbar.');
 
 					\$('.overlay').addClass(color).show();
 					
@@ -169,7 +293,10 @@ class CCTimeTerminal implements iCustomContent {
 			
 			moep();
 
-			$('html').click(function() {
+			$('html').focus(function() {
+				if(inOverlay)
+					return;
+					
 				$('#chipCode').focus();
 			}); 
 
@@ -234,6 +361,7 @@ class CCTimeTerminal implements iCustomContent {
 			$I
 			<div class=\"overlay\">
 				<div class=\"overlayCenter\">
+					<div class=\"overlayList\"></div>
 					<p style=\"font-size:70px;margin-top:60px;font-weight:bold;\" class=\"overlayText\"></p>
 					<p style=\"font-size:50px;margin-top:60px;\" class=\"overlayDetails\"></p>
 				</div>
@@ -243,7 +371,15 @@ class CCTimeTerminal implements iCustomContent {
 		return $html;
 	}
 	
-	public static function stamp($args){
+	public static function stampStack($args){
+		$data = json_decode($args["P0"]);
+		
+		foreach($data AS $stamp)
+			self::stamp(array("P0" => $stamp->chip, "P1" => $stamp->terminal, "P2" => $stamp->action, "P3" => "", "P4" => "", "P5" => $stamp->time), false);
+		
+	}
+	
+	public static function stamp($args, $die = true){
 		#if(strtolower($args["P0"]) == "303005f7b4")
 		#	die('{"status":"command", "action":"reload"}');
 		
@@ -253,12 +389,33 @@ class CCTimeTerminal implements iCustomContent {
 		addClassPath(Util::getRootPath()."personalKartei/Zeiterfassung/");
 		addClassPath(Util::getRootPath()."personalKartei/Personal/");
 		addClassPath(Util::getRootPath()."personalKartei/ObjekteL/");
+		#if(file_exists(Util::getRootPath()."personalKartei/Schichten/"))
+		#	addClassPath(Util::getRootPath()."personalKartei/Schichten/");
 		addClassPath(Util::getRootPath()."open3A/Kategorien/");
 		
-		$T = anyC::getFirst("ZETerminal", "ZETerminalID", $args["P1"]);
-		if(!$T)
-			die('{"status":"error", "message":"Unbekanntes Terminal"}');
+		$CCP = new CCPage();
+		$CCP->loadPlugin("personalKartei", "Schichten", true);
 		
+		$T = anyC::getFirst("ZETerminal", "ZETerminalID", $args["P1"]);
+		if(!$T){
+			if($die)
+				die('{"status":"error", "message":"Unbekanntes Terminal"}');
+			else
+				return;
+		}
+		
+		$CT = FileStorage::getFilesDir()."ChipTrans.csv";
+		
+		
+		
+		if($args["P3"] AND $args["P4"] > 0){
+			$P = new Personal($args["P4"]);
+			if(trim($P->A("PersonalChipNummer")) == ""){
+				$P->changeA("PersonalChipNummer", trim(strtolower($args["P0"])));
+				$P->saveMe();
+			} else
+				file_put_contents($CT, "$args[P4]:".trim(strtolower($args["P0"]))."\n", FILE_APPEND);
+		}
 		
 		$A = new stdClass();
 
@@ -268,7 +425,7 @@ class CCTimeTerminal implements iCustomContent {
 
 		$A->ChipID = trim(strtolower($args["P0"]));
 		$A->Date = $Date->time();
-		$A->Time = Util::parseTime("de_DE", date("H:i", time()));
+		$A->Time = Util::parseTime("de_DE", date("H:i", !isset($args["P5"]) ? time() : $args["P5"]));
 		$A->Type = $args["P2"];
 		$A->Mode = "";
 		$A->TerminalID = $args["P1"];
@@ -276,35 +433,139 @@ class CCTimeTerminal implements iCustomContent {
 			$ok = ZEData::addTime($A);
 		} catch(Exception $e){
 			try {
-				$A->ChipID = trim(strtolower(dechex($args["P0"])));
+				$hex = str_pad(trim(strtolower(dechex($args["P0"]))), 10, "0", STR_PAD_LEFT);
+				$A->ChipID = $hex;
 				$ok = ZEData::addTime($A);
 			} catch(Exception $e){
+				try {
+					if(!$args["P3"])
+						throw new Exception ("Chip unknown", 100);
+					
+					if(!file_exists($CT))
+						file_put_contents($CT, "");
+					
+					$trans = file_get_contents($CT);
+					$found = false;
+					foreach(explode("\n", $trans) AS $line){
+						$line = trim($line);
+						$ex = explode(":", $line);
+						
+						if(trim(strtolower($ex[1])) != trim(strtolower($args["P0"])))
+							continue;
+						
+						$P = new Personal($ex[0]);
+						$A->ChipID = $P->A("PersonalChipNummer");
+						$found = true;
+						
+					}
+					
+					if(!$found)
+						throw new Exception ("Learn", 200);
+					
+					#if(!$found)
+					#	throw new Exception ("Chip unknown", 100);
+					
+					$ok = ZEData::addTime($A);
+					
+				} catch(Exception $e){
+					switch($e->getCode()){
+						case 100:
+							try {
+								$F = new Factory("ZETerminalFail");
+								$F->sA("ZETerminalFailTime", time());
+								$F->sA("ZETerminalFailData", json_encode($args));
+								$F->sA("ZETerminalFailZETerminalID", $args["P1"]);
+								$F->store();
+							} catch(Exception $e){ }
+							
+							if($die)
+								die('{"status":"error", "message":"Unbekannter Chip"}');
+							else
+								return;
+						break;
+					
+						case 200:
+							$AC = anyC::get("Personal", "isDeleted", "0");
+							$AC->setFieldsV3(array("CONCAT(nachname, ' ', vorname) AS name"));
+							$AC->addAssocV3("TRIM(CONCAT(nachname, vorname))", "!=", "");
+							$AC->addOrderV3("nachname");
+							$AC->addOrderV3("vorname");
 
-				switch($e->getCode()){
-					case 100:
-						die('{"status":"error", "message":"Unbekannter Chip"}');
-					break;
-					default:
-						die('{"status":"error", "message":"'.$e->getMessage().'"}');
+							$knownPID = array();
+							$file = file($CT);
+							foreach($file AS $line){
+								$line = trim($line);
+								$ex = explode(":", $line);
+								$knownPID[$ex[0]] = true;
+							}
+							
+							$array = array();
+							while($A = $AC->n()){
+								if(isset($knownPID[$A->getID()]))
+									continue;
+								
+								$subArray = array();
+								foreach($A->getA() as $key => $value)
+									$subArray[$key] = $value;
+
+								$array[] = $subArray;
+							}
+							if($die)
+								die('{"status":"learn", "message":'.json_encode($array, defined("JSON_UNESCAPED_UNICODE") ? JSON_UNESCAPED_UNICODE : 0).'}');
+							else
+								return;
+						break;
+					
+						default:
+							try {
+								$F = new Factory("ZETerminalFail");
+								$F->sA("ZETerminalFailTime", time());
+								$F->sA("ZETerminalFailData", $e->getMessage());
+								$F->sA("ZETerminalFailZETerminalID", $args["P1"]);
+								$F->store();
+							} catch(Exception $e){ }
+							
+							if($die)
+								die('{"status":"error", "message":"'.$e->getMessage().'"}');
+							else
+								return;
+					}
 				}
 			}
 		}
-
+		
 		if($args["P2"] == "G"){
-			$AC = anyC::get("ZEData", "ZEDataChipID", $A->ChipID);
+			$AC = anyC::get("ZEData", "ZEDataPersonalID", $ok["Personal"]->getID());
 			$AC->addAssocV3("ZEDataType", "=", "K");
 			$AC->addAssocV3("ZEDataDate + ZEDataTime", ">", time() - 3600 * 13);
-			$AC->addOrderV3("ZEDataID", "DESC");
+			$AC->addAssocV3("ZEDataDate + ZEDataTime", "<", time());
 			$AC->addAssocV3("ZEDataIsDeleted", "=", "0");
+			$AC->addOrderV3("ZEDataDate + ZEDataTime", "DESC");
 			$AC->setLimitV3("1");
+			
+			$Kommen = $AC->getNextEntry();
+			if($Kommen != null){
+				$Gehen = $ok["ZEData"];
+				
+				$T = new ZETerminal($args["P1"]);
+				
+				$AC2 = anyC::get("PZuO", "ObjektLID", $T->A("ZETerminalObjektLID"));
+				$AC2->addAssocV3("PersonalID", "=", $Kommen->A("ZEDataPersonalID"));
+				$PZuO = $AC2->n();
 
-			$D = $AC->getNextEntry();
-			if($D != null){
-				$pause = ZEAuswertung::calcPause($D, $ok["ZEData"]);
-				if($pause !== null){
-					$DE = $ok["ZEData"];
-					$DE->changeA("ZEDataPause", $pause);
-					$DE->saveMe(false, false);
+				if($PZuO !== null){
+					$worked = ($Gehen->A("ZEDataDate") + $Gehen->A("ZEDataTime")) - ($Kommen->A("ZEDataDate") + $Kommen->A("ZEDataTime"));
+					$AZ = mZEArbeitsZeit::getArbeitszeiten($PZuO->getID(), time());
+					
+					if(isset($AZ[0])){
+						$hasTo = $AZ[0]->A("ZEArbeitsZeitEnde") - $AZ[0]->A("ZEArbeitsZeitStart");
+						
+						if($worked > 0 AND $worked / $hasTo > 0.9){# AND $hasTo / $worked < 1.15){
+							$DE = $ok["ZEData"];
+							$DE->changeA("ZEDataPause", $AZ[0]->A("ZEArbeitsZeitMittag"));
+							$DE->saveMe(false, false);
+						}
+					}
 				}
 			}
 		}#303046a1b7
@@ -317,7 +578,11 @@ class CCTimeTerminal implements iCustomContent {
 		#$ZEA->debug = false;
 		#$current = $ZEA->getContent();
 		
-		die('{"status":"OK", "message": "'.addslashes ($ok["Personal"]->A("vorname")." ".$ok["Personal"]->A("nachname")).'", "details": ""}');#Stunden '.Util::CLMonthName(date("m")).': '.Util::formatSeconds($current["totalHours"][1], false).'
+		if($die)
+			die('{"status":"OK", "message": "'.addslashes ($ok["Personal"]->A("vorname")." ".$ok["Personal"]->A("nachname")).'", "details": ""}');#Stunden '.Util::CLMonthName(date("m")).': '.Util::formatSeconds($current["totalHours"][1], false).'
+		else 
+			return;
+		
 			
 	}
 	

@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class User extends PersistentObject {
 	
@@ -29,20 +29,54 @@ class User extends PersistentObject {
 		return $this->A;
 	}
 	
-	function loadMe($empty = true){
-		if($this->getID() > 20000){
-			$S = Util::getAppServerClient();
-			$this->setA($S->getUserById($this->ID));
-			return;
+	function deleteMe() {
+		$F = new Factory("UserOld");
+		$F->sA("UserOldUserID", $this->getID());
+		
+		$id = $F->store();
+		
+		$O = new UserOld($id);
+		
+		$this->loadMe();
+		$A = $this->getA();
+		foreach($A AS $k => $v){
+			if($O->A($k) !== null)
+				$O->changeA ($k, $v);
 		}
-	    parent::loadMe();
-		if($empty AND $this->A != null) $this->A->SHApassword = "";
+		$O->saveMe();
+		
+		parent::deleteMe();
 	}
 	
-	function saveMe($checkUserData = true, $output = false){
+	function loadMe($empty = true){
+		if($this->getID() > 20000){
+			
+			if(mUserdata::getGlobalSettingValue("AppServer", "") != ""){
+				$S = Util::getAppServerClient();
+				$this->setA($S->getUserById($this->ID, $empty));
+				
+				return;
+			} 
+			
+			$LD = LoginData::get("ADServerUserPass");
+			if($LD != null AND $LD->A("server") != ""){
+				$this->setA(LoginAD::getUserById($this->ID));
+				
+				return;
+			}
+		}
+		
+	    parent::loadMe();
+		
+		if($empty AND $this->A != null) 
+			$this->A->SHApassword = "";
+	}
+	
+	function saveMe($checkUserData = true, $output = false, $hash = true){
 		$allowedUsers = Environment::getS("allowedUsers", null);
 		if($allowedUsers !== null AND $this->A("isAdmin") == "0"){
 			$AC = anyC::get("User", "isAdmin", "0");
+			$AC->addAssocV3("UserType", "=", "0");
 			$AC->addAssocV3("UserID", "!=", $this->getID());
 			$AC->lCV3();
 			
@@ -52,11 +86,17 @@ class User extends PersistentObject {
 		
 		$U = new User($this->ID);
 		$U->loadMe(false);
-		if(mUserdata::getGlobalSettingValue("encryptionKey") == null AND Session::isUserAdminS()) mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
-		if($this->A->SHApassword != "") $this->A->SHApassword = sha1($this->A->SHApassword);
-		else $this->A->SHApassword = $U->A("SHApassword");
+		
+		if(mUserdata::getGlobalSettingValue("encryptionKey") == null AND Session::isUserAdminS()) 
+			mUserdata::setUserdataS("encryptionKey", Util::getEncryptionKey(), "eK", -1);
+		
+		if($this->A->SHApassword != "")
+			$this->A->SHApassword = $hash ? sha1(str_replace("\\$", "$",$this->A->SHApassword)) : $this->A->SHApassword;
+		else
+			$this->A->SHApassword = $U->A("SHApassword");
 
-		if($checkUserData) mUserdata::checkRestrictionOrDie("cantEdit".str_replace("GUI","",get_class($this)));
+		if($checkUserData) 
+			mUserdata::checkRestrictionOrDie("cantEdit".str_replace("GUI","",get_class($this)));
 
 		$this->loadAdapter();
 		$this->Adapter->saveSingle2($this->getClearClass(get_class($this)),$this->A);
@@ -65,9 +105,13 @@ class User extends PersistentObject {
 	}
 	
 	function newMe($checkUserData = true, $output = false){
+		if($this->A->password == "")
+			$this->A->password = ";;;-1;;;";
+		
 		$allowedUsers = Environment::getS("allowedUsers", null);
 		if($allowedUsers !== null AND $this->A("isAdmin") == "0"){
 			$AC = anyC::get("User", "isAdmin", "0");
+			$AC->addAssocV3("UserType", "=", "0");
 			$AC->lCV3();
 			
 			if($AC->numLoaded() >= $allowedUsers)
@@ -96,7 +140,7 @@ class User extends PersistentObject {
 		$A->name = "";
 		$A->username = "";
 		$A->password = "";
-		$A->isAdmin = "";
+		$A->isAdmin = "0";
 		$A->SHApassword = "";
 		$A->language = "";
 		$A->UserEmail = "";
@@ -104,6 +148,9 @@ class User extends PersistentObject {
 		$A->UserJabber = "";
 		$A->UserSkype = "";
 		$A->UserTel = "";
+		$A->UserPosition = "";
+		$A->UserLoginToken = "";
+		$A->UserType = "0";
 		
 		return $A;
 	}

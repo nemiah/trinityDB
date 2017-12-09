@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class AppPlugins {
 	private $folders = array();
@@ -86,7 +86,11 @@ class AppPlugins {
 		
 		
 		foreach($this->appFolder AS $key => $value){
-			if($value == "plugins") continue;
+			if($value == "plugins") 
+				continue;
+			
+			if($value == "customer") 
+				continue;
 			
 			unset($this->menuEntries[array_search($key, $this->menuEntries)]);
 		}
@@ -95,18 +99,19 @@ class AppPlugins {
 
 		if($appFolder == null){
 			$folder = "plugins";
-			if($_SESSION["applications"]->getActiveApplication() != "nil") $folder = $_SESSION["applications"]->getActiveApplication();
-		} else $folder = $appFolder;
-
+			if($_SESSION["applications"]->getActiveApplication() != "nil") 
+				$folder = $_SESSION["applications"]->getActiveApplication();
+		} else
+			$folder = $appFolder;
+		
 		$allowedPlugins = Environment::getS("allowedPlugins", array());
 		$extraPlugins = Environment::getS("pluginsExtra", array());
 		if(Applications::activeApplication() == "Zeus" OR Applications::activeApplication() == "nil")
 			$extraPlugins = array();
-		
+
 		$allowedPlugins = array_merge($allowedPlugins, $extraPlugins);
 		
 		
-		#$p = ".".(is_dir("./$folder/") ? "" : ".");
 		$p = Util::getRootPath();
 
 		if($p[strlen($p) - 1] == "/")
@@ -130,7 +135,9 @@ class AppPlugins {
 					else
 						continue;
 				}
-				if(stripos($file, "plugin") === false) continue;
+				
+				if(stripos($file, "plugin") === false) 
+					continue;
 				
 				$plugins[] = $file;
 			}
@@ -142,13 +149,13 @@ class AppPlugins {
 				$f = explode(".",$file);
 				if($f[0]{0} == "-") continue;
 
-				if($f[1] == "xml") {
-					$c = new XMLPlugin("$p/$folder/$file", $allowedPlugins);
-				} else {
-					require_once "$p/$folder/$file";
-					$f = $f[0];
-					$c = new $f();
-				}
+				#if($f[1] == "xml") {
+				$c = new XMLPlugin("$p/$folder/$file", $allowedPlugins);
+				#} else {
+				#	require_once "$p/$folder/$file";
+				#	$f = $f[0];
+				#	$c = new $f();
+				#}
 				
 				$_SESSION["messages"]->startMessage("trying to register ".$c->registerName().": ");
 
@@ -157,6 +164,28 @@ class AppPlugins {
 					continue;
 				}
 
+				
+				if(count($c->registerApplications())){
+					$apps = $c->registerApplications();
+					$found = false;
+					
+					foreach($apps AS $d){
+						if(Applications::activeApplication() == $d[0]){
+							$this->versions[$c->registerClassName()] = $d[1];
+							
+							if($d[2] != "")
+								$this->menuEntries[$d[2]] = $c->registerClassName();
+							
+							$found = true;
+						}
+					}
+					if(!$found)
+						continue;
+				} else {
+					if($c->registerMenuEntry() != "")
+						$this->menuEntries[$c->registerMenuEntry()] = $c->registerClassName();
+				}
+				
 				$pFolder = $c->registerFolder();
 				if(!is_array($pFolder))
 					$this->folders[] = $pFolder;
@@ -167,8 +196,6 @@ class AppPlugins {
 				
 				$this->blockNonAdmin[$c->registerClassName()] = $c->registerBlockNonAdmin();
 				
-				if($c->registerMenuEntry() != "")
-					$this->menuEntries[$c->registerMenuEntry()] = $c->registerClassName();
 				
 				$this->appFolder[$c->registerClassName()] = $folder;
 				
@@ -189,7 +216,16 @@ class AppPlugins {
 				if($c->registerDependencies() != "none")
 					$this->deps[$c->registerClassName()] = $c->registerDependencies();
 					
-				$this->versions[$c->registerClassName()] = $c->registerVersion();
+				if(!count($c->registerApplications()))
+					$this->versions[$c->registerClassName()] = $c->registerVersion();
+				
+				foreach($c->registerRegistry() AS $call){
+					if(count($call) == 3)
+						Registry::setCallback($call[0], $call[1], $call[2]);
+
+					if(count($call) == 2)
+						Registry::setCallback($call[0], $call[1]);
+				}
 				
 				if($c->registerJavascriptFile() != "" AND isset($_SESSION["JS"])){
 					if(is_array($c->registerJavascriptFile())){
@@ -207,7 +243,7 @@ class AppPlugins {
 				#}
 					
 				$n = $c->registerClassName();
-				if($n != "" AND $appFolder == null){
+				if($n != "" AND ($appFolder == null OR $appFolder == "customer")){
 					try {
 						$nc = new $n();
 						if(method_exists($nc,'getCollectionOf')){
@@ -230,20 +266,23 @@ class AppPlugins {
 					}
 				}
 				
-				if($f[1] == "xml"){
-					$fld = $c->registerFolder();
-					if(!is_array($fld))
-						$fld = array($fld);
-					
-					foreach($fld AS $folderName){
-						$path = "./$folder/$folderName/".$c->registerClassName().".class.php";
-						if(file_exists($path))
+				#if($f[1] == "xml"){
+				$fld = $c->registerFolder();
+				if(!is_array($fld))
+					$fld = array($fld);
+
+				foreach($fld AS $folderName){
+					$path = "./$folder/$folderName/".$c->registerClassName().".class.php";
+
+					if(file_exists($path))
 						require_once $path;
-						elseif(file_exists(".".$path)) require_once ".".$path;
-					}
+					elseif(file_exists(".".$path))
+						require_once ".".$path;
 				}
+				#}
 				
-				if($appFolder == null) $c->doSomethingElse();
+				if($appFolder == null OR $appFolder == "customer")
+					$c->doSomethingElse();
 				
 				$_SESSION["messages"]->endMessage(" successful");
 				unset($c);
@@ -292,13 +331,14 @@ class AppPlugins {
 	
 	public function getIsAdminOnly($plugin){
 		$plugin = str_replace("GUI", "", $plugin);
-		
-		if(isset($this->isAdminOnlyByPlugin[$plugin])) return $this->isAdminOnlyByPlugin[$plugin];
+
+		if(isset($this->isAdminOnlyByPlugin[$plugin])) 
+			return $this->isAdminOnlyByPlugin[$plugin];
 
 		$c = array();
 		foreach($this->collectors AS $k => $v)
 			$c[$v] = $k;
-		
+
 		#$c = array_flip($this->collectors); //deprecated
 
 		if(!isset($c[$plugin])) return false;

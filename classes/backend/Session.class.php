@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class Session {
 	static $instance;
@@ -50,33 +50,39 @@ class Session {
 	
 	public static function reloadDBData() {
 		$_SESSION["DBData"] = $_SESSION[self::$sessionVariable]->getDBData();
+		
+		$DBWrite = Environment::getS("databaseDataWrite", null);
+		if($DBWrite !== null)
+			$_SESSION["DBDataWrite"] = $DBWrite;
 	}
 	
-	public function getDBData($newFolder = null){
-		if(file_exists(Util::getRootPath()."../../phynxConfig"))
-			$newFolder = Util::getRootPath()."../../phynxConfig/";
-		
-		if(file_exists(Util::getRootPath()."../phynxConfig"))
-			$newFolder = Util::getRootPath()."../phynxConfig/";
-		
-		if($newFolder == null)
-			$newFolder = Util::getRootPath()."system/DBData/";
+	public function getDBData($newFolder = null, $forceID = null){
+		list($newFolder, $external) = Installation::getDBFolder($newFolder);
 		
 		$findFor = "*";
 		if(isset($_SERVER["HTTP_HOST"]))
 			$findFor = $_SERVER["HTTP_HOST"];
+		
 		$data = new mInstallation();
-		if($newFolder != "") $data->changeFolder($newFolder);
+		if($newFolder != "") 
+			$data->changeFolder($newFolder);
+		
 		$data->setAssocV3("httpHost","=",$findFor);
-		#$data->loadCollectionV2();
+		
+		if($forceID !== null){
+			$data = new mInstallation();
+			if($newFolder != "") 
+				$data->changeFolder($newFolder);
+			$data->addAssocV3("InstallationID", "=", $forceID);
+		}
 		
 		$n = $data->getNextEntry();
 		
 		if($n == null) {
-			#$data = new mInstallation();
-			#if($newFolder != "") $data->changeFolder($newFolder);
 			$data = new mInstallation();
-			if($newFolder != "") $data->changeFolder($newFolder);
+			if($newFolder != "") 
+				$data->changeFolder($newFolder);
+			
 			$data->setAssocV3("httpHost","=","*");
 			$n = $data->getNextEntry();
 		}
@@ -99,6 +105,8 @@ class Session {
 		if(isset($d))
 			foreach($s as $key => $value)
 				$t[$value] = $d->$value;
+		
+		$t["external"] = $external;
 		
 		$rt = Environment::getS("databaseData", $t);
 		
@@ -126,7 +134,7 @@ class Session {
 		if($plugin == "Printers") return true;
 		if($plugin == "Credits") return true;
 		if($plugin == "Desktop") return true;
-		if($plugin == "DesktopLink") return true;
+		#if($plugin == "DesktopLink") return true;
 		if($plugin == "Userdata" AND $this->isUserAdmin()) return true;
 		if($plugin == "BackupManager" AND $this->isUserAdmin()) return true;
 		if($plugin == "LoginData" AND $this->isUserAdmin()) return true;
@@ -148,6 +156,10 @@ class Session {
 	public function isUserAdmin(){
 		$UA = $this->currentUser->getA();
 		return $UA->isAdmin;
+	}
+
+	public static function isInstallation(){
+		return Session::currentUser()->A("isInstall") !== null;
 	}
 
 	public static function isUserAdminS(){
@@ -173,9 +185,15 @@ class Session {
 		foreach($this->afterLoginFunctions as $key => $value) {
 			try {
 				$c = new $key;
-				if(!method_exists($c, $value)) continue;
-				$f = "@".$key."::".$value."();";
-				eval($f);
+				if(!method_exists($c, $value))
+					continue;
+				
+				#$f = "@".$key."::".$value."();";
+				#eval($f);
+				#$s = explode("::",$value);
+				$method = new ReflectionMethod($key, $value);
+				$method->invoke(null);
+				
 			} catch(Exception $e){
 				continue;
 			}
@@ -204,11 +222,16 @@ class Session {
 		if(isset($_SESSION["viaInterface"]) AND $_SESSION["viaInterface"] == true)
 			return class_exists($pluginName, false);
 
-		if(!isset($_SESSION["CurrentAppPlugins"])) return false;
+		if(!isset($_SESSION["CurrentAppPlugins"])) 
+			return false;
+		
 		return $_SESSION["CurrentAppPlugins"]->isPluginLoaded($pluginName);
 		#return in_array($pluginName,$_SESSION["CurrentAppPlugins"]->getAllPlugins());
 	}
 
+	/**
+	 * @return User
+	 */
 	public static function currentUser(){
 		return $_SESSION["S"]->getCurrentUser();
 	}
@@ -242,8 +265,10 @@ class Session {
 		$_SESSION["CurrentAppPlugins"] = new AppPlugins();
 		$_SESSION["CurrentAppPlugins"]->scanPlugins();
 		$_SESSION["applications"]->setActiveApplication($application);
+		$_SESSION["CurrentAppPlugins"]->scanPlugins("customer");
 		$_SESSION["CurrentAppPlugins"]->scanPlugins();
 		$_SESSION["classPaths"] = array();
+		
 		$this->runOnLoginFunctions();
 	}
 	

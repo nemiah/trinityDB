@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class ArrayCollection extends Collection {
@@ -26,8 +26,13 @@ class ArrayCollection extends Collection {
 		$this->storage = "TempFiles";
 	}
 	
+	public function lCV3($id = -1, $returnCollector = true, $lazyload = false) {
+		#parent::lCV3($id, $returnCollector, $lazyload);
+	}
+	
 	public function add($element){
-		$element->setID($this->counter);
+		if(method_exists($element, "setID"))
+			$element->setID($this->counter);
 		$this->collector[$this->counter++] = $element;
 	}
 	

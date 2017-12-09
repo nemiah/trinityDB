@@ -15,11 +15,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
  
 function htmlReplaces(string) {
-	return string.replace("\#",";-;;raute;;-;").replace("'","_").replace("&",";-;;und;;-;").replace("%",";-;;prozent;;-;").replace("=",";-;;istgleich;;-;").replace("?",";-;;frage;;-;");
+	return string.replace("\#",";-r-;").replace("'","_").replace("&",";-u-;").replace("%",";-p-;").replace("=",";-i-;").replace("?",";-f-;");
 }
  
 var ACDiv = null;
@@ -161,11 +161,6 @@ var AC = {
 	doRequest: function(forField, targetClass){
 		if(forField.value != "") 
 			contentManager.rmePCR(targetClass, '', "getACHTML", [forField.id, htmlReplaces(forField.value)], AC.reloadChecker);
-			/*new Ajax.Request('./interface/rme.php', {
-			
-			method:"get", 
-			parameters:'class='+targetClass+"&method=getACHTML&constructor=''&parameters='"+forField.id+"','"+htmlReplaces(forField.value)+"'", 
-			onSuccess: AC.reloadChecker});*/
 	},
 	
 	start: function(forField){

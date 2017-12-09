@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 var Util = {
 	/*
@@ -164,5 +164,25 @@ var Util = {
 			html = "<img "+id+" "+style+" "+onclick+" "+classes+" src=\""+image+"\" title=\""+label+"\" />";
 		
 		return html;
+	},
+	
+	hexToRgb: function(hex) {
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {
+			r: parseInt(result[1], 16),
+			g: parseInt(result[2], 16),
+			b: parseInt(result[3], 16)
+		} : null;
+	},
+
+	querySt: function(ji) {
+		hu = window.location.search.substring(1);
+		gy = hu.split('&');
+		for (i=0;i<gy.length;i++) {
+			ft = gy[i].split('=');
+
+			if (ft[0] == ji)
+				return ft[1];
+		}
 	}
 }

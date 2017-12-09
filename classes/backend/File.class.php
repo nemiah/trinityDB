@@ -15,13 +15,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class File extends PersistentObject {
 	public function __construct($ID){
 		$this->storage = "File";
 		parent::__construct($ID);
+	}
+	
+	public function newMe($checkUserData = true, $output = false) {
+		
+		return parent::newMe($checkUserData, false);
 	}
 	
 	public function newAttributes(){
@@ -46,9 +51,13 @@ class File extends PersistentObject {
 	
 	public function download(){
 		$this->loadMe();
-		if(strpos($this->getID(), realpath(FileStorage::getFilesDir())) === false)
+		if(!file_exists($this->getID()))
 			return;
-		#if(strpos($this->ID, "specifics") === false) return;
+		
+		
+		if(strpos(realpath($this->getID()), Aspect::joinPoint("checkfor", $this, __METHOD__, "", realpath(FileStorage::getFilesDir()))) === false)
+			return;
+		#if(strpos(realpath($this->ID), "specifics") === false) return;
 		
 		#if(strpos(strtolower($this->ID), ".pdf") !== false) 
 		#	header("Content-Type: application/pdf");
@@ -107,8 +116,12 @@ class File extends PersistentObject {
 		if(!isset($_FILES['qqfile'])){ //XHR upload for good browsers
 			if($_SERVER["CONTENT_LENGTH"] > $maxSize)
 				die("{\"error\":\"Die angegebene Datei ist zu groß\"}");
-
-			$A->FileContent = addslashes(file_get_contents("php://input"));
+			
+			$content = file_get_contents("php://input");
+			if(strlen($content) != $_SERVER["CONTENT_LENGTH"])
+				die("{\"error\":\"Der Upload ist fehlgeschlagen!\"}");
+				
+			$A->FileContent = addslashes($content);
 			$A->FileName = (isset($_GET["targetFilename"]) AND $_GET["targetFilename"] != "") ? $_GET["targetFilename"].".".Util::ext($_GET['qqfile']) : $_GET['qqfile'];
 			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = (int) $_SERVER["CONTENT_LENGTH"];
@@ -122,6 +135,9 @@ class File extends PersistentObject {
 			$A->FileDir = preg_replace("/^([A-Z])%/", "\\1:", $_GET["path"]);
 			$A->FileSize = $_FILES['qqfile']['size'];
 		}
+		
+		if(Util::ext($A->FileName) == "php")
+			die("{\"error\":\"Ungültiges Dateiformat!\"}");
 		
 		echo "{\"success\":true}";
 	}

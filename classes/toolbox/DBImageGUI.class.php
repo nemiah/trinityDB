@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class DBImageGUI implements iGUIHTML2  {
@@ -27,6 +27,9 @@ class DBImageGUI implements iGUIHTML2  {
 	
 	public static function resizeMax($imageData, $max_width, $max_height){
 		$image = imagecreatefromstring($imageData);
+		
+		if(!$max_height)
+			$max_height = $max_width;
 		
 		$width  = $max_width;
 		$height = $max_height;
@@ -44,6 +47,11 @@ class DBImageGUI implements iGUIHTML2  {
 		   $height = floor($width/$ratio_orig);
 		
 		$tempimg = imagecreatetruecolor($width, $height);
+		imagealphablending($tempimg, false);
+		imagesavealpha($tempimg, true);
+		$transparent = imagecolorallocatealpha($tempimg, 255, 255, 255, 127);
+		imagefilledrectangle($tempimg, 0, 0, $width, $height, $transparent);
+		
 		imagecopyresampled($tempimg, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 		
 		ob_start();
@@ -90,6 +98,12 @@ class DBImageGUI implements iGUIHTML2  {
 		return stripslashes(base64_decode($data[2]));
 	}
 	
+	public static function dataURL($imageString){
+		$data = explode(":::",$imageString);
+		
+		return "data:$data[0];base64,".base64_encode(stripslashes(base64_decode($data[2])));
+	}
+	
 	public function loadMe(){
 		
 	}
@@ -128,7 +142,7 @@ class DBImageGUI implements iGUIHTML2  {
 		if(!isset($i[0])) return;
 		if(!isset($i[1])) return;
 		if(!isset($i[2])) return;
-		
+
 		header("Content-type: $i[0]");
 		header("Content-length: $i[1]");
 		echo stripslashes(base64_decode($i[2]));

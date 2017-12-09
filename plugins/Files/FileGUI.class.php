@@ -15,11 +15,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 class FileGUI extends File implements iGUIHTML2 {
 	public $showPreviewOnly = false;
+	function __construct($ID) {
+		parent::__construct($ID);
+		
+		$this->customize();
+	}
 	
 	function getHTML($id){
 		$this->loadMeOrEmpty();
@@ -140,7 +145,6 @@ class FileGUI extends File implements iGUIHTML2 {
 		$BD->windowRme("File", $this->getID(), "download");
 		$BD->onclick("".OnEvent::closePopup("File"));
 		
-		$display = "";
 		if($this->A("FileIsDir") == "0")
 			switch($this->A("FileMimetype")){
 				case "image/jpeg":
@@ -155,8 +159,23 @@ class FileGUI extends File implements iGUIHTML2 {
 				case "text/x-c++":
 					$display = "$BD<div style=\"clear:both;width:600px;max-height:450px;overflow:auto;\"><p>".highlight_file($this->ID,true)."</p></div>";
 				break;
+				case "text/html":
+					$tinyMCEID = "tinyMCEEditor".rand(100, 9000000);
+					$IBody = new HTMLInput("tinyMCEEditor", "textarea");
+					$IBody->style("height: 450px; width: 100%; min-height: 450px;  max-height: 450px;");
+					$IBody->id($tinyMCEID);
+					$IBody->setValue(file_get_contents($this->getID()));
+					
+					tinyMCEGUI::editorMail($tinyMCEID);
+					
+					$display = "$IBody".OnEvent::script("
+						\$j(window).oneTime(40, function() {
+							".tinyMCEGUI::editorMail($tinyMCEID)."
+						});;");
+				break;
 				case "application/pdf":
-					$display = "<script type=\"text/javascript\">".OnEvent::window($this, "previewPDF").OnEvent::closePopup("File")."</script>";
+					$display = "<iframe id=\"filePreview\" style=\"width:100%;border:0;height:500px;\"></iframe>
+						".OnEvent::script(OnEvent::iframe($this, "previewPDF", "", "filePreview"));
 				break;
 				default:
 					$display = "<div  class=\"highlight\">$BD<p style=\"padding-top:10px;\">Es steht leider keine Vorschau<br />für diesen Dateityp zur Verfügung.</p><div style=\"clear:both;\"></div>";

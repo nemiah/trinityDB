@@ -15,10 +15,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 class o3AException extends Exception {
-	function __construct($message){
+	function __construct($message = "none"){
 		if(isset($_SESSION["messages"])) $_SESSION["messages"]->addMessage(get_class($this)." thrown!");
 		parent::__construct($message);
 	}

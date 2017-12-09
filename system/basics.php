@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  2007 - 2013, Rainer Furtmeier - Rainer@Furtmeier.IT
+ *  2007 - 2017, Furtmeier Hard- und Software - Support@Furtmeier.IT
  */
 
 function addClassPath($path){
@@ -30,6 +30,12 @@ function addClassPath($path){
 }
 
 function registerClassPath($className, $classPath){
+	if(!isset($_SESSION["classPaths"]) OR !is_array($_SESSION["classPaths"]))
+		$_SESSION["classPaths"] = array();
+	
+	if(!isset($_SESSION["classPaths"][$className]))
+		$_SESSION["classPaths"][$className] = "";
+	
 	$_SESSION["classPaths"][$className] = $classPath;
 }
 
@@ -54,8 +60,7 @@ function findClass($class_name){
 		return false;
 	
 	$root = str_replace("system".DIRECTORY_SEPARATOR."basics.php", "", __FILE__);
-
-	if(isset($_SESSION["classPaths"][$class_name])) {
+	if(isset($_SESSION["classPaths"]) AND is_array($_SESSION["classPaths"]) AND isset($_SESSION["classPaths"][$class_name])) {
 		$path = $_SESSION["classPaths"][$class_name];
 
 		if(file_exists($path))
@@ -64,7 +69,7 @@ function findClass($class_name){
 			throw new ClassNotFoundException($class_name);
 		return 1;
 	}
-
+	
 	$standardPaths = array();
 	$standardPaths[] = $root."classes/backend/";
 	$standardPaths[] = $root."classes/frontend/";
@@ -73,22 +78,25 @@ function findClass($class_name){
 	$standardPaths[] = $root."libraries/";
 	$standardPaths[] = $root."libraries/fpdf/";
 	$standardPaths[] = $root."libraries/iban/";
+	$standardPaths[] = $root."customizer/"; //first look here for customizers!
 	$standardPaths[] = $root."specifics/";
 	$standardPaths[] = $root."classes/exceptions/";
 	$standardPaths[] = $root."libraries/geshi/";
-	if(isset($_SESSION["phynx_addClassPaths"]))
+	if(isset($_SESSION["phynx_addClassPaths"]) AND is_array($_SESSION["phynx_addClassPaths"]))
 		$standardPaths = array_merge($standardPaths, $_SESSION["phynx_addClassPaths"]);
-
-	foreach($standardPaths as $k => $v){
+	
+	foreach($standardPaths AS $v){
+		#echo $class_name." 1<br>";
 		$path = "$v".$class_name.'.class.php';
-
+			
 		if(is_file($path)) {
 			require_once $path;
 			registerClassPath($class_name, $path);
 			return 1;
 		}
 	}
-	if(isset($_SESSION["CurrentAppPlugins"]) AND count($_SESSION["CurrentAppPlugins"]->getFolders()) > 0) {
+	
+	if(isset($_SESSION["CurrentAppPlugins"]) AND is_object($_SESSION["CurrentAppPlugins"]) AND count($_SESSION["CurrentAppPlugins"]->getFolders()) > 0) {
 
 		foreach($_SESSION["CurrentAppPlugins"]->getFolders() as $key => $value){
 			$path = $root."plugins/$value/$class_name.class.php";
@@ -98,7 +106,6 @@ function findClass($class_name){
 				registerClassPath($class_name, $path);
 				return 1;
 			}
-
 			if($_SESSION["applications"]->getActiveApplication() != "nil"){
 				$path = $root."".$_SESSION["applications"]->getActiveApplication()."/$value/$class_name.class.php";
 
@@ -108,6 +115,15 @@ function findClass($class_name){
 					return 1;
 				}
 			}
+			
+			$path = $root."customer/$value/$class_name.class.php";
+
+			if(is_file($path)){
+				require_once $path;
+				registerClassPath($class_name, $path);
+				return 1;
+			}
+
 		}
 	} else {
 		$fp = opendir($root."plugins/");
@@ -152,13 +168,13 @@ function findClass($class_name){
 	if(preg_match("/^i[A-Z].*/", $class_name)) {
 		$_SESSION["messages"]->addMessage("Warning: Creating interface $class_name");
 		eval('interface '.$class_name.' { } ');
-	} else
-	 eval('class '.$class_name.' { '.
+	} else {
+		eval('class '.str_replace("\\", "_", $class_name).' { '.
 		'    public function __construct() { '.
 		'        throw new ClassNotFoundException("'.$class_name.'"); '.
 		'    } '.
 		'} ');
-
+	}
 }
 
 function phynx_mb_str_pad($input, $pad_length, $pad_string = " ", $pad_style = STR_PAD_RIGHT, $encoding="UTF-8") {
