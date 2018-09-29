@@ -188,9 +188,9 @@ class RSSFilter extends PersistentObject {
 		if($this->A("RSSFilterAutoDL") == "0")
 			return false;
 		
-		$JD = new JD($this->A("RSSFilterJDID"));
-		if(!$JD->supportsAutoDownload())
-			return false;
+		#$JD = new JD($this->A("RSSFilterJDID"));
+		#if(!$JD->supportsAutoDownload())
+		#	return false;
 
 		$Adapter = $this->A("RSSFilterAdapter");
 		$Adapter = new $Adapter();

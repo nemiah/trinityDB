@@ -233,14 +233,15 @@ while($S = $ac->getNextEntry()){
 		</item>";
 	}
 }
-	$DLLink = "$link/trinityDB/RSSFilter/FilteredFeed.php?RSSFilterID=$_GET[RSSFilterID]&amp;manualMultiDL=true";
+	/*$DLLink = "$link/trinityDB/RSSFilter/FilteredFeed.php?RSSFilterID=$_GET[RSSFilterID]&amp;manualMultiDL=true";
 	echo "
 		<item>
 			<title>Manual download</title>
 			<description><![CDATA[]]></description>
 			<pubDate></pubDate>
 			<link>$DLLink</link>
-		</item>
+		</item>";*/
+	echo "
 		<item>
 			<title>Not yet updated series: $nonupdated</title>
 			<description><![CDATA[]]></description>

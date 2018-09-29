@@ -242,10 +242,8 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 
 		$oldest->addAssocV3("lastupdate", "<", time() - 3600 * 24 * 21, "OR", "2");
 		$oldest->addAssocV3("status", "=", "Ended", "AND", "2");
-		$oldest->lCV3();
-		
-		return $oldest->numLoaded();
-
+		$oldest->setLimitV3("3");
+		return $oldest->getTotalNum();
 	}
 }
 ?>

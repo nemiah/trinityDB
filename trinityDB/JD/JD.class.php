@@ -117,6 +117,37 @@ class JD extends PersistentObject {
 			return true;
 		}
 		
+		if($this->A("JDDLType") == "5"){
+			if($logFilename == ""){
+				$info = get_headers($link, 1);
+				if($info !== false){
+					preg_match("/filename=\"(.*)\"/ismU", $info["Content-Disposition"], $matches);
+					if(isset($matches[1]))
+						$logFilename = $matches[1];
+				}
+			}
+			
+			if($logFilename == "")
+				$logFilename = basename($link);
+			
+			$ch = curl_init("https://www.premiumize.me/api/transfer/create?apikey=".urlencode($this->A("JDLinkParserPassword")));
+			curl_setopt($ch, CURLOPT_POST, 1);
+			
+			curl_setopt($ch, CURLOPT_POSTFIELDS, "src=".urlencode($linkOld)."&folder_id=".LPPremiumize::findFolder($this->A("JDLinkParserPassword"), $Serie->A("name")));
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+			$status = json_decode(curl_exec($ch));
+			#print_r($status);
+			curl_close($ch);
+			
+			if($status->status == "success"){
+				$this->logDownload($logLink, $linkOld, $logFilename, $status->filesize, $Serie, true);
+				return true;
+			}
+			
+			return false;
+		}
+		
 		if($this->A("JDDLType") == "0")
 			Util::PostToHost($this->A("JDHost"), $this->A("JDPort"), "/link_adder.tmpl", "none", "do=Add&addlinks=".urlencode($link), $this->A("JDUser"), $this->A("JDPassword"));
 
@@ -196,14 +227,15 @@ class JD extends PersistentObject {
 		return $id;
 	}
 
-	public function supportsAutoDownload(){
+	/*public function supportsAutoDownload(){
+		if($this->A("JDDLType") == "5") return true;
 		if($this->A("JDDLType") == "4") return true;
 		if($this->A("JDDLType") == "3") return true;
 		if($this->A("JDDLType") == "2") return true;
 		if($this->A("JDDLType") == "1") return true;
 
 		return false;
-	}
+	}*/
 
 	public function newAttributes() {
 		$A = parent::newAttributes();

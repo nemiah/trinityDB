@@ -23,23 +23,39 @@ class LPPremiumize implements iLinkParser {
 	}
 
 	public function parse($link, $username, $password) {
-		$ch = curl_init("https://api.premiumize.me/pm-api/v1.php?method=directdownloadlink&params[login]=".urlencode($username)."&params[pass]=".urlencode($password)."&params[link]=".urlencode($link));
+		$ch = curl_init("https://www.premiumize.me/api/transfer/directdl?apikey=".urlencode($password));
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "src=".urlencode($link));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		
 		$response = json_decode(curl_exec($ch));
 		curl_close($ch);
 		
-		#print_r($response);
+		return $response->location;
 		
-		#$ch = curl_init("http://real-debrid.fr/ajax/unrestrict.php?link=".urlencode($link)."&password=&remote=0&time=".time());
-		#curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0'));
-		#curl_setopt($ch, CURLOPT_COOKIEFILE, $ckfile);
-		#curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		#$output = json_decode(curl_exec($ch));
+	}
+	
+	public static function findFolder($password, $seriesName){
 		
-		#unlink($ckfile);*/
-		return $response->result->location;
+		$ch = curl_init("https://www.premiumize.me/api/folder/list?includebreadcrumbs=false&apikey=".urlencode($password));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		$data = json_decode(curl_exec($ch));
+		curl_close($ch);
 		
+		foreach($data->content AS $dir)
+			if($dir->name == $seriesName)
+				return $dir->id;
+		
+		
+		$ch = curl_init("https://www.premiumize.me/api/folder/create?apikey=".urlencode($password));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, "name=".urlencode($seriesName)."");
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$data = json_decode(curl_exec($ch));
+		curl_close($ch);
+		
+		return $data->id;
 	}
 }
 

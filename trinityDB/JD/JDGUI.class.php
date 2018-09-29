@@ -59,9 +59,10 @@ class JDGUI extends JD implements iGUIHTML2 {
 		$FB->addDir(__DIR__);
 		$gui->type("JDLinkParser", "select", array_merge(array("" => "None"), $FB->getAsLabeledArrayF("iLinkParser", ".class.php", true)));
 		
-		$gui->type("JDDLType", "select", array("JDownloader Web", "QNap Downloader", "JDownloader RC", "pyLoad", "wget"));
+		$gui->type("JDDLType", "select", array("JDownloader Web", "QNap Downloader", "JDownloader RC", "pyLoad", "wget", "Premiumize.me cloud"));
 
 		$gui->toggleFields("JDDLType", "4", array("JDWgetFilesDir"), array("JDHost", "JDPort", "JDUser", "JDPassword"));
+		#$gui->toggleFields("JDDLType", "5", array(), array("JDHost", "JDPort", "JDUser", "JDPassword", "JDWgetFilesDir"));
 		
 		$B = $gui->addSideButton("test\ndownload", "./trinityDB/JD/testLink.png");
 		$B->popup("testLink", "test link", "JD", $this->getID(), "testDownloadPopup");
