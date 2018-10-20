@@ -217,7 +217,7 @@ while($S = $ac->getNextEntry()){
 			if(!$alreadyDLed)
 				$usedAutoDL = $RSF->autoDownload($En["fileName"], $En["link"], $S->A("name")." S".$En["season"]."E".$En["episode"], $S);
 
-
+			
 			echo "
 			<item>
 				<title>".$S->A("name")." S".$En["season"]."E".$En["episode"]."".($alreadyDLed ? " already DLed" : "").($usedAutoDL ? " added to DL" : "")."</title>

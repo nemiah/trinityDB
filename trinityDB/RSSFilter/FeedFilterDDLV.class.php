@@ -101,7 +101,7 @@ class FeedFilterDDLV implements iFeedFilter {
 				#echo $link;
 				#echo Serie::determineQuality($link);
 				#echo $Serie->A("quality");
-				if(Serie::determineQuality($link) != SerieGUI::getQualities($Serie->A("quality")))
+				if($Serie->A("quality") != 0 AND Serie::determineQuality($link) != SerieGUI::getQualities($Serie->A("quality")))
 					continue;
 				
 				$found = $link;
