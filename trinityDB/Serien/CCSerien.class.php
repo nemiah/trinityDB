@@ -62,6 +62,7 @@ class CCSerien implements iCustomContent {
 		
 		$AC = anyC::get("Serie");
 		$AC->addAssocV3("status", "=", "Continuing");
+		$AC->addAssocV3("status", "=", "Upcoming", "OR");
 		$AC->addOrderV3("status");
 		$AC->addOrderV3("name");
 		#$AC->setLimitV3(10);

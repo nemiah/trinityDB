@@ -40,13 +40,14 @@ class thetvdbcomAdapter extends EpguideAdapter implements iEpguideAdapter {
 	}
 
 	private function getServerTime(){
-		if(self::$serverTime != null) return self::$serverTime;
+		return time();
+		/*if(self::$serverTime != null) return self::$serverTime;
 
 		$content = file_get_contents(self::$mirror."/api/Updates.php?type=none");
 		$serverTime = new SimpleXMLElement($content);
 		self::$serverTime = $serverTime->Time."";
 
-		return self::$serverTime;
+		return self::$serverTime;*/
 	}
 
 	public function getInfo($name, $language = "en"){
