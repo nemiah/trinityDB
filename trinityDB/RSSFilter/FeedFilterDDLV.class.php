@@ -77,6 +77,7 @@ class FeedFilterDDLV implements iFeedFilter {
 			$hosts["Uploaded.to"] = "uploaded";
 
 		$hosts["openload.co"] = "openload";
+		$hosts["rapidgator.net"] = "rapidgator";
 		
 		return $hosts;
 	}
